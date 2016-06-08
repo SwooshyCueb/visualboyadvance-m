@@ -17,6 +17,8 @@ protected:
 };
 
 #ifndef NO_OGL
+#include <GL/glxew.h>
+#include <GL/glut.h>
 #include <wx/glcanvas.h>
 
 class GLDrawingPanel : public DrawingPanel, public wxGLCanvas

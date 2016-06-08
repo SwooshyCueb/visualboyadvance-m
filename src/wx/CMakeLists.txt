@@ -116,6 +116,7 @@ SET( SRC_WX
    widgets/joyedit.cpp
    widgets/sdljoy.cpp
    widgets/wxmisc.cpp
+   render.cpp
    # probably ought to be in common
    ../sdl/text.cpp
    # from external source with minor modifications
@@ -144,6 +145,7 @@ SET( HDR_WX
    widgets/wx/sdljoy.h
    widgets/wx/webupdatedef.h
    widgets/wx/wxmisc.h
+   render.h
    # probably ought to be in common
    ../sdl/text.h
    # from external source with minor modifications

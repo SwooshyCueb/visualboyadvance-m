@@ -2076,7 +2076,10 @@ void BasicDrawingPanel::DrawArea(wxWindowDC &dc)
 #include <OpenGL/OpenGL.h>
 #endif
 #ifdef __WXGTK__  // should actually check for X11, but GTK implies X11
-#include <GL/glx.h>
+//#include <GL/glx.h>
+#include <GL/glxew.h>
+#include <GL/glut.h>
+#include "render.h"
 #endif
 #ifdef __WXMSW__
 #include <GL/glext.h>
@@ -2137,27 +2140,7 @@ GLDrawingPanel::~GLDrawingPanel()
 
 void GLDrawingPanel::Init()
 {
-	// taken from GTK front end almost verbatim
-	glDisable(GL_CULL_FACE);
-	glEnable(GL_TEXTURE_2D);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, 1.0, 1.0, 0.0, 0.0, 1.0);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	vlist = glGenLists(1);
-	glNewList(vlist, GL_COMPILE);
-	glBegin(GL_TRIANGLE_STRIP);
-	glTexCoord2f(0.0, 0.0);
-	glVertex3i(0, 0, 0);
-	glTexCoord2f(1.0, 0.0);
-	glVertex3i(1, 0, 0);
-	glTexCoord2f(0.0, 1.0);
-	glVertex3i(0, 1, 0);
-	glTexCoord2f(1.0, 1.0);
-	glVertex3i(1, 1, 0);
-	glEnd();
-	glEndList();
+    vbaGL::initGL();
 	glGenTextures(1, &texid);
 	glBindTexture(GL_TEXTURE_2D, texid);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
@@ -2240,7 +2223,7 @@ void GLDrawingPanel::DrawArea(wxWindowDC &dc)
 #endif
 		glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, width * scale, height * scale,
 		             0, tex_fmt, todraw + rowlen * (out_16 ? 2 : 4) * scale);
-		glCallList(vlist);
+        vbaGL::draw();
 	}
 	else
 		glClear(GL_COLOR_BUFFER_BIT);
