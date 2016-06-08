@@ -2141,15 +2141,13 @@ GLDrawingPanel::~GLDrawingPanel()
 void GLDrawingPanel::Init()
 {
     vbaGL::initGL();
-	glGenTextures(1, &texid);
-	glBindTexture(GL_TEXTURE_2D, texid);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-	                gopts.bilinear ? GL_LINEAR : GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-	                gopts.bilinear ? GL_LINEAR : GL_NEAREST);
-#define int_fmt out_16 ? GL_RGB5 : GL_RGB
-#define tex_fmt out_16 ? GL_BGRA : GL_RGBA, \
-                out_16 ? GL_UNSIGNED_SHORT_1_5_5_5_REV : GL_UNSIGNED_BYTE
+    vbaGL::base_sz.x = width;
+    vbaGL::base_sz.y = height;
+    vbaGL::t_init = new vbaTex(scale);
+    vbaGL::t_init->setResizeFilter(gopts.bilinear ? GL_LINEAR : GL_NEAREST);
+//#define int_fmt out_16 ? GL_RGB5 : GL_RGB
+//#define tex_fmt out_16 ? GL_BGRA : GL_RGBA, \
+//                out_16 ? GL_UNSIGNED_SHORT_1_5_5_5_REV : GL_UNSIGNED_BYTE
 #if 0
 	texsize = width > height ? width : height;
 	texsize *= scale;
@@ -2163,7 +2161,7 @@ void GLDrawingPanel::Init()
 #else
 	// but really, most cards support non-p2 and rect
 	// if not, use cairo or wx renderer
-	glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, width * scale, height * scale, 0, tex_fmt, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, width * scale, height * scale, 0, tex_fmt, NULL);
 #endif
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	// non-portable vsync code
@@ -2221,8 +2219,7 @@ void GLDrawingPanel::DrawArea(wxWindowDC &dc)
 			glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
 
 #endif
-		glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, width * scale, height * scale,
-		             0, tex_fmt, todraw + rowlen * (out_16 ? 2 : 4) * scale);
+        vbaGL::t_init->setData(todraw + rowlen * (out_16 ? 2 : 4) * scale);
         vbaGL::draw();
 	}
 	else
@@ -2238,6 +2235,8 @@ void GLDrawingPanel::OnSize(wxSizeEvent &ev)
 
 	int w, h;
 	GetClientSize(&w, &h);
+    vbaGL::vwpt_sz.x = w;
+    vbaGL::vwpt_sz.y = h;
 #if wxCHECK_VERSION(2,9,0) || !defined(__WXMAC__)
 	SetCurrent(ctx);
 #else
