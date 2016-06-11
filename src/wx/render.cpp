@@ -111,6 +111,7 @@ void vbaGL::setBaseSize(uint x, uint y) {
 void vbaGL::setVwptSize(uint x, uint y) {
     vwpt_sz.x = x;
     vwpt_sz.y = y;
+    glViewport(0, 0, x, y);
 }
 
 bool vbaGL::draw() {

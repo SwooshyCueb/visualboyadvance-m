@@ -2236,14 +2236,13 @@ void GLDrawingPanel::OnSize(wxSizeEvent &ev)
 		return;
 
 	int w, h;
-	GetClientSize(&w, &h);
-    GL->setVwptSize(w, h);
+    GetClientSize(&w, &h);
 #if wxCHECK_VERSION(2,9,0) || !defined(__WXMAC__)
 	SetCurrent(ctx);
 #else
 	SetCurrent();
 #endif
-	glViewport(0, 0, w, h);
+    GL->setVwptSize(w, h);
 	ev.Skip(); // propagate to parent
 }
 #endif
