@@ -2209,23 +2209,12 @@ void GLDrawingPanel::DrawArea(wxWindowDC &dc)
 	if (!did_init)
 		Init();
 
-	if (todraw)
-	{
-		int rowlen = width * scale + (out_16 ? 2 : 1);
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, rowlen);
-#if wxBYTE_ORDER == wxBIG_ENDIAN
-
-		// FIXME: is this necessary?
-		if (out_16)
-			glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
-
-#endif
-        GL->setTexData(todraw + rowlen * (out_16 ? 2 : 4) * scale);
+    if (todraw) {
+        GL->setTexData(todraw + (width * scale + 1) * (out_16 ? 2 : 4) * scale);
         GL->draw();
         GL->glErrPrint();
-	}
-	else
-		glClear(GL_COLOR_BUFFER_BIT);
+    } else
+        GL->clear();
 
 	SwapBuffers();
 }

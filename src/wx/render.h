@@ -173,6 +173,7 @@ public:
     bool setTexData(const GLvoid *data);
 
     bool draw();
+    void clear();
     glErr glErrGet();
     void glErrPrint();
 

@@ -116,12 +116,28 @@ void vbaGL::setVwptSize(uint x, uint y) {
 }
 
 bool vbaGL::draw() {
-    #ifndef VBA_TRIANGLE_STRIP
-    glDrawArrays(GL_QUADS, 0, 4);
-    #else
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    #endif
+    for (uint i = 0; i < textures.size(); i++) {
+        textures[i].bind();
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, textures[i].size.x *
+                      textures[i].scale + 1);
+        if (i != textures.size() - 1) {
+            textures[i+1].bindBuffer();
+            glViewport(0, 0, textures[i+1].size.x, textures[i+1].size.y);
+        } else {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glViewport(0, 0, vwpt_sz.x, vwpt_sz.y);
+        }
+        #ifndef VBA_TRIANGLE_STRIP
+        glDrawArrays(GL_QUADS, 0, 4);
+        #else
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        #endif
+    }
     return !glCheckErr();
+}
+
+void vbaGL::clear() {
+    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 /* Might do this differently */
