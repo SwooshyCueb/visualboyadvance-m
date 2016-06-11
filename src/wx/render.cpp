@@ -245,7 +245,7 @@ void vbaTex::setResizeFilter(GLint filter) {
     bind();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-    if (filter = GL_NEAREST)
+    if (filter == GL_NEAREST)
         blitmask = (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     else
         blitmask = GL_COLOR_BUFFER_BIT;
