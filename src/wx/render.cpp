@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <deque>
 #include <queue>
+#include <stack>
 
 #ifndef VBA_TRIANGLE_STRIP
 GLfloat vbaGL::draw_vert[8] = {
@@ -45,6 +46,7 @@ inline bool vbaGL::glPushErr(const char *file, int line, const char *func) {
         //err = new glErr(val, file, line - 1, func);
         //glErrs.push(err);
         glErrs.emplace(val, file, line - 1, func);
+        vbaErrs.push(VBAERR_GLERR);
         ret = true;
     }
     return ret;
@@ -70,37 +72,32 @@ void vbaGL::glErrPrint() {
 }
 
 vbaGL::vbaGL() {
-    if (glewInit() != GLEW_OK)
+    if (glewInit() != GLEW_OK) {
+        vbaErrs.push(VBAERR_GLINIT);
         throw VBAERR_GLINIT;
+    }
     glDisable(GL_CULL_FACE);
-    glCheckErr();
     glEnable(GL_TEXTURE_2D);
-    glCheckErr();
     glMatrixMode(GL_PROJECTION);
-    glCheckErr();
     glEnableClientState(GL_VERTEX_ARRAY);
-    glCheckErr();
     glEnableClientState(GL_TEXTURE_COORD_ARRAY_EXT);
-    glCheckErr();
     glLoadIdentity();
-    glCheckErr();
     //glOrtho(0.0, 1.0, 1.0, 0.0, 0.0, 1.0);
     glOrtho(0.0, 1.0, 1.0, 0.0, 1.0, 0.0);
-    glCheckErr();
     //glMatrixMode(GL_TEXTURE);
     //glLoadIdentity();
     //glScalef(1.0f, -1.0f, 1.0f);
     glMatrixMode(GL_MODELVIEW);
-    glCheckErr();
 
     #ifndef VBA_TRIANGLE_STRIP
     glVertexPointer(2, GL_FLOAT, 0, draw_vert);
     #else
     glVertexPointer(3, GL_INT, 0, draw_vert);
     #endif
-    glCheckErr();
     glTexCoordPointer(2, GL_FLOAT, 0, draw_coord);
-    glCheckErr();
+    if (glCheckErr()) {
+        throw VBAERR_GLERR;
+    }
 }
 
 void vbaGL::setBaseSize(uint x, uint y) {
@@ -189,6 +186,7 @@ bool vbaTex::remBuffer() {
     glDeleteFramebuffers(1, &texbuff);
     glDeleteRenderbuffers(1, &rdrbuff);
     hasBuffer = false;
+    glCheckErr();
     return true;
 }
 
@@ -202,37 +200,31 @@ bool vbaTex::bind() {
 
 bool vbaTex::bind(uint num) {
     glActiveTexture(GL_TEXTURE0 + num);
-    glCheckErr();
     glBindTexture(GL_TEXTURE_2D, texture);
     glCheckErr();
     return true;
 }
 
-bool vbaTex::bindBuffer() {
+bool vbaTex::bindBuffer(GLenum target) {
     if (hasBuffer) {
-        glBindFramebuffer(GL_FRAMEBUFFER, texbuff);
+        glBindFramebuffer(target, texbuff);
+        glCheckErr();
         return true;
     } else {
         return false;
     }
+}
+
+bool vbaTex::bindBuffer() {
+    return bindBuffer(GL_FRAMEBUFFER);
 }
 
 bool vbaTex::bindBufferRead() {
-    if (hasBuffer) {
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, texbuff);
-        return true;
-    } else {
-        return false;
-    }
+    return bindBuffer(GL_READ_FRAMEBUFFER);
 }
 
 bool vbaTex::bindBufferWrite() {
-    if (hasBuffer) {
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, texbuff);
-        return true;
-    } else {
-        return false;
-    }
+    return bindBuffer(GL_DRAW_FRAMEBUFFER);
 }
 
 bool vbaTex::setData(const GLvoid *data) {
@@ -252,9 +244,7 @@ void vbaTex::setResizeFilter(GLint filter) {
     resizefilt = filter;
     bind();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-    glCheckErr();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-    glCheckErr();
     if (filter = GL_NEAREST)
         blitmask = (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     else
@@ -265,7 +255,6 @@ void vbaTex::setResizeFilter(GLint filter) {
 void vbaTex::setOobBehavior(GLint behavior) {
     bind();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, behavior);
-    glCheckErr();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, behavior);
     glCheckErr();
 }

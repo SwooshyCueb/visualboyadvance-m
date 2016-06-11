@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <deque>
 #include <queue>
+#include <stack>
 
 //#define VBA_TRIANGLE_STRIP
 
@@ -100,6 +101,17 @@ public:
     bool init = false;
 };
 
+// Tenative; will probably move to a different file
+enum vbaErr {
+    VBAERR_OK,
+    VBAERR_UNKN,
+    VBAERR_GLERR,
+    VBAERR_GLINIT,
+    VBAERR_NODATA,
+    VBAERR_NOBUFF,
+    VBAERR_INVALIDARGS
+};
+
 /* vbaTex
  * Texture object for use in vbaGL
  */
@@ -122,6 +134,7 @@ public:
     bool initBuffer();
     bool remBuffer();
 
+    bool bindBuffer(GLenum target);
     bool bindBuffer();
     bool bindBufferRead();
     bool bindBufferWrite();
@@ -172,6 +185,7 @@ private:
     std::deque<vbaTex> textures;
     GLuint largest_scale;
     std::queue<glErr> glErrs;
+    std::stack<vbaErr> vbaErrs;
 
     #ifndef VBA_TRIANGLE_STRIP
     static GLfloat draw_vert[8];
@@ -180,14 +194,6 @@ private:
     #endif
     static GLfloat draw_coord[8];
     static GLenum DrawBuffers[1];
-};
-
-// Tenative; will probably move to a different file
-enum vbaErr {
-    VBAERR_OK,
-    VBAERR_UNKN,
-    VBAERR_GLINIT,
-    VBAERR_NODATA
 };
 
 #endif
