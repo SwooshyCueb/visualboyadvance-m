@@ -121,9 +121,7 @@ bool vbaGL::draw() {
     #else
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     #endif
-    glCheckErr();
-
-    return true;
+    return !glCheckErr();
 }
 
 /* Might do this differently */
@@ -138,7 +136,7 @@ bool vbaGL::setTexData(const GLvoid *data) {
 }
 
 inline bool vbaTex::glPushErr(const char *file, int line, const char *func) {
-    ctx->glPushErr(file, line, func);
+    return ctx->glPushErr(file, line, func);
 }
 
 /* Previously, passing 0 as the mult here would create a texture the size of the
@@ -178,6 +176,7 @@ bool vbaTex::initBuffer() {
                            GL_TEXTURE_2D, texture, 0);
     glDrawBuffers(1, ctx->DrawBuffers);
     hasBuffer = true;
+    return !glCheckErr();
 }
 
 bool vbaTex::remBuffer() {
@@ -186,30 +185,26 @@ bool vbaTex::remBuffer() {
     glDeleteFramebuffers(1, &texbuff);
     glDeleteRenderbuffers(1, &rdrbuff);
     hasBuffer = false;
-    glCheckErr();
-    return true;
+    return !glCheckErr();
 }
 
 bool vbaTex::bind() {
     //glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(GL_TEXTURE_2D, texture);
     //bind(0);
-    glCheckErr();
-    return true;
+    return !glCheckErr();
 }
 
 bool vbaTex::bind(uint num) {
     glActiveTexture(GL_TEXTURE0 + num);
     glBindTexture(GL_TEXTURE_2D, texture);
-    glCheckErr();
-    return true;
+    return !glCheckErr();
 }
 
 bool vbaTex::bindBuffer(GLenum target) {
     if (hasBuffer) {
         glBindFramebuffer(target, texbuff);
-        glCheckErr();
-        return true;
+        return !glCheckErr();
     } else {
         return false;
     }
@@ -231,8 +226,7 @@ bool vbaTex::setData(const GLvoid *data) {
     bind();
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y, 0, GL_RGBA,
                  GL_UNSIGNED_BYTE, data);
-    glCheckErr();
-    return true;
+    return !glCheckErr();
 }
 
 void vbaTex::updSize() {
