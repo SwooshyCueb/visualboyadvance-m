@@ -2140,11 +2140,13 @@ GLDrawingPanel::~GLDrawingPanel()
 
 void GLDrawingPanel::Init()
 {
-    vbaGL::initGL();
-    vbaGL::base_sz.x = width;
-    vbaGL::base_sz.y = height;
-    vbaGL::t_init = new vbaTex(scale);
-    vbaGL::t_init->setResizeFilter(gopts.bilinear ? GL_LINEAR : GL_NEAREST);
+    int w, h;
+    GL = new vbaGL();
+    GetClientSize(&w, &h);
+    GL->setVwptSize(w, h);
+    GL->setBaseSize(width, height);
+    GL->genTextures(scale);
+    GL->glErrPrint();
 //#define int_fmt out_16 ? GL_RGB5 : GL_RGB
 //#define tex_fmt out_16 ? GL_BGRA : GL_RGBA, \
 //                out_16 ? GL_UNSIGNED_SHORT_1_5_5_5_REV : GL_UNSIGNED_BYTE
@@ -2163,7 +2165,6 @@ void GLDrawingPanel::Init()
 	// if not, use cairo or wx renderer
     //glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, width * scale, height * scale, 0, tex_fmt, NULL);
 #endif
-	glClearColor(0.0, 0.0, 0.0, 1.0);
 	// non-portable vsync code
 #if defined(__WXGTK__) && defined(GLX_SGI_swap_control)
 	static PFNGLXSWAPINTERVALSGIPROC si = NULL;
@@ -2219,8 +2220,9 @@ void GLDrawingPanel::DrawArea(wxWindowDC &dc)
 			glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
 
 #endif
-        vbaGL::t_init->setData(todraw + rowlen * (out_16 ? 2 : 4) * scale);
-        vbaGL::draw();
+        GL->setTexData(todraw + rowlen * (out_16 ? 2 : 4) * scale);
+        GL->draw();
+        GL->glErrPrint();
 	}
 	else
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -2235,8 +2237,7 @@ void GLDrawingPanel::OnSize(wxSizeEvent &ev)
 
 	int w, h;
 	GetClientSize(&w, &h);
-    vbaGL::vwpt_sz.x = w;
-    vbaGL::vwpt_sz.y = h;
+    GL->setVwptSize(w, h);
 #if wxCHECK_VERSION(2,9,0) || !defined(__WXMAC__)
 	SetCurrent(ctx);
 #else

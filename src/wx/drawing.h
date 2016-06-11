@@ -20,6 +20,7 @@ protected:
 #include <GL/glxew.h>
 #include <GL/glut.h>
 #include <wx/glcanvas.h>
+#include <render.h>
 
 class GLDrawingPanel : public DrawingPanel, public wxGLCanvas
 {
@@ -40,6 +41,7 @@ protected:
 	void Init();
 	GLuint texid, vlist;
 	int texsize;
+    vbaGL *GL;
 
 	DECLARE_CLASS()
 	DECLARE_EVENT_TABLE()
