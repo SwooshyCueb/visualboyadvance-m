@@ -24,6 +24,15 @@ class glErr;
 class vbaGL;
 class vbaTex;
 
+typedef struct vbaDrawArrs {
+    #ifndef VBA_TRIANGLE_STRIP
+    GLfloat vert[8];
+    #else
+    GLint vert[12];
+    #endif
+    GLfloat coord[8];
+} vbaDrawArrs;
+
 /* glErr
  * OpenGL error info object
  *
@@ -171,6 +180,8 @@ public:
 
     bool genTextures(uint scale);
     bool setTexData(const GLvoid *data);
+
+    vbaDrawArrs genDrawArrs(uint x, uint y);
 
     bool draw();
     void clear();
