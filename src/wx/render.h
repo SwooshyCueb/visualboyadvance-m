@@ -106,7 +106,7 @@ class vbaTex {
     friend class vbaGL;
 public:
     vbaTex(uint mult, vbaGL *globj);
-    //~vbaTex();
+    ~vbaTex();
 
     vbaSize getSize();
 
@@ -119,7 +119,7 @@ public:
     bool bind(uint num);
 
     bool initBuffer();
-    //bool remBuffer();
+    bool remBuffer();
 
     bool bindBuffer();
     bool bindBufferRead();

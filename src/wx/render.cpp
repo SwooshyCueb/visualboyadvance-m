@@ -155,6 +155,12 @@ vbaTex::vbaTex(uint mult, vbaGL *globj) {
     glClearColor(0.0, 0.0, 0.0, 1.0);
 }
 
+vbaTex::~vbaTex() {
+    if (hasBuffer)
+        remBuffer();
+    glDeleteTextures(1, &texture);
+}
+
 bool vbaTex::initBuffer() {
     glGenFramebuffers(1, &texbuff);
     glGenRenderbuffers(1, &rdrbuff);
@@ -165,6 +171,15 @@ bool vbaTex::initBuffer() {
                            GL_TEXTURE_2D, texture, 0);
     glDrawBuffers(1, ctx->DrawBuffers);
     hasBuffer = true;
+}
+
+bool vbaTex::remBuffer() {
+    if (!hasBuffer)
+        return false;
+    glDeleteFramebuffers(1, &texbuff);
+    glDeleteRenderbuffers(1, &rdrbuff);
+    hasBuffer = false;
+    return true;
 }
 
 bool vbaTex::bind() {
