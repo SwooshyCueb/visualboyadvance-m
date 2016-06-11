@@ -106,6 +106,10 @@ vbaGL::vbaGL() {
 void vbaGL::setBaseSize(uint x, uint y) {
     base_sz.x = x;
     base_sz.y = y;
+
+    for (uint i = 0; i < textures.size(); i++) {
+        textures[i].updSize();
+    }
 }
 
 void vbaGL::setVwptSize(uint x, uint y) {
@@ -140,9 +144,14 @@ inline bool vbaTex::glPushErr(const char *file, int line, const char *func) {
     ctx->glPushErr(file, line, func);
 }
 
+/* Previously, passing 0 as the mult here would create a texture the size of the
+ * viewport. I'm removing this behavior for now.
+ */
 vbaTex::vbaTex(uint mult, vbaGL *globj) {
     ctx = globj;
     scale = mult;
+    size.x = ctx->base_sz.x * scale;
+    size.y = ctx->base_sz.y * scale;
     unit = ctx->textures.size();
     glGenTextures(1, &texture);
     setData(NULL);
@@ -227,25 +236,16 @@ bool vbaTex::bindBufferWrite() {
 }
 
 bool vbaTex::setData(const GLvoid *data) {
-    vbaSize sz = getSize();
     bind();
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, sz.x, sz.y, 0, GL_RGBA,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y, 0, GL_RGBA,
                  GL_UNSIGNED_BYTE, data);
     glCheckErr();
     return true;
 }
 
-vbaSize vbaTex::getSize(){
-    vbaSize ret;
-    if (!scale) {
-        // Might use largest_scale here instead
-        ret.x = ctx->vwpt_sz.x;
-        ret.y = ctx->vwpt_sz.y;
-    } else {
-        ret.x = ctx->base_sz.x * scale;
-        ret.y = ctx->base_sz.y * scale;
-    }
-    return ret;
+void vbaTex::updSize() {
+    size.x = ctx->base_sz.x * scale;
+    size.y = ctx->base_sz.y * scale;
 }
 
 void vbaTex::setResizeFilter(GLint filter) {

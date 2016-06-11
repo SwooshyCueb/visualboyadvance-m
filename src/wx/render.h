@@ -16,6 +16,7 @@ typedef struct vbaSize {
     GLuint x;
     GLuint y;
 } vbaSize;
+// TODO: Turn vbaSize into a class that can be multiplied by integers
 
 // We need to forward declare some classes.
 class glErr;
@@ -108,7 +109,7 @@ public:
     vbaTex(uint mult, vbaGL *globj);
     ~vbaTex();
 
-    vbaSize getSize();
+    void updSize();
 
     void setResizeFilter(GLint filter);
     void setOobBehavior(GLint behavior);
@@ -133,6 +134,7 @@ private:
     GLuint scale;
     GLint resizefilt;
     GLint blitmask;
+    vbaSize size;
 
     bool hasBuffer = false;
 
