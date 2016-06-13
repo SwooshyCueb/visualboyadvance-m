@@ -76,9 +76,7 @@ vbaGL::vbaGL() {
         vbaErrs.push(VBAERR_GLINIT);
         throw VBAERR_GLINIT;
     }
-    glDisable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
-    glEnable(GL_DEPTH_TEST);
     glMatrixMode(GL_PROJECTION);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY_EXT);
@@ -152,6 +150,8 @@ bool vbaGL::draw() {
         textures[i].bind();
         glPixelStorei(GL_UNPACK_ROW_LENGTH, textures[i].size.x + 1);
         if (i != textures.size() - 1) {
+            glDisable(GL_CULL_FACE);
+            glDisable(GL_DEPTH_TEST);
             /*
             vbaDrawArrs drawArrs = genDrawArrs(textures[i+1].size.x,
                                                textures[i+1].size.y);
@@ -166,6 +166,8 @@ bool vbaGL::draw() {
             //glViewport(0, 0, textures[i+1].size.x, textures[i+1].size.y);
             //glViewport(0, 0, 1, 1);
         } else {
+            glEnable(GL_CULL_FACE);
+            glEnable(GL_DEPTH_TEST);
             /*
             #ifndef VBA_TRIANGLE_STRIP
             glVertexPointer(2, GL_FLOAT, 0, draw_vert);
@@ -221,7 +223,7 @@ vbaTex::vbaTex(uint mult, vbaGL *globj) {
     glGenTextures(1, &texture);
     setData(NULL);
     setResizeFilter(GL_NEAREST);
-    //setOobBehavior(GL_CLAMP_TO_EDGE);
+    setOobBehavior(GL_CLAMP_TO_EDGE);
     hasBuffer = false;
     if (mult) {
         ctx->largest_scale =
