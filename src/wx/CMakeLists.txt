@@ -116,7 +116,11 @@ SET( SRC_WX
    widgets/joyedit.cpp
    widgets/sdljoy.cpp
    widgets/wxmisc.cpp
-   render.cpp
+   swooshboy/glerr.cpp
+   swooshboy/size.cpp
+   swooshboy/swooshboy.cpp
+   swooshboy/tex.cpp
+   swooshboy/vbagl.cpp
    # probably ought to be in common
    ../sdl/text.cpp
    # from external source with minor modifications
@@ -145,7 +149,12 @@ SET( HDR_WX
    widgets/wx/sdljoy.h
    widgets/wx/webupdatedef.h
    widgets/wx/wxmisc.h
-   render.h
+   swooshboy/glerr.h
+   swooshboy/sberr.h
+   swooshboy/size.h
+   swooshboy/swooshboy.h
+   swooshboy/tex.h
+   swooshboy/vbagl.h
    # probably ought to be in common
    ../sdl/text.h
    # from external source with minor modifications

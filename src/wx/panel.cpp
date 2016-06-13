@@ -2079,7 +2079,7 @@ void BasicDrawingPanel::DrawArea(wxWindowDC &dc)
 //#include <GL/glx.h>
 #include <GL/glxew.h>
 #include <GL/glut.h>
-#include "render.h"
+#include "swooshboy/swooshboy.h"
 #endif
 #ifdef __WXMSW__
 #include <GL/glext.h>
