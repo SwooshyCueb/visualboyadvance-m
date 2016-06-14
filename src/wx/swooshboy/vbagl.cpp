@@ -77,11 +77,20 @@ void vbaGL::setBaseSize(uint x, uint y) {
 void vbaGL::setVwptSize(uint x, uint y) {
     vwpt_sz.x = x;
     vwpt_sz.y = y;
-    glViewport(0, 0, x, y);
+    glVwpt(x, y);
 
     for (uint i = 0; i < textures.size(); i++) {
         textures[i].updSize();
     }
+}
+
+inline bool vbaGL::glVwpt(vbaSize sz) {
+    return glVwpt(sz.x, sz.y);
+}
+
+inline bool vbaGL::glVwpt(uint x, uint y) {
+    glViewport(0, 0, x, y);
+    return !glCheckErr();
 }
 
 vbaDrawArrs vbaGL::genDrawArrs(uint x, uint y) {
@@ -118,7 +127,8 @@ bool vbaGL::draw() {
         if (i != textures.size() - 1) {
             glDisable(GL_CULL_FACE);
             glDisable(GL_DEPTH_TEST);
-            /*
+
+            // Might end up dropping this behavior. Just experimenting for now
             vbaDrawArrs drawArrs = genDrawArrs(textures[i+1].size.x,
                                                textures[i+1].size.y);
             #ifndef VBA_TRIANGLE_STRIP
@@ -127,25 +137,26 @@ bool vbaGL::draw() {
             glVertexPointer(3, GL_INT, 0, drawArrs.vert);
             #endif
             glTexCoordPointer(2, GL_FLOAT, 0, drawArrs.coord);
-            */
+
             textures[i+1].bindBuffer();
-            //glViewport(0, 0, textures[i+1].size.x, textures[i+1].size.y);
-            //glViewport(0, 0, 1, 1);
+            glVwpt(textures[i+1].size);
+            //glVwpt(1, 1);
         } else {
             glEnable(GL_CULL_FACE);
             glEnable(GL_DEPTH_TEST);
-            /*
+
             #ifndef VBA_TRIANGLE_STRIP
             glVertexPointer(2, GL_FLOAT, 0, draw_vert);
             #else
             glVertexPointer(3, GL_INT, 0, draw_vert);
             #endif
             glTexCoordPointer(2, GL_FLOAT, 0, draw_coord);
-            */
+
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            glViewport(0, 0, vwpt_sz.x, vwpt_sz.y);
+            glVwpt(vwpt_sz);
         }
         #ifndef VBA_TRIANGLE_STRIP
+
         glDrawArrays(GL_QUADS, 0, 4);
         #else
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -162,7 +173,7 @@ void vbaGL::clear() {
 bool vbaGL::genTextures(uint scale) {
     textures.emplace_back(scale, this);
     textures.back().initBuffer();
-    textures.emplace_back(scale, this);
+    textures.emplace_back(0, this);
     return true;
 }
 

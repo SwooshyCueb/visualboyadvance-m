@@ -23,6 +23,9 @@ public:
     bool genTextures(uint scale);
     bool setTexData(const GLvoid *data);
 
+    bool glVwpt(uint x, uint y);
+    bool glVwpt(vbaSize sz);
+
     vbaDrawArrs genDrawArrs(uint x, uint y);
 
     bool draw();
