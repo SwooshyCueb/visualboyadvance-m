@@ -9,7 +9,6 @@ vbaGL::vbaGL() {
         vbaErrs.push(VBAERR_GLINIT);
         throw VBAERR_GLINIT;
     }
-    glEnable(GL_TEXTURE_2D);
     glMatrixMode(GL_PROJECTION);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY_EXT);

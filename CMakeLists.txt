@@ -242,7 +242,7 @@ ENDIF()
 
 SET( CMAKE_C_FLAGS_RELEASE "-O3")
 SET( CMAKE_CXX_FLAGS_RELEASE "-O3")
-SET( CMAKE_C_FLAGS_DEBUG "-g -D_DEBUG -Wall -Wno-reorder -Wno-switch -Wno-deprecated-declarations -Wno-write-strings -Wno-comment")
+SET( CMAKE_C_FLAGS_DEBUG "-g -D_DEBUG -Wall -Wno-switch -Wno-deprecated-declarations -Wno-write-strings -Wno-comment")
 SET( CMAKE_CXX_FLAGS_DEBUG "-g -D_DEBUG -Wall -Wno-reorder -Wno-switch -Wno-deprecated-declarations -Wno-write-strings -Wno-comment")
 
 if (WIN32)

@@ -60,10 +60,6 @@ private:
     static GLfloat draw_coord[8];
     static GLenum DrawBuffers[1];
 
-    GLuint vtxArrModVwMtx;
-    GLuint vtxArrProjMtx;
-    GLuint vtxBuffModVwMtx;
-    GLuint vtxBuffProjMtx;
     GLuint vtxArrVtx;
     GLuint vtxBuffVtx;
     GLuint vtxArrTexCoord;
