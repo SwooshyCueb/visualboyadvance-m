@@ -4,20 +4,22 @@
 #include "swooshboy/glsl/dummy.fragment.glsl.h"
 
 class glslSrc {
+    friend class glslShader;
 public:
     glslSrc();
-    void loadSrc(const unsigned char *src_in, const uint len);
+    void loadSrc(unsigned char *src_in, const uint len);
     #define LOAD_GLSL_SRC(obj, name) \
-        obj.loadSrc(name##_glsl, name##_glsl_len)
+        obj.loadSrc(const_cast<unsigned char *>(name##_glsl), name##_glsl_len)
 
 private:
-    const char *src_main;
+    char *src_main;
     uint src_main_len;
 };
 
 class glslShader {
 public:
-    glslShader(vbaGL *globj);
+    glslShader(vbaGL *globj, GLenum type_in);
+    bool setSrc(glslSrc *srcobj);
 
     bool compile();
     bool printInfoLog();
@@ -31,9 +33,17 @@ private:
     GLuint shader;
 
     GLint compiled;
+    GLenum type;
 
     glslSrc *src;
+    GLchar *glsl[5];
+    GLint glsl_len[5];
     vbaGL *ctx;
+
+    static GLchar *glsl_version;
+    static GLchar *glsl_defines_global;
+    static GLchar *glsl_defines_vert;
+    static GLchar *glsl_defines_frag;
 };
 
 class glslProg {

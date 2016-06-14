@@ -170,8 +170,11 @@ void vbaGL::clear() {
 }
 
 bool vbaGL::initShaders() {
-    glslSrc dummyfrag;
-    LOAD_GLSL_SRC(dummyfrag, dummy_fragment);
+    glslSrc dummyfrag_src;
+    LOAD_GLSL_SRC(dummyfrag_src, dummy_fragment);
+    glslShader dummyfrag_shd(this, GL_FRAGMENT_SHADER);
+    dummyfrag_shd.setSrc(&dummyfrag_src);
+
 }
 
 /* Might do this differently */
