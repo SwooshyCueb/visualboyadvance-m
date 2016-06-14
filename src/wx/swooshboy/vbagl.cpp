@@ -2,6 +2,7 @@
 #include <GL/glut.h>
 #include "swooshboy.h"
 #include "vbagl.h"
+#include "glsl.h"
 
 vbaGL::vbaGL() {
     if (glewInit() != GLEW_OK) {
@@ -166,6 +167,11 @@ bool vbaGL::draw() {
 
 void vbaGL::clear() {
     glClear(GL_COLOR_BUFFER_BIT);
+}
+
+bool vbaGL::initShaders() {
+    glslSrc dummyfrag;
+    LOAD_GLSL_SRC(dummyfrag, dummy_fragment);
 }
 
 /* Might do this differently */

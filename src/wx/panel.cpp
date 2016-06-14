@@ -2145,6 +2145,7 @@ void GLDrawingPanel::Init()
     GetClientSize(&w, &h);
     GL->setVwptSize(w, h);
     GL->setBaseSize(width, height);
+    GL->initShaders();
     GL->genTextures(scale);
     GL->glErrPrint();
 //#define int_fmt out_16 ? GL_RGB5 : GL_RGB

@@ -26,6 +26,8 @@ public:
     bool genTextures(uint scale);
     bool setTexData(const GLvoid *data);
 
+    bool initShaders();
+
     bool glVwpt(uint x, uint y);
     bool glVwpt(vbaSize sz);
 

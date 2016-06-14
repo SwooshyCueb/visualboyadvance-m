@@ -1,12 +1,14 @@
 #include "swooshboy.h"
 #include "glsl.h"
 
-glslSrc::glslSrc(vbaGL *globj) {
-    ctx = globj;
+glslSrc::glslSrc() {
+    src_main = NULL;
+    src_main_len = 0;
 }
 
-inline bool glslSrc::glPushErr(const char *file, int line, const char *func) {
-    return ctx->glPushErr(file, line, func);
+void glslSrc::loadSrc(const unsigned char *src_in, const uint len) {
+    src_main = (const char*)src_in;
+    src_main_len = len;
 }
 
 glslShader::glslShader(vbaGL *globj) {

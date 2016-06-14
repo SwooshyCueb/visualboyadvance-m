@@ -86,6 +86,11 @@ ADD_CUSTOM_COMMAND(OUTPUT builtin-over.h
                    COMMAND ${CMAKE_COMMAND} -DINFILE=${CMAKE_CURRENT_SOURCE_DIR}/../vba-over.ini -DOUTFILE=builtin-over.h -DVARNAME=builtin_over -P ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.cmake
 		   DEPENDS ../vba-over.ini)
 
+# glsl
+ADD_CUSTOM_COMMAND(OUTPUT swooshboy/glsl/dummy.fragment.glsl.h
+                   COMMAND ${CMAKE_COMMAND} -DINFILE=${CMAKE_CURRENT_SOURCE_DIR}/swooshboy/glsl/dummy.fragment.glsl -DOUTFILE=swooshboy/glsl/dummy.fragment.glsl.h -DVARNAME=dummy_fragment_glsl -P ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.cmake
+           DEPENDS swooshboy/glsl/dummy.fragment.glsl)
+
 
 # I don't like duplicating/triplicating code, so I only declare
 # event handlers once, and copy them in other places they are needed
@@ -133,6 +138,7 @@ SET( SRC_WX
    builtin-over.h
    cmdhandlers.h
    cmd-evtable.h
+   swooshboy/glsl/dummy.fragment.glsl.h
    #Icon File
    xrc/vbam.xpm
 )
@@ -165,8 +171,13 @@ SET( HDR_WX
 
 FILE(GLOB XRC_WX xrc/*.xrc)
 
+SET( GLSL_SRC
+    swooshboy/glsl/dummy.fragment.glsl
+)
+
 SET( RES_WX
     ${XRC_WX}
+    ${GLSL_SRC}
     ../vba-over.ini
 )
 
