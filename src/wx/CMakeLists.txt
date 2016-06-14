@@ -117,6 +117,7 @@ SET( SRC_WX
    widgets/sdljoy.cpp
    widgets/wxmisc.cpp
    swooshboy/glerr.cpp
+   swooshboy/glsl.cpp
    swooshboy/size.cpp
    swooshboy/swooshboy.cpp
    swooshboy/tex.cpp
@@ -150,6 +151,7 @@ SET( HDR_WX
    widgets/wx/webupdatedef.h
    widgets/wx/wxmisc.h
    swooshboy/glerr.h
+   swooshboy/glsl.h
    swooshboy/sberr.h
    swooshboy/size.h
    swooshboy/swooshboy.h

@@ -25,6 +25,7 @@ typedef struct vbaDrawArrs {
 #include "size.h"
 #include "vbagl.h"
 #include "tex.h"
+#include "glsl.h"
 
 #include <cstdio>
 #include <cstddef>

@@ -13,6 +13,9 @@
  */
 class vbaGL {
     friend class vbaTex;
+    friend class glslSrc;
+    friend class glslShader;
+    friend class glslProg;
 public:
     vbaGL();
     ~vbaGL();

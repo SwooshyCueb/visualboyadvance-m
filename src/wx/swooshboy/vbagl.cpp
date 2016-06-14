@@ -156,7 +156,6 @@ bool vbaGL::draw() {
             glVwpt(vwpt_sz);
         }
         #ifndef VBA_TRIANGLE_STRIP
-
         glDrawArrays(GL_QUADS, 0, 4);
         #else
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
