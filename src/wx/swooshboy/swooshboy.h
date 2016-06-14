@@ -33,7 +33,7 @@ typedef struct vbaDrawArrs {
 #include <queue>
 #include <stack>
 
-//#define VBA_TRIANGLE_STRI
+//#define VBA_TRIANGLE_STRIP
 
 #ifdef _DEBUG
 #define dprintf(format, ...) fprintf(stderr, format, ##__VA_ARGS__)
