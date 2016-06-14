@@ -13,7 +13,7 @@ uniform mat4 modVwMtx;
 
 void main () {
     gl_Position = modVwMtx * v_pos;
-    v_texcoord=texcoord;
+    //v_texcoord=texcoord;
 }
 
 #endif

@@ -10,10 +10,6 @@ vbaGL::vbaGL() {
         throw VBAERR_GLINIT;
     }
     glEnable(GL_TEXTURE_2D);
-    //glDisable(GL_CULL_FACE);
-    //glDisable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
-    //glEnable(GL_DEPTH_TEST);
     glMatrixMode(GL_PROJECTION);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY_EXT);
@@ -25,37 +21,6 @@ vbaGL::vbaGL() {
     //glScalef(1.0f, -1.0f, 1.0f);
     glMatrixMode(GL_MODELVIEW);
 
-    /*
-    glGenVertexArrays(1, &vtxArrModVwMtx);
-    glBindVertexArray(vtxArrModVwMtx);
-    glGenBuffers(1, &vtxBuffModVwMtx);
-    glBindBuffer(GL_ARRAY_BUFFER, vtxBuffModVwMtx);
-
-    glGenVertexArrays(1, &vtxArrProjMtx);
-    glBindVertexArray(vtxArrProjMtx);
-    glGenBuffers(1, &vtxBuffProjMtx);
-    glBindBuffer(GL_ARRAY_BUFFER, vtxBuffProjMtx);
-    */
-
-    /*
-    glGenVertexArrays(1, &vtxArrVtx);
-    glBindVertexArray(vtxArrVtx);
-    glGenBuffers(1, &vtxBuffVtx);
-    glBindBuffer(GL_ARRAY_BUFFER, vtxBuffVtx);
-    #ifndef VBA_TRIANGLE_STRIP
-    glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), draw_vert, GL_STATIC_DRAW);
-    #else
-    glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLint), draw_vert, GL_STATIC_DRAW);
-    #endif
-
-    glGenVertexArrays(1, &vtxArrTexCoord);
-    glBindVertexArray(vtxArrTexCoord);
-    glGenBuffers(1, &vtxBuffTexCoord);
-    glBindBuffer(GL_ARRAY_BUFFER, vtxBuffTexCoord);
-    glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), draw_coord, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    */
     #ifndef VBA_TRIANGLE_STRIP
     glVertexPointer(2, GL_FLOAT, 0, draw_vert);
     #else
@@ -161,33 +126,21 @@ vbaDrawArrs vbaGL::genDrawArrs(uint x, uint y) {
 
 bool vbaGL::draw() {
     for (uint i = 0; i < textures.size(); i++) {
-        //textures[i].bind();
         textures[i].bind(textures[i].unit);
         if (textures[i].hasShader) {
             textures[i].prog->activate();
-            glCheckErr();
             textures[i].prog->setPass(i);
-            glCheckErr();
             textures[i].prog->setSrcTexUnit(textures[i].unit);
-            //textures[i].prog->setSrcTexUnit(0);
-            glCheckErr();
             if (i != textures.size() - 1) {
                 textures[i].prog->setDstSz(textures[i+1].size);
             } else {
                 textures[i].prog->setDstSz(vwpt_sz);
             }
             textures[i].prog->setSrcSz(textures[i].size);
-            glCheckErr();
             textures[i].prog->updMatrices();
-            glCheckErr();
         }
         if (i != textures.size() - 1) {
-            //textures[i].bind(textures[i].unit);
             glPixelStorei(GL_UNPACK_ROW_LENGTH, textures[i].size.x + 1);
-            //glDisable(GL_CULL_FACE);
-            //glDisable(GL_DEPTH_TEST);
-            //glEnable(GL_CULL_FACE);
-            //glEnable(GL_DEPTH_TEST);
             // Might end up dropping this behavior. Just experimenting for now
             /*
             vbaDrawArrs drawArrs = genDrawArrs(textures[i+1].size.x,
@@ -198,17 +151,10 @@ bool vbaGL::draw() {
             glVertexPointer(3, GL_INT, 0, drawArrs.vert);
             #endif
             glTexCoordPointer(2, GL_FLOAT, 0, drawArrs.coord);
-
             */
             textures[i+1].bindBuffer();
             glVwpt(textures[i].size);
-            //glVwpt(1, 1);
         } else {
-            //textures[i].bind(0);
-            //glDisable(GL_CULL_FACE);
-            //glDisable(GL_DEPTH_TEST);
-            //glEnable(GL_CULL_FACE);
-            //glEnable(GL_DEPTH_TEST);
             /*
             #ifndef VBA_TRIANGLE_STRIP
             glVertexPointer(2, GL_FLOAT, 0, draw_vert);
@@ -237,14 +183,33 @@ void vbaGL::clear() {
 }
 
 bool vbaGL::initShaders() {
+    glGenVertexArrays(1, &vtxArrVtx);
+    glBindVertexArray(vtxArrVtx);
+    glGenBuffers(1, &vtxBuffVtx);
+    glBindBuffer(GL_ARRAY_BUFFER, vtxBuffVtx);
+    #ifndef VBA_TRIANGLE_STRIP
+    glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), draw_vert, GL_STATIC_DRAW);
+    #else
+    glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLint), draw_vert, GL_STATIC_DRAW);
+    #endif
+
+    glGenVertexArrays(1, &vtxArrTexCoord);
+    glBindVertexArray(vtxArrTexCoord);
+    glGenBuffers(1, &vtxBuffTexCoord);
+    glBindBuffer(GL_ARRAY_BUFFER, vtxBuffTexCoord);
+    glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), draw_coord, GL_STATIC_DRAW);
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
     glslSrc dummy_src;
     LOAD_GLSL_SRC(dummy_src, dummy);
     glslShader dummy_shd_f(this, GL_FRAGMENT_SHADER);
-    //glslShader dummy_shd_v(this, GL_VERTEX_SHADER);
+    glslShader dummy_shd_v(this, GL_VERTEX_SHADER);
     dummy_shd_f.setSrc(&dummy_src);
     dummy_shd_f.compile();
-    //dummy_shd_v.setSrc(&dummy_src);
-    //dummy_shd_v.compile();
+    dummy_shd_v.setSrc(&dummy_src);
+    dummy_shd_v.compile();
 
     dummyglsl = new glslProg(this);
     dummyglsl->attachShader(dummy_shd_f);

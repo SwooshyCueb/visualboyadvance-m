@@ -159,33 +159,32 @@ bool glslProg::init() {
 
     vars.texcoord = getAttrPtr("texcoord");
     vars.v_pos = getAttrPtr("v_pos");
-    //vars.modVwMtx = getAttrPtr("modVwMtx");
-    //vars.projMtx = getAttrPtr("projMtx");
     vars.modVwMtx = getUniformPtr("modVwMtx");
-    vars.projMtx = getUniformPtr("projMtx");
     vars.src_tex = getUniformPtr("src_tex");
     vars.src_sz = getUniformPtr("src_sz");
     vars.dst_sz = getUniformPtr("dst_sz");
     vars.pass = getUniformPtr("pass");
     glCheckErr();
 
-    /*
     if(hasVtx) {
+        activate();
         glBindVertexArray(ctx->vtxArrVtx);
         glBindBuffer(GL_ARRAY_BUFFER, ctx->vtxBuffVtx);
         #ifndef VBA_TRIANGLE_STRIP
-        glVertexAttribPointer(vars.v_pos, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        setVtxAttrPtr(vars.v_pos, 2, GL_FLOAT, GL_FALSE, 0, 0);
         #else
-        glVertexAttribPointer(vars.v_pos, 3, GL_INT, GL_FALSE, 0, 0);
+        setVtxAttrPtr(vars.v_pos, 3, GL_INT, GL_FALSE, 0, 0);
         #endif
         enableVertAttrArr(vars.v_pos);
 
         glBindVertexArray(ctx->vtxArrTexCoord);
         glBindBuffer(GL_ARRAY_BUFFER, ctx->vtxBuffTexCoord);
-        glVertexAttribPointer(vars.texcoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        setVtxAttrPtr(vars.texcoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
         enableVertAttrArr(vars.texcoord);
+        glUseProgram(0);
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
-    */
 
     return !glCheckErr();
 }
@@ -234,20 +233,6 @@ void glslProg::updMatrices() {
     glCheckErr();
     //glUniformMatrix4fv(vars.projMtx, 1, GL_FALSE, proj);
     //glCheckErr();
-
-    /*
-    glBindVertexArray(ctx->vtxArrModVwMtx);
-    glBindBuffer(GL_ARRAY_BUFFER, ctx->vtxBuffModVwMtx);
-    glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(GLfloat), model, GL_STATIC_DRAW);
-    setVtxAttrPtr(vars.mvm, 4, GL_FLOAT, GL_FALSE, 0, 0);
-    enableVertAttrArr(vars.modVwMtx);
-
-    glBindVertexArray(ctx->vtxArrProjMtx);
-    glBindBuffer(GL_ARRAY_BUFFER, ctx->vtxBuffProjMtx);
-    glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(GLfloat), model, GL_STATIC_DRAW);
-    setVtxAttrPtr(vars.pm, 4, GL_FLOAT, GL_FALSE, 0, 0);
-    enableVertAttrArr(vars.projMtx);
-    */
 }
 
 bool glslProg::printInfoLog() {
