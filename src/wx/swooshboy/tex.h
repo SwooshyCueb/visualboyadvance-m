@@ -47,8 +47,7 @@ private:
 
     bool hasBuffer = false;
 
-    GLuint texbuff;
-    GLuint rdrbuff;
+    GLuint fbo;
 
     vbaGL *ctx;
 };

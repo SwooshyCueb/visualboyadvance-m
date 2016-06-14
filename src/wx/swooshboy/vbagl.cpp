@@ -143,7 +143,6 @@ bool vbaGL::draw() {
             glTexCoordPointer(2, GL_FLOAT, 0, draw_coord);
             */
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            //glBindRenderbuffer(GL_RENDERBUFFER, 0);
             glViewport(0, 0, vwpt_sz.x, vwpt_sz.y);
         }
         #ifndef VBA_TRIANGLE_STRIP

@@ -34,21 +34,12 @@ inline bool vbaTex::glPushErr(const char *file, int line, const char *func) {
 }
 
 bool vbaTex::initBuffer() {
-    glGenFramebuffers(1, &texbuff);
-    glGenRenderbuffers(1, &rdrbuff);
-    glBindFramebuffer(GL_FRAMEBUFFER, texbuff);
-    //glBindRenderbuffer(GL_RENDERBUFFER, rdrbuff);
-    //glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, size.x, size.y);
-    //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-    //                         GL_RENDERBUFFER, rdrbuff);
-    glCheckErr();
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                            GL_TEXTURE_2D, texture, 0);
-    glCheckErr();
     glDrawBuffers(1, ctx->DrawBuffers);
-    glCheckErr();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    //glBindRenderbuffer(GL_RENDERBUFFER, 0);
     hasBuffer = true;
     return !glCheckErr();
 }
@@ -56,8 +47,7 @@ bool vbaTex::initBuffer() {
 bool vbaTex::remBuffer() {
     if (!hasBuffer)
         return false;
-    glDeleteFramebuffers(1, &texbuff);
-    glDeleteRenderbuffers(1, &rdrbuff);
+    glDeleteFramebuffers(1, &fbo);
     hasBuffer = false;
     return !glCheckErr();
 }
@@ -77,7 +67,7 @@ bool vbaTex::bind(uint num) {
 
 bool vbaTex::bindBuffer(GLenum target) {
     if (hasBuffer) {
-        glBindFramebuffer(target, texbuff);
+        glBindFramebuffer(target, fbo);
         return !glCheckErr();
     } else {
         return false;
