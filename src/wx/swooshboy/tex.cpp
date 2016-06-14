@@ -16,6 +16,7 @@ vbaTex::vbaTex(uint mult, vbaGL *globj) {
     setResizeFilter(GL_NEAREST);
     setOobBehavior(GL_CLAMP_TO_EDGE);
     hasBuffer = false;
+    hasShader = false;
     if (mult) {
         ctx->largest_scale =
                 (scale > ctx->largest_scale) ? scale : ctx->largest_scale;
@@ -120,4 +121,9 @@ void vbaTex::setOobBehavior(GLint behavior) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, behavior);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, behavior);
     glCheckErr();
+}
+
+void vbaTex::setShaderProg(glslProg *program) {
+    prog = program;
+    hasShader = true;
 }

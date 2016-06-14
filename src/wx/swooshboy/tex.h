@@ -19,6 +19,7 @@ public:
 
     void setResizeFilter(GLint filter);
     void setOobBehavior(GLint behavior);
+    void setShaderProg(glslProg *program);
 
     bool setData(const GLvoid *data);
 
@@ -47,6 +48,7 @@ private:
     vbaSize size;
 
     bool hasBuffer = false;
+    bool hasShader = false;
 
     GLuint fbo;
 

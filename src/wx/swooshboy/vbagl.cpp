@@ -25,12 +25,44 @@ vbaGL::vbaGL() {
     //glScalef(1.0f, -1.0f, 1.0f);
     glMatrixMode(GL_MODELVIEW);
 
+    /*
+    glGenVertexArrays(1, &vtxArrModVwMtx);
+    glBindVertexArray(vtxArrModVwMtx);
+    glGenBuffers(1, &vtxBuffModVwMtx);
+    glBindBuffer(GL_ARRAY_BUFFER, vtxBuffModVwMtx);
+
+    glGenVertexArrays(1, &vtxArrProjMtx);
+    glBindVertexArray(vtxArrProjMtx);
+    glGenBuffers(1, &vtxBuffProjMtx);
+    glBindBuffer(GL_ARRAY_BUFFER, vtxBuffProjMtx);
+    */
+
+    /*
+    glGenVertexArrays(1, &vtxArrVtx);
+    glBindVertexArray(vtxArrVtx);
+    glGenBuffers(1, &vtxBuffVtx);
+    glBindBuffer(GL_ARRAY_BUFFER, vtxBuffVtx);
+    #ifndef VBA_TRIANGLE_STRIP
+    glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), draw_vert, GL_STATIC_DRAW);
+    #else
+    glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLint), draw_vert, GL_STATIC_DRAW);
+    #endif
+
+    glGenVertexArrays(1, &vtxArrTexCoord);
+    glBindVertexArray(vtxArrTexCoord);
+    glGenBuffers(1, &vtxBuffTexCoord);
+    glBindBuffer(GL_ARRAY_BUFFER, vtxBuffTexCoord);
+    glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), draw_coord, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    */
     #ifndef VBA_TRIANGLE_STRIP
     glVertexPointer(2, GL_FLOAT, 0, draw_vert);
     #else
     glVertexPointer(3, GL_INT, 0, draw_vert);
     #endif
     glTexCoordPointer(2, GL_FLOAT, 0, draw_coord);
+
     if (glCheckErr()) {
         throw VBAERR_GLERR;
     }
@@ -62,12 +94,14 @@ glErr vbaGL::glErrGet() {
     }
 }
 
-void vbaGL::glErrPrint() {
+bool vbaGL::glErrPrint() {
     uint errs = glErrs.size();
+    bool ret = bool(errs);
     for (uint i = 0; i < errs; i++) {
         glErrs.front().print();
         glErrs.pop();
     }
+    return ret;
 }
 
 void vbaGL::setBaseSize(uint x, uint y) {
@@ -129,6 +163,24 @@ bool vbaGL::draw() {
     for (uint i = 0; i < textures.size(); i++) {
         //textures[i].bind();
         textures[i].bind(textures[i].unit);
+        if (textures[i].hasShader) {
+            textures[i].prog->activate();
+            glCheckErr();
+            textures[i].prog->setPass(i);
+            glCheckErr();
+            textures[i].prog->setSrcTexUnit(textures[i].unit);
+            //textures[i].prog->setSrcTexUnit(0);
+            glCheckErr();
+            if (i != textures.size() - 1) {
+                textures[i].prog->setDstSz(textures[i+1].size);
+            } else {
+                textures[i].prog->setDstSz(vwpt_sz);
+            }
+            textures[i].prog->setSrcSz(textures[i].size);
+            glCheckErr();
+            textures[i].prog->updMatrices();
+            glCheckErr();
+        }
         if (i != textures.size() - 1) {
             //textures[i].bind(textures[i].unit);
             glPixelStorei(GL_UNPACK_ROW_LENGTH, textures[i].size.x + 1);
@@ -149,7 +201,7 @@ bool vbaGL::draw() {
 
             */
             textures[i+1].bindBuffer();
-            glVwpt(textures[i+1].size);
+            glVwpt(textures[i].size);
             //glVwpt(1, 1);
         } else {
             //textures[i].bind(0);
@@ -173,6 +225,9 @@ bool vbaGL::draw() {
         #else
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         #endif
+        glUseProgram(0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glCheckErr();
     }
     return !glCheckErr();
 }
@@ -182,21 +237,43 @@ void vbaGL::clear() {
 }
 
 bool vbaGL::initShaders() {
-    glslSrc dummyfrag_src;
-    LOAD_GLSL_SRC(dummyfrag_src, dummy_fragment);
-    glslShader dummyfrag_shd(this, GL_FRAGMENT_SHADER);
-    dummyfrag_shd.setSrc(&dummyfrag_src);
-    dummyfrag_shd.compile();
+    glslSrc dummy_src;
+    LOAD_GLSL_SRC(dummy_src, dummy);
+    glslShader dummy_shd_f(this, GL_FRAGMENT_SHADER);
+    //glslShader dummy_shd_v(this, GL_VERTEX_SHADER);
+    dummy_shd_f.setSrc(&dummy_src);
+    dummy_shd_f.compile();
+    //dummy_shd_v.setSrc(&dummy_src);
+    //dummy_shd_v.compile();
+
+    dummyglsl = new glslProg(this);
+    dummyglsl->attachShader(dummy_shd_f);
+    //dummyglsl->attachShader(dummy_shd_v);
+    dummyglsl->init();
     return true;
 }
 
 /* Might do this differently */
 bool vbaGL::genTextures(uint scale) {
+    // Initial texture
     textures.emplace_back(scale, this);
+    textures.back().setShaderProg(dummyglsl);
+
+    // Intermediate texture 1
     textures.emplace_back(scale, this);
     textures.back().initBuffer();
-    textures.emplace_back(0, this);
+    textures.back().setShaderProg(dummyglsl);
+
+    // Intermediate texture 2
+    //textures.emplace_back(scale, this);
+    //textures.back().initBuffer();
+    //textures.back().setShaderProg(dummyglsl);
+
+    // Final texture
+    textures.emplace_back(scale, this);
     textures.back().initBuffer();
+    textures.back().setShaderProg(dummyglsl);
+
     return true;
 }
 

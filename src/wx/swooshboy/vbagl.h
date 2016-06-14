@@ -2,6 +2,7 @@
 #define VBA_GL_H
 
 #include "swooshboy.h"
+#include "glsl.h"
 #include <GL/glxew.h>
 #include <GL/glut.h>
 #include <deque>
@@ -36,7 +37,7 @@ public:
     bool draw();
     void clear();
     glErr glErrGet();
-    void glErrPrint();
+    bool glErrPrint();
 
 private:
     bool glPushErr(const char *file, int line, const char *func);
@@ -58,6 +59,17 @@ private:
     #endif
     static GLfloat draw_coord[8];
     static GLenum DrawBuffers[1];
+
+    GLuint vtxArrModVwMtx;
+    GLuint vtxArrProjMtx;
+    GLuint vtxBuffModVwMtx;
+    GLuint vtxBuffProjMtx;
+    GLuint vtxArrVtx;
+    GLuint vtxBuffVtx;
+    GLuint vtxArrTexCoord;
+    GLuint vtxBuffTexCoord;
+
+    glslProg *dummyglsl;
 };
 
 #endif
