@@ -10,6 +10,10 @@ vbaGL::vbaGL() {
         throw VBAERR_GLINIT;
     }
     glEnable(GL_TEXTURE_2D);
+    //glDisable(GL_CULL_FACE);
+    //glDisable(GL_DEPTH_TEST);
+    //glEnable(GL_CULL_FACE);
+    //glEnable(GL_DEPTH_TEST);
     glMatrixMode(GL_PROJECTION);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY_EXT);
@@ -123,13 +127,17 @@ vbaDrawArrs vbaGL::genDrawArrs(uint x, uint y) {
 
 bool vbaGL::draw() {
     for (uint i = 0; i < textures.size(); i++) {
-        textures[i].bind();
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, textures[i].size.x + 1);
+        //textures[i].bind();
+        textures[i].bind(textures[i].unit);
         if (i != textures.size() - 1) {
-            glDisable(GL_CULL_FACE);
-            glDisable(GL_DEPTH_TEST);
-
+            //textures[i].bind(textures[i].unit);
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, textures[i].size.x + 1);
+            //glDisable(GL_CULL_FACE);
+            //glDisable(GL_DEPTH_TEST);
+            //glEnable(GL_CULL_FACE);
+            //glEnable(GL_DEPTH_TEST);
             // Might end up dropping this behavior. Just experimenting for now
+            /*
             vbaDrawArrs drawArrs = genDrawArrs(textures[i+1].size.x,
                                                textures[i+1].size.y);
             #ifndef VBA_TRIANGLE_STRIP
@@ -139,20 +147,24 @@ bool vbaGL::draw() {
             #endif
             glTexCoordPointer(2, GL_FLOAT, 0, drawArrs.coord);
 
+            */
             textures[i+1].bindBuffer();
             glVwpt(textures[i+1].size);
             //glVwpt(1, 1);
         } else {
-            glEnable(GL_CULL_FACE);
-            glEnable(GL_DEPTH_TEST);
-
+            //textures[i].bind(0);
+            //glDisable(GL_CULL_FACE);
+            //glDisable(GL_DEPTH_TEST);
+            //glEnable(GL_CULL_FACE);
+            //glEnable(GL_DEPTH_TEST);
+            /*
             #ifndef VBA_TRIANGLE_STRIP
             glVertexPointer(2, GL_FLOAT, 0, draw_vert);
             #else
             glVertexPointer(3, GL_INT, 0, draw_vert);
             #endif
             glTexCoordPointer(2, GL_FLOAT, 0, draw_coord);
-
+            */
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glVwpt(vwpt_sz);
         }
@@ -174,18 +186,21 @@ bool vbaGL::initShaders() {
     LOAD_GLSL_SRC(dummyfrag_src, dummy_fragment);
     glslShader dummyfrag_shd(this, GL_FRAGMENT_SHADER);
     dummyfrag_shd.setSrc(&dummyfrag_src);
-
+    dummyfrag_shd.compile();
+    return true;
 }
 
 /* Might do this differently */
 bool vbaGL::genTextures(uint scale) {
     textures.emplace_back(scale, this);
+    textures.emplace_back(scale, this);
     textures.back().initBuffer();
     textures.emplace_back(0, this);
+    textures.back().initBuffer();
     return true;
 }
 
 /* Might do this differently */
 bool vbaGL::setTexData(const GLvoid *data) {
-    return textures[0].setData(data);
+    return textures.front().setData(data);
 }

@@ -58,6 +58,7 @@ inline bool glslShader::glPushErr(const char *file, int line, const char *func) 
 bool glslShader::compile() {
     glCompileShader(shader);
     glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
+    printInfoLog();
 
     return bool(compiled);
 }

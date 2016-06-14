@@ -52,6 +52,7 @@ public:
 
     bool printInfoLog();
 
+
 private:
     bool glPushErr(const char *file, int line, const char *func);
     #ifndef glCheckErr

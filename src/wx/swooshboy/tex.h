@@ -4,6 +4,7 @@
 #include "swooshboy.h"
 #include <GL/glxew.h>
 #include <GL/glut.h>
+#include "glsl.h"
 
 /* vbaTex
  * Texture object for use in vbaGL
@@ -50,6 +51,7 @@ private:
     GLuint fbo;
 
     vbaGL *ctx;
+    glslProg *prog;
 };
 
 #endif
