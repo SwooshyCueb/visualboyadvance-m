@@ -5,11 +5,27 @@
 #include <GL/glxew.h>
 #include <GL/glut.h>
 
-/* Just a struct for holding sizes or coords or what-have-you */
-typedef struct vbaSize {
+class vbaSize {
+public:
+    vbaSize();
+    vbaSize(uint w, uint h);
+    vbaSize(uint w,  int h);
+    vbaSize( int w, uint h);
+    vbaSize( int w,  int h);
+    vbaSize(const vbaSize &other);
+
+    vbaSize &operator  = (const vbaSize &other);
+    vbaSize &operator += (const vbaSize &other);
+    vbaSize &operator -= (const vbaSize &other);
+    vbaSize &operator *= (const uint &num);
+    vbaSize &operator *= (const  int &num);
+    vbaSize &operator /= (const uint &num);
+    vbaSize &operator /= (const  int &num);
+    vbaSize &operator %= (const uint &num);
+    vbaSize &operator %= (const  int &num);
+
     GLuint x;
     GLuint y;
-} vbaSize;
-// TODO: Turn vbaSize into a class that can be multiplied by integers
+};
 
 #endif
