@@ -16,18 +16,51 @@
  */
 class glErr {
 public:
+
+    /* Standard constructor
+     *
+     * Takes a GL error enum, the filename of the source file the error came
+     * from, the line number where the error takes place, and the function in
+     * which it occurred.
+     */
     glErr(GLenum val, const char *src, uint loc, const char *fnc);
+
+    /* Dummy constructor
+     *
+     * This is pretty much just here to make life easier for me.
+     */
     glErr();
+
+    /* Destructor
+     *
+     * Does what it says on the tin.
+     */
     ~glErr();
 
+
+    /* Error printing function
+     *
+     * Prints information about the GL error to stderr
+     */
     void print();
+
+    /* = operator
+     *
+     * Does what it says on the tin
+     */
     glErr& operator = (const glErr &other);
 
-    GLenum err;
-    char *file;
-    char *func;
-    uint line;
-    bool init = false;
+
+    /* Most of the stuff below here should probably be private, but I'm not
+     * bothering with that for this particular class. At least not at the
+     * moment.
+     */
+
+    GLenum err; //error constant
+    char *file; //filename
+    char *func; //function name
+    uint line; //line number
+    bool init = false; //is the instance properly initialized?
 };
 
 #endif
