@@ -54,6 +54,9 @@ bool glslShader::setSrc(glslSrc *srcobj) {
 inline bool glslShader::glPushErr(const char *file, int line, const char *func) {
     return ctx->glPushErr(file, line, func);
 }
+inline bool glslShader::glPushErr(const char *file, int line, const char *func, GLenum err) {
+    return ctx->glPushErr(file, line, func, err);
+}
 
 bool glslShader::compile() {
     glCompileShader(shader);
@@ -90,6 +93,9 @@ glslProg::glslProg(vbaGL *globj) {
 
 inline bool glslProg::glPushErr(const char *file, int line, const char *func) {
     return ctx->glPushErr(file, line, func);
+}
+inline bool glslProg::glPushErr(const char *file, int line, const char *func, GLenum err) {
+    return ctx->glPushErr(file, line, func, err);
 }
 
 bool glslProg::attachShader(glslShader shader) {

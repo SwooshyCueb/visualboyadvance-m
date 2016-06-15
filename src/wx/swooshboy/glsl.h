@@ -33,6 +33,10 @@ private:
     #ifndef glCheckErr
     #define glCheckErr() glPushErr(__FILE__, __LINE__, __func__)
     #endif
+    bool glPushErr(const char *file, int line, const char *func, GLenum err);
+    #ifndef glIgnoreErr
+    #define glIgnoreErr(err) glPushErr(__FILE__, __LINE__, __func__, err);
+    #endif
 
     GLuint shader;
 
@@ -72,6 +76,10 @@ private:
     bool glPushErr(const char *file, int line, const char *func);
     #ifndef glCheckErr
     #define glCheckErr() glPushErr(__FILE__, __LINE__, __func__)
+    #endif
+    bool glPushErr(const char *file, int line, const char *func, GLenum err);
+    #ifndef glIgnoreErr
+    #define glIgnoreErr(err) glPushErr(__FILE__, __LINE__, __func__, err);
     #endif
 
     GLint getUniformPtr(const char *name);

@@ -40,15 +40,29 @@ vbaGL::vbaGL() {
 inline bool vbaGL::glPushErr(const char *file, int line, const char *func) {
     GLenum val;
     bool ret = false;
-    //glErr *err;
 
     while ((val = glGetError()) != GL_NO_ERROR) {
-        //err = new glErr(val, file, line - 1, func);
-        //glErrs.push(err);
         glErrs.emplace(val, file, line - 1, func);
         vbaErrs.push(VBAERR_GLERR);
         ret = true;
     }
+    return ret;
+}
+
+inline bool vbaGL::glPushErr(const char *file, int line, const char *func, GLenum err) {
+    GLenum val;
+    bool ret = false;
+    //glErr *err;
+    val = glGetError();
+
+    if ((val == GL_NO_ERROR) || (val == err))
+        return ret;
+
+    do {
+        glErrs.emplace(val, file, line - 1, func);
+        vbaErrs.push(VBAERR_GLERR);
+        ret = true;
+    } while ((val = glGetError()) != GL_NO_ERROR);
     return ret;
 }
 

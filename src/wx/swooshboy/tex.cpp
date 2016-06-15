@@ -34,6 +34,10 @@ inline bool vbaTex::glPushErr(const char *file, int line, const char *func) {
     return ctx->glPushErr(file, line, func);
 }
 
+inline bool vbaTex::glPushErr(const char *file, int line, const char *func, GLenum err) {
+    return ctx->glPushErr(file, line, func, err);
+}
+
 bool vbaTex::initBuffer() {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
