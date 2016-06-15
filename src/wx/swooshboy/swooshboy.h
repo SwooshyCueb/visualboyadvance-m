@@ -10,15 +10,7 @@ class glErr;
 class vbaGL;
 class vbaTex;
 
-// Temporary
-typedef struct vbaDrawArrs {
-    #ifndef VBA_TRIANGLE_STRIP
-    GLfloat vert[8];
-    #else
-    GLint vert[12];
-    #endif
-    GLfloat coord[8];
-} vbaDrawArrs;
+//#define VBA_TRIANGLE_STRIP
 
 #include "glerr.h"
 #include "sberr.h"
@@ -33,7 +25,6 @@ typedef struct vbaDrawArrs {
 #include <queue>
 #include <stack>
 
-//#define VBA_TRIANGLE_STRIP
 
 #ifdef _DEBUG
 #define dprintf(format, ...) fprintf(stderr, format, ##__VA_ARGS__)

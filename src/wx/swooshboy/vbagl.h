@@ -32,8 +32,6 @@ public:
     bool glVwpt(uint x, uint y);
     bool glVwpt(vbaSize sz);
 
-    vbaDrawArrs genDrawArrs(uint x, uint y);
-
     bool draw();
     void clear();
     glErr glErrGet();
@@ -60,10 +58,11 @@ private:
     static GLfloat draw_coord[8];
     static GLenum DrawBuffers[1];
 
-    GLuint vtxArrVtx;
-    GLuint vtxBuffVtx;
-    GLuint vtxArrTexCoord;
-    GLuint vtxBuffTexCoord;
+    GLfloat* mtx_ortho;
+
+    GLuint vtxArr;
+    GLuint vb_vtx;
+    GLuint vb_texcoord;
 
     glslProg *dummyglsl;
 };

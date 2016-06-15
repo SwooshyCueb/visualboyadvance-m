@@ -61,10 +61,12 @@ public:
     bool init();
     bool activate();
 
-    void setPass(uint n);
+    void setPassQty(uint n);
+    void setPassIdx(uint n);
     void setSrcTexUnit(GLuint n);
     void setSrcSz(vbaSize sz);
     void setDstSz(vbaSize sz);
+    void setNeedsFlip(bool flip);
 
 private:
     bool glPushErr(const char *file, int line, const char *func);
@@ -73,6 +75,9 @@ private:
     #endif
 
     GLint getUniformPtr(const char *name);
+    void setVar1i(GLint var, GLint val);
+    void setVar2f(GLint var, GLfloat val1, GLfloat val2);
+
     GLint getAttrPtr(const char *name);
     bool enableVertAttrArr(const GLint arr);
     bool disableVertAttrArr(const GLint arr);
@@ -92,14 +97,29 @@ private:
     glslShader *f;
 
     struct {
-        GLint src_tex;
-        GLint src_sz;
-        GLint dst_sz;
-        GLint pass;
-        GLint texcoord;
-        GLint v_pos;
-        GLint modVwMtx;
-        GLint projMtx;
+        struct {
+            GLint position = 0;
+            GLint texcoord = 0;
+
+            GLint src_sz = 0;
+            GLint dst_sz = 0;
+
+            GLint pass_idx = 0;
+            GLint pass_qty = 0;
+        } v;
+
+        struct {
+            GLint src_tex = 0;
+
+            GLint src_sz = 0;
+            GLint dst_sz = 0;
+
+            GLint pass_idx = 0;
+            GLint pass_qty = 0;
+        } f;
+
+        GLint needs_flip = 0; // Can be in either, but not both
+
     } vars;
 };
 

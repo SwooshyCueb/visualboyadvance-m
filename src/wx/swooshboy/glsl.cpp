@@ -154,35 +154,50 @@ bool glslProg::init() {
     glCheckErr();
 
     printInfoLog();
+
     if (!linked)
         return false;
 
-    vars.texcoord = getAttrPtr("texcoord");
-    vars.v_pos = getAttrPtr("v_pos");
-    vars.modVwMtx = getUniformPtr("modVwMtx");
-    vars.src_tex = getUniformPtr("src_tex");
-    vars.src_sz = getUniformPtr("src_sz");
-    vars.dst_sz = getUniformPtr("dst_sz");
-    vars.pass = getUniformPtr("pass");
+    if (hasVtx) {
+        vars.v.position = getAttrPtr("v_pos");
+        vars.v.texcoord = getAttrPtr("texcoord");
+
+        vars.v.src_sz = getUniformPtr("v_src_sz");
+        vars.v.dst_sz = getUniformPtr("v_dst_sz");
+
+        vars.v.pass_idx = getUniformPtr("v_pass_idx");
+        vars.v.pass_qty = getUniformPtr("v_pass_qty");
+    }
+
+    if (hasFrag) {
+        vars.f.src_tex = getUniformPtr("src_tex");
+
+        vars.f.src_sz = getUniformPtr("f_src_sz");
+        vars.f.dst_sz = getUniformPtr("f_dst_sz");
+
+        vars.f.pass_idx = getUniformPtr("f_pass_idx");
+        vars.f.pass_qty = getUniformPtr("f_pass_qty");
+    }
+
+    vars.needs_flip = getUniformPtr("needs_flip");
+
     glCheckErr();
 
     if(hasVtx) {
         activate();
-        glBindVertexArray(ctx->vtxArrVtx);
-        glBindBuffer(GL_ARRAY_BUFFER, ctx->vtxBuffVtx);
+        glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_vtx);
         #ifndef VBA_TRIANGLE_STRIP
-        setVtxAttrPtr(vars.v_pos, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        setVtxAttrPtr(vars.v.position, 2, GL_FLOAT, GL_FALSE, 0, 0);
         #else
-        setVtxAttrPtr(vars.v_pos, 3, GL_INT, GL_FALSE, 0, 0);
+        setVtxAttrPtr(vars.v.position, 3, GL_INT, GL_FALSE, 0, 0);
         #endif
-        enableVertAttrArr(vars.v_pos);
+        enableVertAttrArr(vars.v.position);
 
-        glBindVertexArray(ctx->vtxArrTexCoord);
-        glBindBuffer(GL_ARRAY_BUFFER, ctx->vtxBuffTexCoord);
-        setVtxAttrPtr(vars.texcoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        enableVertAttrArr(vars.texcoord);
+        glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_texcoord);
+        setVtxAttrPtr(vars.v.texcoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        enableVertAttrArr(vars.v.texcoord);
+
         glUseProgram(0);
-        glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
@@ -194,45 +209,56 @@ bool glslProg::activate() {
     return !glCheckErr();
 }
 
-void glslProg::setPass(uint n) {
-    if (vars.pass < 0)
+inline void glslProg::setVar1i(GLint var, GLint val) {
+    if (var < 0)
         return;
-    glUniform1i(vars.pass, n);
+
+    GLint curr_prog;
+    glGetIntegerv(GL_CURRENT_PROGRAM, &curr_prog);
+    glUseProgram(program);
+    glUniform1i(var, val);
+    glUseProgram(curr_prog);
     glCheckErr();
+}
+
+inline void glslProg::setVar2f(GLint var, GLfloat val1, GLfloat val2) {
+    if (var < 0)
+        return;
+
+    GLint curr_prog;
+    glGetIntegerv(GL_CURRENT_PROGRAM, &curr_prog);
+    glUseProgram(program);
+    glUniform2f(var, val1, val2);
+    glUseProgram(curr_prog);
+    glCheckErr();
+}
+
+void glslProg::setPassQty(uint n) {
+    setVar1i(vars.v.pass_qty, n);
+    setVar1i(vars.f.pass_qty, n);
+}
+
+void glslProg::setPassIdx(uint n) {
+    setVar1i(vars.v.pass_idx, n);
+    setVar1i(vars.f.pass_idx, n);
 }
 
 void glslProg::setSrcTexUnit(GLuint n) {
-    if (vars.src_tex < 0)
-        return;
-    glUniform1i(vars.src_tex, GLint(n));
-    glCheckErr();
+    setVar1i(vars.f.src_tex, GLint(n));
 }
 
 void glslProg::setSrcSz(vbaSize sz) {
-    if (vars.src_sz < 0)
-        return;
-    glUniform2f(vars.src_sz, sz.x, sz.y);
-    glCheckErr();
+    setVar2f(vars.v.src_sz, sz.x, sz.y);
+    setVar2f(vars.f.src_sz, sz.x, sz.y);
 }
 
 void glslProg::setDstSz(vbaSize sz) {
-    if (vars.dst_sz < 0)
-        return;
-    glUniform2f(vars.dst_sz, sz.x, sz.y);
-    glCheckErr();
+    setVar2f(vars.v.dst_sz, sz.x, sz.y);
+    setVar2f(vars.f.dst_sz, sz.x, sz.y);
 }
 
-void glslProg::updMatrices() {
-    GLfloat model[16];
-    //GLfloat proj[16];
-    glGetFloatv(GL_MODELVIEW_MATRIX, model);
-    glCheckErr();
-    //glGetFloatv(GL_PROJECTION, proj);
-    //glCheckErr();
-    glUniformMatrix4fv(vars.modVwMtx, 1, GL_FALSE, model);
-    glCheckErr();
-    //glUniformMatrix4fv(vars.projMtx, 1, GL_FALSE, proj);
-    //glCheckErr();
+void glslProg::setNeedsFlip(bool flip) {
+    setVar1i(vars.needs_flip, flip ? 1 : 0);
 }
 
 bool glslProg::printInfoLog() {
