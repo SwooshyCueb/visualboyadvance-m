@@ -115,7 +115,7 @@ inline bool vbaGL::glVwpt(uint x, uint y) {
     return !glCheckErr();
 }
 
-bool vbaGL::draw() {
+bool vbaGL::render() {
     for (uint i = 0; i < textures.size(); i++) {
         textures[i].bind(textures[i].unit);
         if (textures[i].hasShader) {
@@ -143,16 +143,20 @@ bool vbaGL::draw() {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glVwpt(vwpt_sz);
         }
-        #ifndef VBA_TRIANGLE_STRIP
-        glDrawArrays(GL_QUADS, 0, 4);
-        #else
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        #endif
+        draw();
         glUseProgram(0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glCheckErr();
     }
     return !glCheckErr();
+}
+
+bool vbaGL::draw() {
+    #ifndef VBA_TRIANGLE_STRIP
+    glDrawArrays(GL_QUADS, 0, 4);
+    #else
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    #endif
 }
 
 void vbaGL::clear() {

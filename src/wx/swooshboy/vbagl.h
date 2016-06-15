@@ -32,12 +32,14 @@ public:
     bool glVwpt(uint x, uint y);
     bool glVwpt(vbaSize sz);
 
-    bool draw();
+    bool render();
     void clear();
     glErr glErrGet();
     bool glErrPrint();
 
 private:
+    bool draw();
+
     bool glPushErr(const char *file, int line, const char *func);
     #ifndef glCheckErr
     #define glCheckErr() glPushErr(__FILE__, __LINE__, __func__)

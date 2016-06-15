@@ -2212,7 +2212,7 @@ void GLDrawingPanel::DrawArea(wxWindowDC &dc)
 
     if (todraw) {
         GL->setTexData(todraw + (width * scale + 1) * (out_16 ? 2 : 4) * scale);
-        GL->draw();
+        GL->render();
         if(GL->glErrPrint())
             throw VBAERR_GLERR;
     } else
