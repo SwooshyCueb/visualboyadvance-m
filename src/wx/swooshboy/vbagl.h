@@ -26,6 +26,7 @@ public:
 
     bool genTextures(uint scale);
     bool setTexData(const GLvoid *data);
+    bool setVsyncState(int vsync);
 
     bool initShaders();
 

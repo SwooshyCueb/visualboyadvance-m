@@ -4,6 +4,10 @@
 #include "vbagl.h"
 #include "glsl.h"
 
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#endif
+
 vbaGL::vbaGL() {
     if (glewInit() != GLEW_OK) {
         vbaErrs.push(VBAERR_GLINIT);
@@ -213,4 +217,35 @@ bool vbaGL::genTextures(uint scale) {
 /* Might do this differently */
 bool vbaGL::setTexData(const GLvoid *data) {
     return textures.front().setData(data);
+}
+
+bool vbaGL::setVsyncState(int vsync) {
+    // non-portable vsync code
+#if defined(__linux__) && defined(GLX_SGI_swap_control)
+    static PFNGLXSWAPINTERVALSGIPROC si = NULL;
+
+    if (!si)
+        si = (PFNGLXSWAPINTERVALSGIPROC)glXGetProcAddress((const GLubyte*)"glxSwapIntervalSGI");
+
+    if (si)
+        si(vsync);
+
+    #elif defined(_WIN32) && defined(WGL_EXT_swap_control)
+    static PFNWGLSWAPINTERVALEXTPROC si = NULL;
+
+    if (!si)
+        si = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
+
+    if (si)
+        si(vsync);
+
+    #elif defined(__APPLE__) && !defined(TARGET_OS_IPHONE)
+    int swap_interval = vsync ? 1 : 0;
+    CGLContextObj cgl_context = CGLGetCurrentContext();
+    CGLSetParameter(cgl_context, kCGLCPSwapInterval, &swap_interval);
+    #else
+    //#warning no vsync support on this platform
+    return false;
+    #endif
+    return true;
 }
