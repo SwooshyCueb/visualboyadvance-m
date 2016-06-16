@@ -9,6 +9,13 @@
 #include <queue>
 #include <stack>
 
+// Moving these here for my reference
+/*
+#define int_fmt out_16 ? GL_RGB5 : GL_RGB
+#define tex_fmt out_16 ? GL_BGRA : GL_RGBA, \
+                out_16 ? GL_UNSIGNED_SHORT_1_5_5_5_REV : GL_UNSIGNED_BYTE
+*/
+
 /* vbaGL
  * OpenGL stuff.
  */

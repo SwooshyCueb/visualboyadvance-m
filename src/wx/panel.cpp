@@ -2165,24 +2165,6 @@ void GLDrawingPanel::Init()
     GL->initShaders();
     GL->genTextures(scale);
     GL->glErrPrint();
-//#define int_fmt out_16 ? GL_RGB5 : GL_RGB
-//#define tex_fmt out_16 ? GL_BGRA : GL_RGBA, \
-//                out_16 ? GL_UNSIGNED_SHORT_1_5_5_5_REV : GL_UNSIGNED_BYTE
-#if 0
-	texsize = width > height ? width : height;
-	texsize *= scale;
-	// texsize = 1 << ffs(texsize);
-	texsize = texsize | (texsize >> 1);
-	texsize = texsize | (texsize >> 2);
-	texsize = texsize | (texsize >> 4);
-	texsize = texsize | (texsize >> 8);
-	texsize = (texsize >> 1) + 1;
-	glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, texsize, texsize, 0, tex_fmt, NULL);
-#else
-	// but really, most cards support non-p2 and rect
-	// if not, use cairo or wx renderer
-    //glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, width * scale, height * scale, 0, tex_fmt, NULL);
-#endif
     GL->setVsyncState(vsync);
 	did_init = true;
 }
