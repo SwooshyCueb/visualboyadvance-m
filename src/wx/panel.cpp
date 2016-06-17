@@ -2164,7 +2164,7 @@ void GLDrawingPanel::Init()
     GL->setBaseSize(width, height);
     GL->initShaders();
     GL->genTextures(scale);
-    GL->glErrPrint();
+    GL->errPrint();
     GL->setVsyncState(vsync);
 	did_init = true;
 }
@@ -2183,8 +2183,8 @@ void GLDrawingPanel::DrawArea(wxWindowDC &dc)
     if (todraw) {
         GL->setTexData(todraw + (width * scale + 1) * (out_16 ? 2 : 4) * scale);
         GL->render();
-        if(GL->glErrPrint())
-            throw VBAERR_GLERR;
+        if(GL->errPrint())
+            errThrowVBA(VBA_ERR_GL_ERR);
     } else
         GL->clear();
 

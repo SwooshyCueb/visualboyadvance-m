@@ -24,6 +24,7 @@ class vbaGL {
     friend class glslSrc;
     friend class glslShader;
     friend class glslProg;
+    friend class vbaOSD;
 public:
     vbaGL();
     ~vbaGL();
@@ -42,27 +43,82 @@ public:
 
     bool render();
     void clear();
-    glErr glErrGet();
-    bool glErrPrint();
+    vbaErr errGet();
+    bool errPrint();
 
 private:
     bool draw();
 
-    bool glPushErr(const char *file, int line, const char *func);
-    #ifndef glCheckErr
-    #define glCheckErr() glPushErr(__FILE__, __LINE__, __func__)
+    /* pushErr/errVBASet
+     * add a VBA error to the error queue
+     *
+     * The pushErr function takes the error value, source filename in which the
+     * error is caught, line number where the error is caught, and function name
+     * in which it was caught.
+     *
+     * The macro errVBASet takes the error value only.
+     */
+    void pushErr(vbaErrVal val, const char *file, int line, const char *func);
+    #ifndef errVBASet
+    #define errVBASet(err) pushErr(err, __FILE__, __LINE__, __func__)
     #endif
-    bool glPushErr(const char *file, int line, const char *func, GLenum err);
-    #ifndef glIgnoreErr
-    #define glIgnoreErr(err) glPushErr(__FILE__, __LINE__, __func__, err);
+
+    /* pushErrGL/errGLCheck
+     * Check for GL errors and add them to the error queue
+     * Returns true if one or more GL errors are found.
+     * Sets the VBA error to VBA_ERR_GL_ERR in the vbaErr objects.
+     */
+    bool pushErrGL(const char *file, int line, const char *func);
+    #ifndef errGLCheck
+    #define errGLCheck() pushErrGL(__FILE__, __LINE__, __func__)
+    #endif
+
+    /* pushErrGL/errGLCheckVBASet/errVBASetGLCheck
+     * Check for GL errors and add them to the error queue.
+     * Returns true if one or more GL errors are found.
+     * Sets the VBA error to the provided VBA error value in the vbaErr objects.
+     */
+    bool pushErrGL(vbaErrVal val, const char *file, int line, const char *func);
+    #ifndef errGLCheckVBASet
+    #define errGLCheckVBASet(err) pushErrGL(err, __FILE__, __LINE__, __func__)
+    #endif
+    #ifndef errVBASetGLCheck
+    #define errVBASetGLCheck(err) errGLCheckVBASet(err)
+    #endif
+
+    /* catchErrGL/errGLCatch
+     * Check for GL errors and add them to the error queue.
+     * Returns true if one or more GL errors are found.
+     * Ignores the first GL error if it matches a provided GL error value.
+     * Sets the VBA error to VBA_ERR_GL_ERR in the vbaErr objects.
+     */
+    bool catchErrGL(GLenum ignore, const char *file, int line,
+                    const char *func);
+    #ifndef errGLCatch
+    #define errGLCatch(val) catchErrGL(val, __FILE__, __LINE__, __func__)
+    #endif
+
+    /* catchErrGL/errGLCatchVBASet/errVBASetGLCatch
+     * Check for GL errors and add them to the error queue.
+     * Returns true if one or more GL errors are found.
+     * Ignores the first GL error if it matches a provided GL error value.
+     * Sets the VBA error to the provided VBA error value in the vbaErr objects.
+     */
+    bool catchErrGL(GLenum ignore, vbaErrVal val, const char *file, int line,
+                    const char *func);
+    #ifndef errGLCatchVBASet
+    #define errGLCatchVBASet(val, err) catchErrGL(val, err, __FILE__, \
+                                                  __LINE__, __func__)
+    #endif
+    #ifndef errVBASetGLCatch
+    #define errVBASetGLCatch(err, val) errGLCatchVBASet(val, err)
     #endif
 
     vbaSize base_sz;
     vbaSize vwpt_sz;
     std::deque<vbaTex> textures;
     GLuint largest_scale;
-    std::queue<glErr> glErrs;
-    std::stack<vbaErr> vbaErrs;
+    std::queue<vbaErr> vbaErrs;
 
     #ifndef VBA_TRIANGLE_STRIP
     static GLfloat draw_vert[8];

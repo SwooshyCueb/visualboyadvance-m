@@ -20,8 +20,10 @@ glslShader::glslShader(vbaGL *globj, GLenum type_in) {
     ctx = globj;
     type = type_in;
     shader = glCreateShader(type);
-    if (glCheckErr())
-        throw VBAERR_GLERR;
+    GLenum err = errGLCheck();
+    if (err != GL_NO_ERROR) {
+        errThrowGLVBA(err, VBA_ERR_GL_ERR);
+    }
 }
 
 bool glslShader::setSrc(glslSrc *srcobj) {
@@ -48,19 +50,32 @@ bool glslShader::setSrc(glslSrc *srcobj) {
     glsl_len[3] = 0;
 
     glShaderSource(shader, 5, glsl, glsl_len);
-    return !glCheckErr();
+    return !errGLCheck();
 }
 
-inline bool glslShader::glPushErr(const char *file, int line, const char *func) {
-    return ctx->glPushErr(file, line, func);
+inline void glslShader::pushErr(vbaErrVal val, const char *file, int line,
+                            const char *func) {
+    return ctx->pushErr(val, file, line, func);
 }
-inline bool glslShader::glPushErr(const char *file, int line, const char *func, GLenum err) {
-    return ctx->glPushErr(file, line, func, err);
+inline bool glslShader::pushErrGL(const char *file, int line, const char *func) {
+    return ctx->pushErrGL(file, line, func);
+}
+inline bool glslShader::pushErrGL(vbaErrVal val, const char *file, int line,
+                              const char *func) {
+    return ctx->pushErrGL(val, file, line, func);
+}
+inline bool glslShader::catchErrGL(GLenum ignore, const char *file, int line,
+                               const char *func) {
+    return ctx->catchErrGL(ignore, file, line, func);
+}
+inline bool glslShader::catchErrGL(GLenum ignore, vbaErrVal val, const char *file,
+                               int line, const char *func) {
+    return ctx->catchErrGL(ignore, val, file, line, func);
 }
 
 bool glslShader::compile() {
     glCompileShader(shader);
-    glCheckErr();
+    errGLCheck();
     glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
     printInfoLog();
 
@@ -87,20 +102,33 @@ bool glslShader::printInfoLog() {
 glslProg::glslProg(vbaGL *globj) {
     ctx = globj;
     program = glCreateProgram();
-    glCheckErr();
+    errGLCheck();
     hasVtx = hasFrag = false;
 }
 
-inline bool glslProg::glPushErr(const char *file, int line, const char *func) {
-    return ctx->glPushErr(file, line, func);
+inline void glslProg::pushErr(vbaErrVal val, const char *file, int line,
+                            const char *func) {
+    return ctx->pushErr(val, file, line, func);
 }
-inline bool glslProg::glPushErr(const char *file, int line, const char *func, GLenum err) {
-    return ctx->glPushErr(file, line, func, err);
+inline bool glslProg::pushErrGL(const char *file, int line, const char *func) {
+    return ctx->pushErrGL(file, line, func);
+}
+inline bool glslProg::pushErrGL(vbaErrVal val, const char *file, int line,
+                              const char *func) {
+    return ctx->pushErrGL(val, file, line, func);
+}
+inline bool glslProg::catchErrGL(GLenum ignore, const char *file, int line,
+                               const char *func) {
+    return ctx->catchErrGL(ignore, file, line, func);
+}
+inline bool glslProg::catchErrGL(GLenum ignore, vbaErrVal val, const char *file,
+                               int line, const char *func) {
+    return ctx->catchErrGL(ignore, val, file, line, func);
 }
 
 bool glslProg::attachShader(glslShader shader) {
     glAttachShader(program, shader.shader);
-    glCheckErr();
+    errGLCheck();
     if (shader.type == GL_VERTEX_SHADER) {
         v = &shader;
         hasVtx = true;
@@ -108,12 +136,12 @@ bool glslProg::attachShader(glslShader shader) {
         f = &shader;
         hasFrag = true;
     }
-    return !glCheckErr();
+    return !errGLCheck();
 }
 
 inline GLint glslProg::getUniformPtr(const char *name) {
     GLint ret = glGetUniformLocation(program, name);
-    glCheckErr();
+    errGLCheck();
     if (ret < 0)
         dprintf("Could not bind %s\n", name);
     return ret;
@@ -121,7 +149,7 @@ inline GLint glslProg::getUniformPtr(const char *name) {
 
 inline GLint glslProg::getAttrPtr(const char *name) {
     GLint ret = glGetAttribLocation(program, name);
-    glCheckErr();
+    errGLCheck();
     if (ret < 0)
         dprintf("Could not bind %s\n", name);
     return ret;
@@ -131,7 +159,7 @@ inline bool glslProg::enableVertAttrArr(const GLint arr) {
     if (arr < 0)
         return false;
     glEnableVertexAttribArray(arr);
-    glCheckErr();
+    errGLCheck();
     return true;
 }
 
@@ -139,7 +167,7 @@ inline bool glslProg::disableVertAttrArr(const GLint arr) {
     if (arr < 0)
         return false;
     glDisableVertexAttribArray(arr);
-    glCheckErr();
+    errGLCheck();
     return true;
 }
 
@@ -149,15 +177,15 @@ inline bool glslProg::setVtxAttrPtr(const GLint arr, GLint sz, GLenum typ,
     if (arr < 0)
         return false;
     glVertexAttribPointer(arr, sz, typ, norm, stride, ptr);
-    glCheckErr();
+    errGLCheck();
     return true;
 }
 
 bool glslProg::init() {
     glLinkProgram(program);
-    glCheckErr();
+    errGLCheck();
     glGetProgramiv(program, GL_LINK_STATUS, &linked);
-    glCheckErr();
+    errGLCheck();
 
     printInfoLog();
 
@@ -187,7 +215,7 @@ bool glslProg::init() {
 
     vars.needs_flip = getUniformPtr("needs_flip");
 
-    glCheckErr();
+    errGLCheck();
 
     if(hasVtx) {
         activate();
@@ -207,12 +235,12 @@ bool glslProg::init() {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    return !glCheckErr();
+    return !errGLCheck();
 }
 
 bool glslProg::activate() {
     glUseProgram(program);
-    return !glCheckErr();
+    return !errGLCheck();
 }
 
 inline void glslProg::setVar1i(GLint var, GLint val) {
@@ -224,7 +252,7 @@ inline void glslProg::setVar1i(GLint var, GLint val) {
     glUseProgram(program);
     glUniform1i(var, val);
     glUseProgram(curr_prog);
-    glCheckErr();
+    errGLCheck();
 }
 
 inline void glslProg::setVar2f(GLint var, GLfloat val1, GLfloat val2) {
@@ -236,7 +264,7 @@ inline void glslProg::setVar2f(GLint var, GLfloat val1, GLfloat val2) {
     glUseProgram(program);
     glUniform2f(var, val1, val2);
     glUseProgram(curr_prog);
-    glCheckErr();
+    errGLCheck();
 }
 
 void glslProg::setPassQty(uint n) {

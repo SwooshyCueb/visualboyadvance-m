@@ -60,14 +60,35 @@ public:
     bool printInfoLog();
 
 private:
-    // The glErr functions call their counterparts in the vbaGL object
-    bool glPushErr(const char *file, int line, const char *func);
-    #ifndef glCheckErr
-    #define glCheckErr() glPushErr(__FILE__, __LINE__, __func__)
+    // These functions call their counterparts in the vbaGL object
+    void pushErr(vbaErrVal val, const char *file, int line, const char *func);
+    #ifndef errVBASet
+    #define errVBASet(err) pushErr(err, __FILE__, __LINE__, __func__)
     #endif
-    bool glPushErr(const char *file, int line, const char *func, GLenum err);
-    #ifndef glIgnoreErr
-    #define glIgnoreErr(err) glPushErr(__FILE__, __LINE__, __func__, err);
+    bool pushErrGL(const char *file, int line, const char *func);
+    #ifndef errGLCheck
+    #define errGLCheck() pushErrGL(__FILE__, __LINE__, __func__)
+    #endif
+    bool pushErrGL(vbaErrVal val, const char *file, int line, const char *func);
+    #ifndef errGLCheckVBASet
+    #define errGLCheckVBASet(err) pushErrGL(err, __FILE__, __LINE__, __func__)
+    #endif
+    #ifndef errVBASetGLCheck
+    #define errVBASetGLCheck(err) errGLCheckVBASet(err)
+    #endif
+    bool catchErrGL(GLenum ignore, const char *file, int line,
+                    const char *func);
+    #ifndef errGLCatch
+    #define errGLCatch(val) catchErrGL(val, __FILE__, __LINE__, __func__)
+    #endif
+    bool catchErrGL(GLenum ignore, vbaErrVal val, const char *file, int line,
+                    const char *func);
+    #ifndef errGLCatchVBASet
+    #define errGLCatchVBASet(val, err) catchErrGL(val, err, __FILE__, \
+                                                  __LINE__, __func__)
+    #endif
+    #ifndef errVBASetGLCatch
+    #define errVBASetGLCatch(err, val) errGLCatchVBASet(val, err)
     #endif
 
     GLuint shader;
@@ -109,13 +130,34 @@ public:
     void setNeedsFlip(bool flip);
 
 private:
-    bool glPushErr(const char *file, int line, const char *func);
-    #ifndef glCheckErr
-    #define glCheckErr() glPushErr(__FILE__, __LINE__, __func__)
+    void pushErr(vbaErrVal val, const char *file, int line, const char *func);
+    #ifndef errVBASet
+    #define errVBASet(err) pushErr(err, __FILE__, __LINE__, __func__)
     #endif
-    bool glPushErr(const char *file, int line, const char *func, GLenum err);
-    #ifndef glIgnoreErr
-    #define glIgnoreErr(err) glPushErr(__FILE__, __LINE__, __func__, err);
+    bool pushErrGL(const char *file, int line, const char *func);
+    #ifndef errGLCheck
+    #define errGLCheck() pushErrGL(__FILE__, __LINE__, __func__)
+    #endif
+    bool pushErrGL(vbaErrVal val, const char *file, int line, const char *func);
+    #ifndef errGLCheckVBASet
+    #define errGLCheckVBASet(err) pushErrGL(err, __FILE__, __LINE__, __func__)
+    #endif
+    #ifndef errVBASetGLCheck
+    #define errVBASetGLCheck(err) errGLCheckVBASet(err)
+    #endif
+    bool catchErrGL(GLenum ignore, const char *file, int line,
+                    const char *func);
+    #ifndef errGLCatch
+    #define errGLCatch(val) catchErrGL(val, __FILE__, __LINE__, __func__)
+    #endif
+    bool catchErrGL(GLenum ignore, vbaErrVal val, const char *file, int line,
+                    const char *func);
+    #ifndef errGLCatchVBASet
+    #define errGLCatchVBASet(val, err) catchErrGL(val, err, __FILE__, \
+                                                  __LINE__, __func__)
+    #endif
+    #ifndef errVBASetGLCatch
+    #define errVBASetGLCatch(err, val) errGLCatchVBASet(val, err)
     #endif
 
     GLint getUniformPtr(const char *name);

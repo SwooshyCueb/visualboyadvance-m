@@ -30,12 +30,24 @@ vbaTex::~vbaTex() {
     glDeleteTextures(1, &texture);
 }
 
-inline bool vbaTex::glPushErr(const char *file, int line, const char *func) {
-    return ctx->glPushErr(file, line, func);
+inline void vbaTex::pushErr(vbaErrVal val, const char *file, int line,
+                            const char *func) {
+    return ctx->pushErr(val, file, line, func);
 }
-
-inline bool vbaTex::glPushErr(const char *file, int line, const char *func, GLenum err) {
-    return ctx->glPushErr(file, line, func, err);
+inline bool vbaTex::pushErrGL(const char *file, int line, const char *func) {
+    return ctx->pushErrGL(file, line, func);
+}
+inline bool vbaTex::pushErrGL(vbaErrVal val, const char *file, int line,
+                              const char *func) {
+    return ctx->pushErrGL(val, file, line, func);
+}
+inline bool vbaTex::catchErrGL(GLenum ignore, const char *file, int line,
+                               const char *func) {
+    return ctx->catchErrGL(ignore, file, line, func);
+}
+inline bool vbaTex::catchErrGL(GLenum ignore, vbaErrVal val, const char *file,
+                               int line, const char *func) {
+    return ctx->catchErrGL(ignore, val, file, line, func);
 }
 
 bool vbaTex::initBuffer() {
@@ -46,7 +58,7 @@ bool vbaTex::initBuffer() {
     glDrawBuffers(1, ctx->DrawBuffers);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     hasBuffer = true;
-    return !glCheckErr();
+    return !errGLCheck();
 }
 
 bool vbaTex::remBuffer() {
@@ -54,26 +66,26 @@ bool vbaTex::remBuffer() {
         return false;
     glDeleteFramebuffers(1, &fbo);
     hasBuffer = false;
-    return !glCheckErr();
+    return !errGLCheck();
 }
 
 bool vbaTex::bind() {
     //glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(GL_TEXTURE_2D, texture);
     //bind(0);
-    return !glCheckErr();
+    return !errGLCheck();
 }
 
 bool vbaTex::bind(uint num) {
     glActiveTexture(GL_TEXTURE0 + num);
     glBindTexture(GL_TEXTURE_2D, texture);
-    return !glCheckErr();
+    return !errGLCheck();
 }
 
 bool vbaTex::bindBuffer(GLenum target) {
     if (hasBuffer) {
         glBindFramebuffer(target, fbo);
-        return !glCheckErr();
+        return !errGLCheck();
     } else {
         return false;
     }
@@ -96,7 +108,7 @@ bool vbaTex::setData(const GLvoid *data) {
     glPixelStorei(GL_UNPACK_ROW_LENGTH, size.x + 1);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA,
                  GL_UNSIGNED_BYTE, data);
-    return !glCheckErr();
+    return !errGLCheck();
 }
 
 void vbaTex::updSize() {
@@ -117,14 +129,14 @@ void vbaTex::setResizeFilter(GLint filter) {
         blitmask = (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     else
         blitmask = GL_COLOR_BUFFER_BIT;
-    glCheckErr();
+    errGLCheck();
 }
 
 void vbaTex::setOobBehavior(GLint behavior) {
     bind();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, behavior);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, behavior);
-    glCheckErr();
+    errGLCheck();
 }
 
 void vbaTex::setShaderProg(glslProg *program) {

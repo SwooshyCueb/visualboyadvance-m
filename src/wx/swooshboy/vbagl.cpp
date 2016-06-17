@@ -10,8 +10,7 @@
 
 vbaGL::vbaGL() {
     if (glewInit() != GLEW_OK) {
-        vbaErrs.push(VBAERR_GLINIT);
-        throw VBAERR_GLINIT;
+        errThrowVBA(VBA_ERR_GL_INIT);
     }
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY_EXT);
@@ -36,57 +35,78 @@ vbaGL::vbaGL() {
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    if (glCheckErr()) {
-        throw VBAERR_GLERR;
+    GLenum err = errGLCheck();
+    if (err != GL_NO_ERROR) {
+        errThrowGLVBA(err, VBA_ERR_GL_INIT);
     }
 }
 
-inline bool vbaGL::glPushErr(const char *file, int line, const char *func) {
-    GLenum val;
+inline void vbaGL::pushErr(vbaErrVal val, const char *file, int line,
+                           const char *func) {
+    vbaErrs.emplace(val, file, line, func);
+}
+
+inline bool vbaGL::pushErrGL(vbaErrVal val, const char *file, int line,
+                             const char *func) {
+    GLenum glErr;
     bool ret = false;
 
-    while ((val = glGetError()) != GL_NO_ERROR) {
-        glErrs.emplace(val, file, line - 1, func);
-        vbaErrs.push(VBAERR_GLERR);
+    while ((glErr = glGetError()) != GL_NO_ERROR) {
+        vbaErrs.emplace(val, glErr, file, line, func);
         ret = true;
     }
+
     return ret;
 }
 
-inline bool vbaGL::glPushErr(const char *file, int line, const char *func, GLenum err) {
-    GLenum val;
-    bool ret = false;
-    //glErr *err;
-    val = glGetError();
+inline bool vbaGL::pushErrGL(const char *file, int line, const char *func) {
+    return pushErrGL(VBA_ERR_GL_ERR, file, line, func);
+}
 
-    if ((val == GL_NO_ERROR) || (val == err))
+inline bool vbaGL::catchErrGL(GLenum ignore, vbaErrVal val, const char *file,
+                              int line, const char *func) {
+    GLenum glErr;
+    bool ret = false;
+    glErr = glGetError();
+
+    if (glErr == GL_NO_ERROR)
         return ret;
 
-    do {
-        glErrs.emplace(val, file, line - 1, func);
-        vbaErrs.push(VBAERR_GLERR);
+    if (glErr != ignore) {
+        vbaErrs.emplace(val, glErr, file, line, func);
         ret = true;
-    } while ((val = glGetError()) != GL_NO_ERROR);
+    }
+
+    while ((glErr = glGetError()) != GL_NO_ERROR) {
+        vbaErrs.emplace(val, glErr, file, line, func);
+        ret = true;
+    }
+
     return ret;
 }
 
-glErr vbaGL::glErrGet() {
-    if (glErrs.size()) {
-        glErr ret;
-        ret = glErrs.front();
-        glErrs.pop();
+inline bool vbaGL::catchErrGL(GLenum ignore, const char *file, int line,
+                              const char *func) {
+    return catchErrGL(ignore, VBA_ERR_GL_ERR, file, line, func);
+}
+
+vbaErr vbaGL::errGet() {
+    if (vbaErrs.size()) {
+        vbaErr ret;
+        ret = vbaErrs.front();
+        vbaErrs.pop();
         return ret;
     } else {
-        throw VBAERR_NODATA;
+        errThrowVBA(VBA_ERR_NO_MORE);
     }
 }
 
-bool vbaGL::glErrPrint() {
-    uint errs = glErrs.size();
+bool vbaGL::errPrint() {
+    uint errs = vbaErrs.size();
     bool ret = bool(errs);
     for (uint i = 0; i < errs; i++) {
-        glErrs.front().print();
-        glErrs.pop();
+        vbaErrs.front().print();
+        vbaErrs.pop();
     }
     return ret;
 }
@@ -116,7 +136,7 @@ inline bool vbaGL::glVwpt(vbaSize sz) {
 
 inline bool vbaGL::glVwpt(uint x, uint y) {
     glViewport(0, 0, x, y);
-    return !glCheckErr();
+    return !errGLCheck();
 }
 
 bool vbaGL::render() {
@@ -150,9 +170,8 @@ bool vbaGL::render() {
         draw();
         glUseProgram(0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glCheckErr();
     }
-    return !glCheckErr();
+    return !errGLCheck();
 }
 
 bool vbaGL::draw() {
@@ -161,7 +180,7 @@ bool vbaGL::draw() {
     #else
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     #endif
-    return !glCheckErr();
+    return !errGLCheck();
 }
 
 void vbaGL::clear() {

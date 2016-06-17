@@ -6,14 +6,13 @@
 //#include <wx/glcanvas.h>
 
 // Forward declarations to make life easier.
-class glErr;
+class vbaErr;
 class vbaGL;
 class vbaTex;
 
 //#define VBA_TRIANGLE_STRIP
 
-#include "glerr.h"
-#include "sberr.h"
+#include "vbaerr.h"
 #include "size.h"
 #include "vbagl.h"
 #include "tex.h"
