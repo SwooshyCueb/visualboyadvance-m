@@ -1,3 +1,5 @@
+// Not yet functional
+
 #ifndef VBA_OSD_H
 #define VBA_OSD_H
 

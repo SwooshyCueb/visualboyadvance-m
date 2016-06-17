@@ -1,6 +1,7 @@
 /* Shader for text rendering
  *
  * Vertex and fragment
+ * Not finished yet (obviously)
  */
 
 precision highp float;
@@ -19,6 +20,8 @@ attribute vec2 texcoord;
 
 #ifdef FRAGMENT
 
-uniform sampler2D src_tex;
+uniform sampler2D glyph;
+uniform vec4 fg;
+uniform vec4 bg;
 
 #endif

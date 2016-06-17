@@ -1,3 +1,5 @@
+// Not yet functional
+
 #include "swooshboy.h"
 #include "osd.h"
 #include "vbagl.h"
@@ -54,10 +56,8 @@ vbaOSD::vbaOSD(vbaGL *globj) {
     glyphs.push_back(placeholder);
 
     init = true;
+    // Preload some glyphs here?
 
-    getGlyph('c');
-    getGlyph('!');
-    getGlyph(',');
 }
 
 vbaOSD::~vbaOSD() {
