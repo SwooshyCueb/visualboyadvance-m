@@ -86,7 +86,25 @@ ADD_CUSTOM_COMMAND(OUTPUT builtin-over.h
                    COMMAND ${CMAKE_COMMAND} -DINFILE=${CMAKE_CURRENT_SOURCE_DIR}/../vba-over.ini -DOUTFILE=builtin-over.h -DVARNAME=builtin_over -P ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.cmake
 		   DEPENDS ../vba-over.ini)
 
-# glsl
+# let's use ld to add any other resources
+FUNCTION(ADD_RESOURCES out_var)
+    SET(result)
+    FOREACH(in_f ${ARGN})
+        GET_FILENAME_COMPONENT(in_d ${CMAKE_CURRENT_SOURCE_DIR}/${in_f} DIRECTORY)
+        GET_FILENAME_COMPONENT(src_f ${in_f} NAME)
+        SET(out_f "${CMAKE_CURRENT_BINARY_DIR}/${in_f}.o")
+        ADD_CUSTOM_COMMAND(OUTPUT ${out_f}
+            COMMAND ${CMAKE_LINKER} -r -b binary -o ${out_f} ${src_f}
+            DEPENDS ${in_f}
+            WORKING_DIRECTORY ${in_d}
+            COMMENT "Building static resource object ${out_f}"
+        VERBATIM
+        )
+        LIST(APPEND result ${out_f})
+    ENDFOREACH()
+    SET(${out_var} "${result}" PARENT_SCOPE)
+ENDFUNCTION()
+
 ADD_CUSTOM_COMMAND(OUTPUT swooshboy/glsl/dummy.glsl.h
                    COMMAND ${CMAKE_COMMAND} -DINFILE=${CMAKE_CURRENT_SOURCE_DIR}/swooshboy/glsl/dummy.glsl -DOUTFILE=swooshboy/glsl/dummy.glsl.h -DVARNAME=dummy_glsl -P ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.cmake
            DEPENDS swooshboy/glsl/dummy.glsl)
@@ -175,10 +193,18 @@ SET( GLSL_SRC
     swooshboy/glsl/dummy.glsl
 )
 
+SET(RES_WX_LN
+    ${GLSL_SRC}
+)
+
 SET( RES_WX
     ${XRC_WX}
-    ${GLSL_SRC}
+    ${RES_WX_LN}
     ../vba-over.ini
+)
+
+ADD_RESOURCES( RES_LN
+    ${RES_WX_LN}
 )
 
 SET( CM_STUFF
@@ -217,6 +243,7 @@ ADD_EXECUTABLE (
     ${SRC_WX}
     ${HDR_WX}
     ${RES_WX}
+    ${RES_LN}
     ${VBAM_ICON}
     ${CM_STUFF}
 )

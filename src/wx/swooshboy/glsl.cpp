@@ -11,8 +11,8 @@ glslSrc::glslSrc() {
     src_main_len = 0;
 }
 
-void glslSrc::loadSrc(unsigned char *src_in, const uint len) {
-    src_main = (char*)src_in;
+void glslSrc::loadSrc(char *src_in, const uint len) {
+    src_main = src_in;
     src_main_len = len;
 }
 
