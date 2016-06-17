@@ -48,6 +48,16 @@ inline void vbaGL::pushErr(vbaErrVal val, const char *file, int line,
     vbaErrs.emplace(val, file, line, func);
 }
 
+inline void vbaGL::pushErrFT(FT_Error ftval, const char *file, int line,
+                           const char *func) {
+    vbaErrs.emplace(VBA_ERR_FT_ERR, ftval, file, line, func);
+}
+
+inline void vbaGL::pushErrFT(vbaErrVal val, FT_Error ftval, const char *file,
+                           int line, const char *func) {
+    vbaErrs.emplace(val, ftval, file, line, func);
+}
+
 inline bool vbaGL::pushErrGL(vbaErrVal val, const char *file, int line,
                              const char *func) {
     GLenum glErr;

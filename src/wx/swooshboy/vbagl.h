@@ -63,6 +63,15 @@ private:
     #define errVBASet(err) pushErr(err, __FILE__, __LINE__, __func__)
     #endif
 
+    /* pushErrFT/errFTSet
+     * add an FT error to the error queue
+     * Sets the VBA error to VBA_ERR_FT_ERR in the vbaErr objects.
+     */
+    void pushErrFT(FT_Error val, const char *file, int line, const char *func);
+    #ifndef errFTSet
+    #define errFTSet(err) pushErrFT(err, __FILE__, __LINE__, __func__)
+    #endif
+
     /* pushErrGL/errGLCheck
      * Check for GL errors and add them to the error queue
      * Returns true if one or more GL errors are found.
@@ -84,6 +93,20 @@ private:
     #endif
     #ifndef errVBASetGLCheck
     #define errVBASetGLCheck(err) errGLCheckVBASet(err)
+    #endif
+
+    /* pushErrFT/errVBASetFTSet/ErrFTSetVBASet
+     * add an FT error to the error queue
+     * Sets the VBA error to the provided VBA error value in the vbaErr objects.
+     */
+    void pushErrFT(vbaErrVal val, FT_Error ftval, const char *file, int line,
+                   const char *func);
+    #ifndef errVBASetFTSet
+    #define errVBASetFTSet(err, fterr) pushErrFT(err, fterr, __FILE__, \
+                                                 __LINE__, __func__)
+    #endif
+    #ifndef errFTSetVBASet
+    #define errFTSetVBASet(fterr, err) errVBASetFTSet(err, fterr)
     #endif
 
     /* catchErrGL/errGLCatch

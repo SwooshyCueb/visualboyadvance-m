@@ -9,7 +9,9 @@
 extern const unsigned char _binary_neoletters_ttf_start;
 extern const unsigned char _binary_neoletters_ttf_end;
 
-vbaOSD::vbaOSD(vbaGL *ctx) {
+vbaOSD::vbaOSD(vbaGL *globj) {
+    ctx = globj;
+
     FT_Error fterr;
     if (fterr = FT_Init_FreeType(&ft.lib)) {
         dprintf("Freetype lib init failed\n");
@@ -38,4 +40,32 @@ vbaOSD::~vbaOSD() {
         FT_Done_Face(ft.face);
         FT_Done_FreeType(ft.lib);
     }
+}
+
+inline void vbaOSD::pushErr(vbaErrVal val, const char *file, int line,
+                            const char *func) {
+    return ctx->pushErr(val, file, line, func);
+}
+inline void vbaOSD::pushErrFT(FT_Error ftval, const char *file, int line,
+                            const char *func) {
+    return ctx->pushErr(ftval, file, line, func);
+}
+inline void vbaOSD::pushErrFT(vbaErrVal val,FT_Error ftval, const char *file,
+                            int line, const char *func) {
+    return ctx->pushErr(val, file, line, func);
+}
+inline bool vbaOSD::pushErrGL(const char *file, int line, const char *func) {
+    return ctx->pushErrGL(file, line, func);
+}
+inline bool vbaOSD::pushErrGL(vbaErrVal val, const char *file, int line,
+                              const char *func) {
+    return ctx->pushErrGL(val, file, line, func);
+}
+inline bool vbaOSD::catchErrGL(GLenum ignore, const char *file, int line,
+                               const char *func) {
+    return ctx->catchErrGL(ignore, file, line, func);
+}
+inline bool vbaOSD::catchErrGL(GLenum ignore, vbaErrVal val, const char *file,
+                               int line, const char *func) {
+    return ctx->catchErrGL(ignore, val, file, line, func);
 }
