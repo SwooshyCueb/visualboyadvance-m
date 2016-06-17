@@ -134,7 +134,7 @@ private:
     GLuint vb_vtx;
     GLuint vb_texcoord;
 
-    glslProg *dummyglsl;
+    glslProg *glsl_passthrough;
 };
 
 #endif

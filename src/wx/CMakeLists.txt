@@ -105,11 +105,6 @@ FUNCTION(ADD_RESOURCES out_var)
     SET(${out_var} "${result}" PARENT_SCOPE)
 ENDFUNCTION()
 
-ADD_CUSTOM_COMMAND(OUTPUT swooshboy/glsl/dummy.glsl.h
-                   COMMAND ${CMAKE_COMMAND} -DINFILE=${CMAKE_CURRENT_SOURCE_DIR}/swooshboy/glsl/dummy.glsl -DOUTFILE=swooshboy/glsl/dummy.glsl.h -DVARNAME=dummy_glsl -P ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.cmake
-           DEPENDS swooshboy/glsl/dummy.glsl)
-
-
 # I don't like duplicating/triplicating code, so I only declare
 # event handlers once, and copy them in other places they are needed
 # all using portable cmake code
@@ -190,7 +185,7 @@ SET( HDR_WX
 FILE(GLOB XRC_WX xrc/*.xrc)
 
 SET( GLSL_SRC
-    swooshboy/glsl/dummy.glsl
+    swooshboy/glsl/passthrough.glsl
 )
 
 SET(RES_WX_LN

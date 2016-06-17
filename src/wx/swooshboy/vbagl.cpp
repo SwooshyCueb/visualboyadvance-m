@@ -188,19 +188,19 @@ void vbaGL::clear() {
 }
 
 bool vbaGL::initShaders() {
-    glslSrc dummy_src;
-    LOAD_GLSL_SRC(dummy_src, dummy);
-    glslShader dummy_shd_f(this, GL_FRAGMENT_SHADER);
-    glslShader dummy_shd_v(this, GL_VERTEX_SHADER);
-    dummy_shd_f.setSrc(&dummy_src);
-    dummy_shd_f.compile();
-    dummy_shd_v.setSrc(&dummy_src);
-    dummy_shd_v.compile();
+    glslSrc passthru_src;
+    LOAD_GLSL_SRC(passthru_src, passthrough);
+    glslShader passthru_shd_f(this, GL_FRAGMENT_SHADER);
+    glslShader passthru_shd_v(this, GL_VERTEX_SHADER);
+    passthru_shd_f.setSrc(&passthru_src);
+    passthru_shd_f.compile();
+    passthru_shd_v.setSrc(&passthru_src);
+    passthru_shd_v.compile();
 
-    dummyglsl = new glslProg(this);
-    dummyglsl->attachShader(dummy_shd_f);
-    dummyglsl->attachShader(dummy_shd_v);
-    dummyglsl->init();
+    glsl_passthrough = new glslProg(this);
+    glsl_passthrough->attachShader(passthru_shd_f);
+    glsl_passthrough->attachShader(passthru_shd_v);
+    glsl_passthrough->init();
     return true;
 }
 
@@ -208,22 +208,22 @@ bool vbaGL::initShaders() {
 bool vbaGL::genTextures(uint scale) {
     // Initial texture
     textures.emplace_back(scale, this);
-    textures.back().setShaderProg(dummyglsl);
+    textures.back().setShaderProg(glsl_passthrough);
 
     // Intermediate texture 1
     textures.emplace_back(scale, this);
     textures.back().initBuffer();
-    textures.back().setShaderProg(dummyglsl);
+    textures.back().setShaderProg(glsl_passthrough);
 
     // Intermediate texture 2
     textures.emplace_back(scale, this);
     textures.back().initBuffer();
-    textures.back().setShaderProg(dummyglsl);
+    textures.back().setShaderProg(glsl_passthrough);
 
     // Final texture
     textures.emplace_back(0, this);
     textures.back().initBuffer();
-    textures.back().setShaderProg(dummyglsl);
+    textures.back().setShaderProg(glsl_passthrough);
 
     // For now, pass_qty will just be the number of textures we have
     for (uint i = 0; i < textures.size(); i++) {
