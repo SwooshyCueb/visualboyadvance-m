@@ -35,6 +35,8 @@ vbaGL::vbaGL() {
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    osd = new vbaOSD(this);
+
     GLenum err = errGLCheck();
     if (err != GL_NO_ERROR) {
         errThrowGLVBA(err, VBA_ERR_GL_INIT);

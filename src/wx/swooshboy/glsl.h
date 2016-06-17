@@ -2,6 +2,7 @@
 #define VBA_GLSL_H
 #include "swooshboy.h"
 #include "size.h"
+#include "vbaerr.h"
 
 /* glslSrc
  * glsl source container object

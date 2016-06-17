@@ -64,6 +64,9 @@ IF(WIN32 AND ENABLE_DIRECTX)
     FIND_PACKGE ( DirectX REQUIRED )
 ENDIF(WIN32 AND ENABLE_DIRECTX)
 
+FIND_PACKAGE(Freetype REQUIRED)
+include_directories(${FREETYPE_INCLUDE_DIRS})
+
 # contrib widgets
 include_directories(widgets)
 
@@ -135,6 +138,7 @@ SET( SRC_WX
    widgets/sdljoy.cpp
    widgets/wxmisc.cpp
    swooshboy/glsl.cpp
+   swooshboy/osd.cpp
    swooshboy/size.cpp
    swooshboy/swooshboy.cpp
    swooshboy/tex.cpp
@@ -170,6 +174,7 @@ SET( HDR_WX
    widgets/wx/webupdatedef.h
    widgets/wx/wxmisc.h
    swooshboy/glsl.h
+   swooshboy/osd.h
    swooshboy/size.h
    swooshboy/swooshboy.h
    swooshboy/tex.h
@@ -190,6 +195,7 @@ SET( GLSL_SRC
 
 SET(RES_WX_LN
     ${GLSL_SRC}
+    swooshboy/font/neoletters.ttf
 )
 
 SET( RES_WX
@@ -250,6 +256,7 @@ TARGET_LINK_LIBRARIES (
     ${FFMPEG_LIBRARIES}
     ${DIRECTX_LIBRARIES}
     ${CAIRO_LIBRARIES}
+    ${FREETYPE_LIBRARIES}
 )
 IF(WIN32)
     INSTALL(PROGRAMS ${PROJECT_BINARY_DIR}/visualboyadvance-m${CMAKE_EXECUTABLE_SUFFIX} DESTINATION ${CMAKE_BINARY_DIR})

@@ -36,5 +36,17 @@ VBAERR_DEF_(GL_ERR,
 
 VBAERR_DEF_(GL_INIT,
             "Encountered a problem during GL initialization",
-            0x1000
+            0x1001
+)
+
+//FreeType-related errors
+
+VBAERR_DEF_(FT_ERR,
+            "Encountered a FreeType error",
+            0x2000
+)
+
+VBAERR_DEF_(FT_INIT,
+            "Encountered a problem during FreeType initialization",
+            0x2001
 )

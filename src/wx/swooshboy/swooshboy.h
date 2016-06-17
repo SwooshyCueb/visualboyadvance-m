@@ -9,9 +9,11 @@
 class vbaErr;
 class vbaGL;
 class vbaTex;
+class vbaOSD;
 
 //#define VBA_TRIANGLE_STRIP
 
+#include "osd.h"
 #include "vbaerr.h"
 #include "size.h"
 #include "vbagl.h"

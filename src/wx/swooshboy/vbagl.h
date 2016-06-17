@@ -119,6 +119,7 @@ private:
     std::deque<vbaTex> textures;
     GLuint largest_scale;
     std::queue<vbaErr> vbaErrs;
+    vbaOSD *osd;
 
     #ifndef VBA_TRIANGLE_STRIP
     static GLfloat draw_vert[8];
