@@ -8,6 +8,19 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#include <deque>
+
+class ftGlyph {
+public:
+    char character;
+
+    vbaSize sz_tex;
+    vbaSize sz_glyph;
+
+    unsigned char *data;
+    FT_Vector adv;
+};
+
 class vbaOSD {
     friend class vbaGL;
 public:
@@ -15,6 +28,8 @@ public:
     ~vbaOSD();
 
 private:
+    void getGlyph(char character);
+
     void pushErr(vbaErrVal val, const char *file, int line, const char *func);
     #ifndef errVBASet
     #define errVBASet(err) pushErr(err, __FILE__, __LINE__, __func__)
@@ -65,6 +80,10 @@ private:
         FT_Face face;
         FT_GlyphSlot gs;
     } ft;
+
+    std::deque<ftGlyph> glyphs;
+    ftGlyph currGlyph;
+    ftGlyph placeholder;
 
     vbaGL *ctx;
 

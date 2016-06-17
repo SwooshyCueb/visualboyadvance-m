@@ -26,9 +26,10 @@ public:
     void loadSrc(char *src_in, const uint len);
     // This macro makes using the above function a little easier
     #define LOAD_GLSL_SRC(obj, name) \
-        extern const char _binary_##name##_glsl_start,_binary_##name##_glsl_end; \
+        extern char _binary_##name##_glsl_start,_binary_##name##_glsl_end; \
+        _binary_##name##_glsl_end = '\0'; \
         uint name##_glsl_len = &_binary_##name##_glsl_start - &_binary_##name##_glsl_end; \
-        obj.loadSrc(const_cast<char *>(&_binary_##name##_glsl_start), name##_glsl_len)
+        obj.loadSrc(&_binary_##name##_glsl_start, name##_glsl_len)
 
 private:
     // The glsl source
