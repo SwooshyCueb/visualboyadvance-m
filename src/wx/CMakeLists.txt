@@ -192,6 +192,8 @@ FILE(GLOB XRC_WX xrc/*.xrc)
 SET( GLSL_SRC
     swooshboy/glsl/passthrough.glsl
     swooshboy/glsl/osd.glsl
+    swooshboy/glsl/supereagle.glsl
+    swooshboy/glsl/common.glsl
 )
 
 SET(RES_WX_LN

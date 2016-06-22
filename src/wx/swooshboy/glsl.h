@@ -26,10 +26,10 @@ public:
     void loadSrc(char *src_in, const uint len);
     // This macro makes using the above function a little easier
     #define LOAD_GLSL_SRC(obj, name) \
-        extern char _binary_##name##_glsl_start,_binary_##name##_glsl_end; \
-        _binary_##name##_glsl_end = '\0'; \
-        uint name##_glsl_len = &_binary_##name##_glsl_start - &_binary_##name##_glsl_end; \
-        obj.loadSrc(&_binary_##name##_glsl_start, name##_glsl_len)
+        _binary_##name##_glsl_start,_binary_##name##_glsl_end; \
+        char *name##_glsl_start = &_binary_##name##_glsl_start + (sizeof(char) * 13); \
+        uint name##_glsl_len = &_binary_##name##_glsl_end - name##_glsl_start; \
+        obj.loadSrc(name##_glsl_start, name##_glsl_len)
 
 private:
     // The glsl source
@@ -116,6 +116,7 @@ private:
  */
 class glslProg {
     friend class vbaGL;
+    friend class glslShader;
 public:
     glslProg(vbaGL *globj);
 
@@ -165,6 +166,7 @@ private:
 
     GLint getUniformPtr(const char *name);
     void setVar1i(GLint var, GLint val);
+    void setVar2i(GLint var, GLint val1, GLint val2);
     void setVar2f(GLint var, GLfloat val1, GLfloat val2);
 
     GLint getAttrPtr(const char *name);

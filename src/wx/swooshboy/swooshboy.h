@@ -54,6 +54,13 @@ class vbaGL;
 class vbaTex;
 class vbaOSD;
 
+extern char _binary_common_glsl_start;
+extern char _binary_common_glsl_end;
+extern char _binary_supereagle_glsl_start;
+extern char _binary_supereagle_glsl_end;
+extern char _binary_passthrough_glsl_start;
+extern char _binary_passthrough_glsl_end;
+
 //#define VBA_TRIANGLE_STRIP
 
 #include "osd.h"

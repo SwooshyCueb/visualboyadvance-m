@@ -2,7 +2,7 @@
 #include "glsl.h"
 
 GLchar *glslShader::glsl_version = "#version 100\n\0"; //14
-GLchar *glslShader::glsl_defines_global = "#define DEBUG\n\0"; //15
+GLchar *glslShader::glsl_defines_global = "#define DEBUG\n#define IN_VBA\n\0"; //30
 GLchar *glslShader::glsl_defines_vert = "#define VERTEX\n\0"; //16
 GLchar *glslShader::glsl_defines_frag = "#define FRAGMENT\n\0"; //18
 
@@ -29,14 +29,20 @@ glslShader::glslShader(vbaGL *globj, GLenum type_in) {
 bool glslShader::setSrc(glslSrc *srcobj) {
     src = srcobj;
 
+    if (ctx->glsl_common.src_main_len == 0) {
+        /* SOMEHOW, we're losing the common glsl source during setup of the
+         * Super Eagle shader.
+         */
+        //_binary_common_glsl_end = '\0';
+        uint cl = &_binary_common_glsl_end - &_binary_common_glsl_start;
+        ctx->glsl_common.loadSrc(&_binary_common_glsl_start, cl);
+    }
+
     glsl[0] = glsl_version;
     glsl_len[0] = 13;
 
     glsl[1] = glsl_defines_global;
-    glsl_len[1] = 14;
-
-    glsl[4] = src->src_main;
-    glsl_len[4] = src->src_main_len;
+    glsl_len[1] = 29;
 
     if (type == GL_VERTEX_SHADER) {
         glsl[2] = glsl_defines_vert;
@@ -46,8 +52,11 @@ bool glslShader::setSrc(glslSrc *srcobj) {
         glsl_len[2] = 17;
     }
 
-    glsl[3] = "\0";
-    glsl_len[3] = 0;
+    glsl[3] = ctx->glsl_common.src_main;
+    glsl_len[3] = ctx->glsl_common.src_main_len;
+
+    glsl[4] = src->src_main;
+    glsl_len[4] = src->src_main_len;
 
     glShaderSource(shader, 5, glsl, glsl_len);
     return !errGLCheck();
@@ -194,7 +203,7 @@ bool glslProg::init() {
 
     if (hasVtx) {
         vars.v.position = getAttrPtr("v_pos");
-        vars.v.texcoord = getAttrPtr("texcoord");
+        vars.v.texcoord = getAttrPtr("v_texcoord");
 
         vars.v.src_sz = getUniformPtr("v_src_sz");
         vars.v.dst_sz = getUniformPtr("v_dst_sz");
@@ -251,6 +260,18 @@ inline void glslProg::setVar1i(GLint var, GLint val) {
     glGetIntegerv(GL_CURRENT_PROGRAM, &curr_prog);
     glUseProgram(program);
     glUniform1i(var, val);
+    glUseProgram(curr_prog);
+    errGLCheck();
+}
+
+inline void glslProg::setVar2i(GLint var, GLint val1, GLint val2) {
+    if (var < 0)
+        return;
+
+    GLint curr_prog;
+    glGetIntegerv(GL_CURRENT_PROGRAM, &curr_prog);
+    glUseProgram(program);
+    glUniform2i(var, val1, val2);
     glUseProgram(curr_prog);
     errGLCheck();
 }

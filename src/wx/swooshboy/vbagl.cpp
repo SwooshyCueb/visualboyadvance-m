@@ -213,6 +213,20 @@ bool vbaGL::initShaders() {
     glsl_passthrough->attachShader(passthru_shd_f);
     glsl_passthrough->attachShader(passthru_shd_v);
     glsl_passthrough->init();
+
+    glslSrc supereagle_src;
+    LOAD_GLSL_SRC(supereagle_src, supereagle);
+    glslShader supereagle_shd_f(this, GL_FRAGMENT_SHADER);
+    glslShader supereagle_shd_v(this, GL_VERTEX_SHADER);
+    supereagle_shd_f.setSrc(&supereagle_src);
+    supereagle_shd_f.compile();
+    supereagle_shd_v.setSrc(&supereagle_src);
+    supereagle_shd_v.compile();
+
+    glsl_supereagle = new glslProg(this);
+    glsl_supereagle->attachShader(supereagle_shd_f);
+    glsl_supereagle->attachShader(supereagle_shd_v);
+    glsl_supereagle->init();
     return true;
 }
 
@@ -225,10 +239,10 @@ bool vbaGL::genTextures(uint scale) {
     // Intermediate texture 1
     textures.emplace_back(scale, this);
     textures.back().initBuffer();
-    textures.back().setShaderProg(glsl_passthrough);
+    textures.back().setShaderProg(glsl_supereagle);
 
     // Intermediate texture 2
-    textures.emplace_back(scale, this);
+    textures.emplace_back(scale * 2, this);
     textures.back().initBuffer();
     textures.back().setShaderProg(glsl_passthrough);
 

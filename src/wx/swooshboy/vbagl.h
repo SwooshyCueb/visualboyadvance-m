@@ -9,6 +9,7 @@
 #include <queue>
 #include <stack>
 
+
 // Moving these here for my reference
 /*
 #define int_fmt out_16 ? GL_RGB5 : GL_RGB
@@ -159,6 +160,8 @@ private:
     GLuint vb_texcoord;
 
     glslProg *glsl_passthrough;
+    glslProg *glsl_supereagle;
+    glslSrc glsl_common;
 };
 
 #endif
