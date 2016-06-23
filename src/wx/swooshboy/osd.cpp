@@ -8,10 +8,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-extern const unsigned char _binary_neoletters_ttf_start;
-extern const unsigned char _binary_neoletters_ttf_end;
-
 vbaOSD::vbaOSD(vbaGL *globj) {
+    DECLARE_RES(ttf_neoletters);
     ctx = globj;
 
     FT_Error fterr;
@@ -20,9 +18,7 @@ vbaOSD::vbaOSD(vbaGL *globj) {
         errThrowVBAFT(VBA_ERR_FT_INIT, fterr);
     }
 
-    FT_Long ttf_len = (FT_Long)(&_binary_neoletters_ttf_end - &_binary_neoletters_ttf_start);
-
-    if (fterr = FT_New_Memory_Face(ft.lib, &_binary_neoletters_ttf_start, ttf_len, 0, &ft.face)) {
+    if (fterr = FT_New_Memory_Face(ft.lib, (unsigned char*)res_ttf_neoletters, res_ttf_neoletters_len, 0, &ft.face)) {
         dprintf("Freetype face init failed\n");
         errThrowVBAFT(VBA_ERR_FT_INIT, fterr);
     }

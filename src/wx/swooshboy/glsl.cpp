@@ -33,9 +33,8 @@ bool glslShader::setSrc(glslSrc *srcobj) {
         /* SOMEHOW, we're losing the common glsl source during setup of the
          * Super Eagle shader.
          */
-        //_binary_common_glsl_end = '\0';
-        uint cl = &_binary_common_glsl_end - &_binary_common_glsl_start;
-        ctx->glsl_common.loadSrc(&_binary_common_glsl_start, cl);
+        DECLARE_RES(glsl_common);
+        ctx->glsl_common.loadSrc(res_glsl_common, res_glsl_common_len);
     }
 
     glsl[0] = glsl_version;

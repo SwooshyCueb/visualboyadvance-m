@@ -44,6 +44,8 @@
 #ifndef VBA_SB_H
 #define VBA_SB_H
 
+#include <cstdint>
+
 #include <GL/glxew.h>
 #include <GL/glut.h>
 //#include <wx/glcanvas.h>
@@ -54,12 +56,11 @@ class vbaGL;
 class vbaTex;
 class vbaOSD;
 
-extern char _binary_common_glsl_start;
-extern char _binary_common_glsl_end;
-extern char _binary_supereagle_glsl_start;
-extern char _binary_supereagle_glsl_end;
-extern char _binary_passthrough_glsl_start;
-extern char _binary_passthrough_glsl_end;
+#define DECLARE_RES(name) \
+    extern char *res_##name __attribute__((nocommon)); \
+    extern void *_res_##name##_len __attribute__((nocommon)); \
+    uint res_##name##_len  __attribute__((common)) = \
+            (uint)(uintptr_t)&_res_##name##_len
 
 //#define VBA_TRIANGLE_STRIP
 
