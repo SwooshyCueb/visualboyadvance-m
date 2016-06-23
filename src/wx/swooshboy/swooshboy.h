@@ -56,12 +56,6 @@ class vbaGL;
 class vbaTex;
 class vbaOSD;
 
-#define DECLARE_RES(name) \
-    extern char *res_##name __attribute__((nocommon)); \
-    extern void *_res_##name##_len __attribute__((nocommon)); \
-    uint res_##name##_len  __attribute__((common)) = \
-            (uint)(uintptr_t)&_res_##name##_len
-
 //#define VBA_TRIANGLE_STRIP
 
 #include "osd.h"
@@ -84,5 +78,10 @@ class vbaOSD;
 #define dprintf(format, ...)
 #endif
 
+#define DECLARE_RES(name) \
+    extern char *res_##name __attribute__((nocommon)); \
+    extern void *_res_##name##_len __attribute__((nocommon)); \
+    uint res_##name##_len  __attribute__((common)) = \
+            (uint)(uintptr_t)&_res_##name##_len
 
 #endif

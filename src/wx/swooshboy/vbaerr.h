@@ -191,4 +191,66 @@ public:
 #undef VBAERR_DEF_
 #endif
 
+#define EH_DEFINE(objn) \
+    inline void objn::pushErr(vbaErrVal val, const char *file, int line, \
+                              const char *func) { \
+        return ctx->pushErr(val, file, line, func); \
+    } \
+    inline void objn::pushErrFT(FT_Error ftval, const char *file, int line, \
+                                const char *func) { \
+        return ctx->pushErr(ftval, file, line, func); \
+    } \
+    inline void objn::pushErrFT(vbaErrVal val,FT_Error ftval, \
+                                const char *file, int line, \
+                                const char *func) { \
+        return ctx->pushErr(val, file, line, func); \
+    } \
+    inline bool objn::pushErrGL(const char *file, int line, \
+                                const char *func) { \
+        return ctx->pushErrGL(file, line, func); \
+    } \
+    inline bool objn::pushErrGL(vbaErrVal val, const char *file, int line, \
+                                const char *func) { \
+        return ctx->pushErrGL(val, file, line, func); \
+    } \
+    inline bool objn::catchErrGL(GLenum ignore, const char *file, int line, \
+                                 const char *func) { \
+        return ctx->catchErrGL(ignore, file, line, func); \
+    } \
+    inline bool objn::catchErrGL(GLenum ignore, vbaErrVal val, \
+                                 const char *file, int line, \
+                                 const char *func) { \
+        return ctx->catchErrGL(ignore, val, file, line, func); \
+    } \
+    static int just_here_to_allow_semicolon##objn __attribute__((unused))
+
+#define errVBASet(err) pushErr(err, __FILE__, __LINE__, __func__)
+#define errFTSet(err) pushErrFT(err, __FILE__, __LINE__, __func__)
+#define errVBASetFTSet(err, fterr) pushErrFT(err, fterr, __FILE__, \
+                                             __LINE__, __func__)
+#define errFTSetVBASet(fterr, err) errVBASetFTSet(err, fterr)
+#define errGLCheck() pushErrGL(__FILE__, __LINE__, __func__)
+#define errGLCheckVBASet(err) pushErrGL(err, __FILE__, __LINE__, __func__)
+#define errVBASetGLCheck(err) errGLCheckVBASet(err)
+#define errGLCatch(val) catchErrGL(val, __FILE__, __LINE__, __func__)
+#define errGLCatchVBASet(val, err) catchErrGL(val, err, __FILE__, \
+                                              __LINE__, __func__)
+#define errVBASetGLCatch(err, val) errGLCatchVBASet(val, err)
+
+#endif
+
+#ifndef EH_DECLARE
+#define EH_DECLARE() \
+    void pushErr(vbaErrVal val, const char *file, int line, const char *func); \
+    void pushErrFT(FT_Error val, const char *file, int line, \
+                   const char *func); \
+    void pushErrFT(vbaErrVal val, FT_Error ftval, const char *file, int line, \
+                   const char *func); \
+    bool pushErrGL(const char *file, int line, const char *func); \
+    bool pushErrGL(vbaErrVal val, const char *file, int line, \
+                   const char *func); \
+    bool catchErrGL(GLenum ignore, const char *file, int line, \
+                    const char *func); \
+    bool catchErrGL(GLenum ignore, vbaErrVal val, const char *file, int line, \
+                    const char *func)
 #endif

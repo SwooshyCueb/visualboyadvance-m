@@ -30,25 +30,7 @@ vbaTex::~vbaTex() {
     glDeleteTextures(1, &texture);
 }
 
-inline void vbaTex::pushErr(vbaErrVal val, const char *file, int line,
-                            const char *func) {
-    return ctx->pushErr(val, file, line, func);
-}
-inline bool vbaTex::pushErrGL(const char *file, int line, const char *func) {
-    return ctx->pushErrGL(file, line, func);
-}
-inline bool vbaTex::pushErrGL(vbaErrVal val, const char *file, int line,
-                              const char *func) {
-    return ctx->pushErrGL(val, file, line, func);
-}
-inline bool vbaTex::catchErrGL(GLenum ignore, const char *file, int line,
-                               const char *func) {
-    return ctx->catchErrGL(ignore, file, line, func);
-}
-inline bool vbaTex::catchErrGL(GLenum ignore, vbaErrVal val, const char *file,
-                               int line, const char *func) {
-    return ctx->catchErrGL(ignore, val, file, line, func);
-}
+EH_DEFINE(vbaTex);
 
 bool vbaTex::initBuffer() {
     glGenFramebuffers(1, &fbo);

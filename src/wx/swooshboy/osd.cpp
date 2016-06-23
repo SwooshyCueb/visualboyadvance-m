@@ -63,33 +63,7 @@ vbaOSD::~vbaOSD() {
     }
 }
 
-inline void vbaOSD::pushErr(vbaErrVal val, const char *file, int line,
-                            const char *func) {
-    return ctx->pushErr(val, file, line, func);
-}
-inline void vbaOSD::pushErrFT(FT_Error ftval, const char *file, int line,
-                            const char *func) {
-    return ctx->pushErr(ftval, file, line, func);
-}
-inline void vbaOSD::pushErrFT(vbaErrVal val,FT_Error ftval, const char *file,
-                            int line, const char *func) {
-    return ctx->pushErr(val, file, line, func);
-}
-inline bool vbaOSD::pushErrGL(const char *file, int line, const char *func) {
-    return ctx->pushErrGL(file, line, func);
-}
-inline bool vbaOSD::pushErrGL(vbaErrVal val, const char *file, int line,
-                              const char *func) {
-    return ctx->pushErrGL(val, file, line, func);
-}
-inline bool vbaOSD::catchErrGL(GLenum ignore, const char *file, int line,
-                               const char *func) {
-    return ctx->catchErrGL(ignore, file, line, func);
-}
-inline bool vbaOSD::catchErrGL(GLenum ignore, vbaErrVal val, const char *file,
-                               int line, const char *func) {
-    return ctx->catchErrGL(ignore, val, file, line, func);
-}
+EH_DEFINE(vbaOSD);
 
 void vbaOSD::getGlyph(char character) {
     std::deque<ftGlyph>::iterator iter = glyphs.begin();

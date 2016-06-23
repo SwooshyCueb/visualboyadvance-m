@@ -43,21 +43,43 @@ vbaGL::vbaGL() {
     }
 }
 
+/* pushErr/errVBASet
+ * add a VBA error to the error queue
+ *
+ * The pushErr function takes the error value, source filename in which the
+ * error is caught, line number where the error is caught, and function name
+ * in which it was caught.
+ *
+ * The macro errVBASet takes the error value only.
+ */
 inline void vbaGL::pushErr(vbaErrVal val, const char *file, int line,
                            const char *func) {
     vbaErrs.emplace(val, file, line, func);
 }
 
+/* pushErrFT/errFTSet
+ * add an FT error to the error queue
+ * Sets the VBA error to VBA_ERR_FT_ERR in the vbaErr objects.
+ */
 inline void vbaGL::pushErrFT(FT_Error ftval, const char *file, int line,
                            const char *func) {
     vbaErrs.emplace(VBA_ERR_FT_ERR, ftval, file, line, func);
 }
 
+/* pushErrFT/errVBASetFTSet/ErrFTSetVBASet
+ * add an FT error to the error queue
+ * Sets the VBA error to the provided VBA error value in the vbaErr objects.
+ */
 inline void vbaGL::pushErrFT(vbaErrVal val, FT_Error ftval, const char *file,
                            int line, const char *func) {
     vbaErrs.emplace(val, ftval, file, line, func);
 }
 
+/* pushErrGL/errGLCheckVBASet/errVBASetGLCheck
+ * Check for GL errors and add them to the error queue.
+ * Returns true if one or more GL errors are found.
+ * Sets the VBA error to the provided VBA error value in the vbaErr objects.
+ */
 inline bool vbaGL::pushErrGL(vbaErrVal val, const char *file, int line,
                              const char *func) {
     GLenum glErr;
@@ -71,10 +93,21 @@ inline bool vbaGL::pushErrGL(vbaErrVal val, const char *file, int line,
     return ret;
 }
 
+/* pushErrGL/errGLCheck
+ * Check for GL errors and add them to the error queue
+ * Returns true if one or more GL errors are found.
+ * Sets the VBA error to VBA_ERR_GL_ERR in the vbaErr objects.
+ */
 inline bool vbaGL::pushErrGL(const char *file, int line, const char *func) {
     return pushErrGL(VBA_ERR_GL_ERR, file, line, func);
 }
 
+/* catchErrGL/errGLCatch
+ * Check for GL errors and add them to the error queue.
+ * Returns true if one or more GL errors are found.
+ * Ignores the first GL error if it matches a provided GL error value.
+ * Sets the VBA error to VBA_ERR_GL_ERR in the vbaErr objects.
+ */
 inline bool vbaGL::catchErrGL(GLenum ignore, vbaErrVal val, const char *file,
                               int line, const char *func) {
     GLenum glErr;
@@ -97,6 +130,12 @@ inline bool vbaGL::catchErrGL(GLenum ignore, vbaErrVal val, const char *file,
     return ret;
 }
 
+/* catchErrGL/errGLCatchVBASet/errVBASetGLCatch
+ * Check for GL errors and add them to the error queue.
+ * Returns true if one or more GL errors are found.
+ * Ignores the first GL error if it matches a provided GL error value.
+ * Sets the VBA error to the provided VBA error value in the vbaErr objects.
+ */
 inline bool vbaGL::catchErrGL(GLenum ignore, const char *file, int line,
                               const char *func) {
     return catchErrGL(ignore, VBA_ERR_GL_ERR, file, line, func);

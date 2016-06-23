@@ -61,25 +61,7 @@ bool glslShader::setSrc(glslSrc *srcobj) {
     return !errGLCheck();
 }
 
-inline void glslShader::pushErr(vbaErrVal val, const char *file, int line,
-                            const char *func) {
-    return ctx->pushErr(val, file, line, func);
-}
-inline bool glslShader::pushErrGL(const char *file, int line, const char *func) {
-    return ctx->pushErrGL(file, line, func);
-}
-inline bool glslShader::pushErrGL(vbaErrVal val, const char *file, int line,
-                              const char *func) {
-    return ctx->pushErrGL(val, file, line, func);
-}
-inline bool glslShader::catchErrGL(GLenum ignore, const char *file, int line,
-                               const char *func) {
-    return ctx->catchErrGL(ignore, file, line, func);
-}
-inline bool glslShader::catchErrGL(GLenum ignore, vbaErrVal val, const char *file,
-                               int line, const char *func) {
-    return ctx->catchErrGL(ignore, val, file, line, func);
-}
+EH_DEFINE(glslShader);
 
 bool glslShader::compile() {
     glCompileShader(shader);
@@ -114,25 +96,7 @@ glslProg::glslProg(vbaGL *globj) {
     hasVtx = hasFrag = false;
 }
 
-inline void glslProg::pushErr(vbaErrVal val, const char *file, int line,
-                            const char *func) {
-    return ctx->pushErr(val, file, line, func);
-}
-inline bool glslProg::pushErrGL(const char *file, int line, const char *func) {
-    return ctx->pushErrGL(file, line, func);
-}
-inline bool glslProg::pushErrGL(vbaErrVal val, const char *file, int line,
-                              const char *func) {
-    return ctx->pushErrGL(val, file, line, func);
-}
-inline bool glslProg::catchErrGL(GLenum ignore, const char *file, int line,
-                               const char *func) {
-    return ctx->catchErrGL(ignore, file, line, func);
-}
-inline bool glslProg::catchErrGL(GLenum ignore, vbaErrVal val, const char *file,
-                               int line, const char *func) {
-    return ctx->catchErrGL(ignore, val, file, line, func);
-}
+EH_DEFINE(glslProg);
 
 bool glslProg::attachShader(glslShader shader) {
     glAttachShader(program, shader.shader);
