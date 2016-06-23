@@ -18,6 +18,8 @@
 #include "common.glsl"
 #endif
 
+#define NOSMASH4
+
 varying vec2 f_texcoord;
 varying vec2 dst_inc;
 varying vec2 src_inc;
@@ -70,16 +72,16 @@ vec2 src_pos;
 vec2 dst_coord;
 vec2 src_coord;
 
-float m_color_d = float(0xF7DE);
-float m_low_d = float(0x0821);
-float qm_color_d = float(0xE79C);
-float qm_low_d = float(0x1863);
+vec2 m_color_d = vec2(float(0xF7), float(0xDE));
+vec2 m_low_d = vec2(float(0x08), float(0x21));
+vec2 qm_color_d = vec2(float(0xE7), float(0x9C));
+vec2 qm_low_d = vec2(float(0x18), float(0x63));
 
 // TODO: Make these tweakable?
-vec2 m_color;
-vec2 m_low;
-vec2 qm_color;
-vec2 qm_low;
+u32 m_color;
+u32 m_low;
+u32 qm_color;
+u32 qm_low;
 
 int magicnumber(vec4 A, vec4 B, vec4 C, vec4 D) {
     ivec3 tmp = ivec3(0, 0, 0);
@@ -107,42 +109,49 @@ int magicnumber(vec4 A, vec4 B, vec4 C, vec4 D) {
     return tmp.z;
 }
 
+#ifdef NOSMASH2
+#define smash2(a, b) a
+#else
 vec4 smash2(vec4 A, vec4 B) {
     if (A == B) {
         return A;
     }
-    vec2 rA = pack(A);
-    vec2 rB = pack(B);
+    u32 rA = pack(A);
+    u32 rB = pack(B);
 
-    vec4 ret;
-    vec2 rAm = shiftR(and(rA, m_color), 1.0);
-    vec2 rBm = shiftR(and(rB, m_color), 1.0);
-    vec2 rLm = and(rA, rB, m_low);
+    u32 rAm = shiftR(and(rA, m_color), 1.0);
+    u32 rBm = shiftR(and(rB, m_color), 1.0);
+    u32 rLm = and(rA, rB, m_low);
 
     return unpack(fix_overflow(rAm + rBm + rLm));
 }
+#endif
 
+#ifdef NOSMASH4
+#define smash4(a, b, c, d) a
+#else
 vec4 smash4(vec4 A, vec4 B, vec4 C, vec4 D) {
-    vec2 rA = pack(A);
-    vec2 rB = pack(B);
-    vec2 rC = pack(C);
-    vec2 rD = pack(D);
+    u32 rA = pack(A);
+    u32 rB = pack(B);
+    u32 rC = pack(C);
+    u32 rD = pack(D);
 
-    vec2 rAm = shiftR(and(rA, qm_color), 2.0);
-    vec2 rBm = shiftR(and(rB, qm_color), 2.0);
-    vec2 rCm = shiftR(and(rC, qm_color), 2.0);
-    vec2 rDm = shiftR(and(rD, qm_color), 2.0);
+    u32 rAm = shiftR(and(rA, qm_color), 2.0);
+    u32 rBm = shiftR(and(rB, qm_color), 2.0);
+    u32 rCm = shiftR(and(rC, qm_color), 2.0);
+    u32 rDm = shiftR(and(rD, qm_color), 2.0);
 
-    vec2 rAl = and(rA, qm_low);
-    vec2 rBl = and(rB, qm_low);
-    vec2 rCl = and(rC, qm_low);
-    vec2 rDl = and(rD, qm_low);
+    u32 rAl = and(rA, qm_low);
+    u32 rBl = and(rB, qm_low);
+    u32 rCl = and(rC, qm_low);
+    u32 rDl = and(rD, qm_low);
 
-    vec2 rL = shiftR(fix_overflow(rAl + rBl + rCl + rDl), 2.0);
-    vec2 rLm = and(rL, qm_low);
+    u32 rL = shiftR(fix_overflow(rAl + rBl + rCl + rDl), 2.0);
+    u32 rLm = and(rL, qm_low);
 
     return unpack(fix_overflow(rAm + rBm + rCm + rDm + rLm));
 }
+#endif
 
 vec4 getpx(float x, float y) {
     vec2 offset = vec2(vec2(x, y) * src_inc);
@@ -152,13 +161,13 @@ vec4 getpx(float x, float y) {
 void main() {
     dst_pos = floor(gl_FragCoord.xy);
     src_pos = floor(dst_pos / 2.0);
-    dst_coord = vec2(dst_pos) * dst_inc; // Might need to add 0.5 to this?
-    src_coord = vec2(src_pos) * src_inc; // Might need to add 0.5 to this?
+    dst_coord = gl_FragCoord.xy * dst_inc;
+    src_coord = (src_pos + 0.5) * src_inc;
 
-    m_color = vec2(m_color_d, m_color_d);
-    m_low = vec2(m_low_d, m_low_d);
-    qm_color = vec2(qm_color_d, qm_color_d);
-    qm_low = vec2(qm_low_d, qm_low_d);
+    m_color = u32(m_color_d, m_color_d);
+    m_low = u32(m_low_d, m_low_d);
+    qm_color = u32(qm_color_d, qm_color_d);
+    qm_low = u32(qm_low_d, qm_low_d);
 
     vec2 skew = mod(dst_pos, 2.0);
 
@@ -264,9 +273,9 @@ void main() {
 
     if(skew == vec2(0.0, 0.0)) {
         gl_FragColor = dst_px;
-    } else if(skew == vec2(0.0, 1.0)) {
-        gl_FragColor = dst_px_E;
     } else if(skew == vec2(1.0, 0.0)) {
+        gl_FragColor = dst_px_E;
+    } else if(skew == vec2(0.0, 1.0)) {
         gl_FragColor = dst_px_N;
     } else if(skew == vec2(1.0, 1.0)) {
         gl_FragColor = dst_px_NE;
