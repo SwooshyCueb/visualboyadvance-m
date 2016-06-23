@@ -239,33 +239,8 @@ void vbaGL::clear() {
 }
 
 bool vbaGL::initShaders() {
-    glslSrc passthru_src;
-    LOAD_GLSL_SRC(passthru_src, passthrough);
-    glslShader passthru_shd_f(this, GL_FRAGMENT_SHADER);
-    glslShader passthru_shd_v(this, GL_VERTEX_SHADER);
-    passthru_shd_f.setSrc(&passthru_src);
-    passthru_shd_f.compile();
-    passthru_shd_v.setSrc(&passthru_src);
-    passthru_shd_v.compile();
-
-    glsl_passthrough = new glslProg(this);
-    glsl_passthrough->attachShader(passthru_shd_f);
-    glsl_passthrough->attachShader(passthru_shd_v);
-    glsl_passthrough->init();
-
-    glslSrc supereagle_src;
-    LOAD_GLSL_SRC(supereagle_src, supereagle);
-    glslShader supereagle_shd_f(this, GL_FRAGMENT_SHADER);
-    glslShader supereagle_shd_v(this, GL_VERTEX_SHADER);
-    supereagle_shd_f.setSrc(&supereagle_src);
-    supereagle_shd_f.compile();
-    supereagle_shd_v.setSrc(&supereagle_src);
-    supereagle_shd_v.compile();
-
-    glsl_supereagle = new glslProg(this);
-    glsl_supereagle->attachShader(supereagle_shd_f);
-    glsl_supereagle->attachShader(supereagle_shd_v);
-    glsl_supereagle->init();
+    shd_passthru1 = new shdPassthrough(this);
+    shd_supereagle = new shdSuperEagle(this);
     return true;
 }
 
@@ -273,22 +248,22 @@ bool vbaGL::initShaders() {
 bool vbaGL::genTextures(uint scale) {
     // Initial texture
     textures.emplace_back(scale, this);
-    textures.back().setShaderProg(glsl_passthrough);
+    textures.back().setShaderProg(shd_passthru1);
 
     // Intermediate texture 1
     textures.emplace_back(scale, this);
     textures.back().initBuffer();
-    textures.back().setShaderProg(glsl_supereagle);
+    textures.back().setShaderProg(shd_supereagle);
 
     // Intermediate texture 2
     textures.emplace_back(scale * 2, this);
     textures.back().initBuffer();
-    textures.back().setShaderProg(glsl_passthrough);
+    textures.back().setShaderProg(shd_passthru1);
 
     // Final texture
     textures.emplace_back(0, this);
     textures.back().initBuffer();
-    textures.back().setShaderProg(glsl_passthrough);
+    textures.back().setShaderProg(shd_passthru1);
 
     // For now, pass_qty will just be the number of textures we have
     for (uint i = 0; i < textures.size(); i++) {

@@ -193,6 +193,7 @@ SET( SRC_WX
    widgets/wxmisc.cpp
    swooshboy/glsl.cpp
    swooshboy/osd.cpp
+   swooshboy/shaders.cpp
    swooshboy/size.cpp
    swooshboy/swooshboy.cpp
    swooshboy/tex.cpp
@@ -229,6 +230,7 @@ SET( HDR_WX
    widgets/wx/wxmisc.h
    swooshboy/glsl.h
    swooshboy/osd.h
+   swooshboy/shaders.h
    swooshboy/size.h
    swooshboy/swooshboy.h
    swooshboy/tex.h

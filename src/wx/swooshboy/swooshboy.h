@@ -64,6 +64,7 @@ class vbaOSD;
 #include "vbagl.h"
 #include "tex.h"
 #include "glsl.h"
+#include "shaders.h"
 
 #include <cstdio>
 #include <cstddef>

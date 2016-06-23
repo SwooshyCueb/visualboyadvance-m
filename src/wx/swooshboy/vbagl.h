@@ -3,6 +3,7 @@
 
 #include "swooshboy.h"
 #include "glsl.h"
+#include "shaders.h"
 #include <GL/glxew.h>
 #include <GL/glut.h>
 #include <deque>
@@ -73,9 +74,9 @@ private:
     GLuint vb_vtx;
     GLuint vb_texcoord;
 
-    glslProg *glsl_passthrough;
-    glslProg *glsl_supereagle;
-    glslSrc glsl_common;
+    shdPassthrough *shd_passthru1;
+    shdSuperEagle  *shd_supereagle;
+    glslCommonSrc glsl_common;
 };
 
 #endif

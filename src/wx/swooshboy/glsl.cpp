@@ -6,12 +6,7 @@ GLchar *glslShader::glsl_defines_global = "#define DEBUG\n#define IN_VBA\n\0"; /
 GLchar *glslShader::glsl_defines_vert = "#define VERTEX\n\0"; //16
 GLchar *glslShader::glsl_defines_frag = "#define FRAGMENT\n\0"; //18
 
-glslSrc::glslSrc() {
-    src_main = NULL;
-    src_main_len = 0;
-}
-
-void glslSrc::loadSrc(char *src_in, const uint len) {
+glslSrc::glslSrc(char *src_in, const uint len) {
     src_main = src_in;
     src_main_len = len;
 }
@@ -28,14 +23,6 @@ glslShader::glslShader(vbaGL *globj, GLenum type_in) {
 
 bool glslShader::setSrc(glslSrc *srcobj) {
     src = srcobj;
-
-    if (ctx->glsl_common.src_main_len == 0) {
-        /* SOMEHOW, we're losing the common glsl source during setup of the
-         * Super Eagle shader.
-         */
-        DECLARE_RES(glsl_common);
-        ctx->glsl_common.loadSrc(res_glsl_common, res_glsl_common_len);
-    }
 
     glsl[0] = glsl_version;
     glsl_len[0] = 13;
