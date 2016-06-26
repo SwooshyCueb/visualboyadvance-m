@@ -6,7 +6,10 @@
 
 stgPassthrough::stgPassthrough(vbaGL *globj)
     : renderStage(globj) {
+    init(globj);
+}
 
+bool stgPassthrough::init(vbaGL *globj) {
     CREATE_GLSL_SRC_OBJ(pt_src, passthrough);
 
     glslShader shd_f(globj, GL_FRAGMENT_SHADER);
@@ -21,13 +24,18 @@ stgPassthrough::stgPassthrough(vbaGL *globj)
     renderStage::shader->attachShader(shd_f);
     renderStage::shader->attachShader(shd_v);
 
-    renderStage::shader->init();
+    renderStage::shader->link();
 
     renderStage::setMult(STAGE_MULT);
 
+    renderStage::is_init = true;
+    return true;
 }
 
 bool stgPassthrough::setIndex(uint idx) {
+    if (!renderStage::is_init) {
+        return false;
+    }
     renderStage::setIndex(idx);
     renderStage::shader->setSrcTexUnit(idx);
     renderStage::shader->setNeedsFlip(false);
@@ -37,6 +45,9 @@ bool stgPassthrough::setIndex(uint idx) {
 }
 
 bool stgPassthrough::render(vbaTex *src) {
+    if (!renderStage::is_init) {
+        return false;
+    }
     renderStage::render(src);
 
     return true;

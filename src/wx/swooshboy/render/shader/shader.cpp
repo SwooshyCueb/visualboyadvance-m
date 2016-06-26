@@ -1,12 +1,21 @@
 #include "swooshboy.h"
 #include "shader.h"
 
+// Somehow move this to header
 GLchar *glslShader::glsl_version = "#version 100\n\0"; //14
 GLchar *glslShader::glsl_defines_global = "#define DEBUG\n#define IN_VBA\n\0"; //30
 GLchar *glslShader::glsl_defines_vert = "#define VERTEX\n\0"; //16
 GLchar *glslShader::glsl_defines_frag = "#define FRAGMENT\n\0"; //18
 
+glslShader::glslShader() {
+    is_init = false;
+}
+
 glslShader::glslShader(vbaGL *globj, GLenum type_in) {
+    init(globj, type_in);
+}
+
+bool glslShader::init(vbaGL *globj, GLenum type_in) {
     ctx = globj;
     type = type_in;
     shader = glCreateShader(type);
@@ -14,9 +23,15 @@ glslShader::glslShader(vbaGL *globj, GLenum type_in) {
     if (err != GL_NO_ERROR) {
         errThrowGLVBA(err, VBA_ERR_GL_ERR);
     }
+    is_init = true;
+
+    return true;
 }
 
 bool glslShader::setSrc(glslSrc *srcobj) {
+    if (!is_init) {
+        return false;
+    }
     src = srcobj;
 
     glsl[0] = glsl_version;
@@ -46,6 +61,9 @@ bool glslShader::setSrc(glslSrc *srcobj) {
 EH_DEFINE(glslShader);
 
 bool glslShader::compile() {
+    if (!is_init) {
+        return false;
+    }
     glCompileShader(shader);
     errGLCheck();
     glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
@@ -55,6 +73,9 @@ bool glslShader::compile() {
 }
 
 bool glslShader::printInfoLog() {
+    if (!is_init) {
+        return false;
+    }
     GLint len = 0;
     GLint out = 0;
     GLchar *log;

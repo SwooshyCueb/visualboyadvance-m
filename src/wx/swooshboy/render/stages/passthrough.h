@@ -7,6 +7,7 @@
 class stgPassthrough : public renderStage {
 public:
     stgPassthrough(vbaGL *globj);
+    bool init(vbaGL *globj);
     bool setIndex(uint idx);
     bool render(vbaTex *src);
 };

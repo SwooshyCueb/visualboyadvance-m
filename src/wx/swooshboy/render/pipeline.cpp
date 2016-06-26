@@ -2,16 +2,34 @@
 #include "pipeline.h"
 #include "vbaerr.h"
 
+renderStage::renderStage() {
+    is_init = false;
+}
+
 renderStage::renderStage(vbaGL *globj) {
+    init(globj);
+}
+
+bool renderStage::init(vbaGL *globj) {
     ctx = globj;
+    is_init = true;
+    return true;
 }
 
 bool renderStage::setMult(uint coeff) {
+    if (!is_init) {
+        return false;
+    }
     mult = coeff;
     init_m = true;
+
+    return true;
 }
 
 bool renderStage::setIndex(uint idx) {
+    if (!is_init) {
+        return false;
+    }
     if (!init_m) {
         return false;
     }
@@ -58,7 +76,15 @@ bool renderStage::render(vbaTex *src) {
 
 EH_DEFINE(renderStage);
 
+renderPipeline::renderPipeline() {
+    is_init = false;
+}
+
 renderPipeline::renderPipeline(vbaGL *globj) {
+    init(globj);
+}
+
+bool renderPipeline::init(vbaGL *globj) {
     ctx = globj;
 
     // Initialize base texture
@@ -75,18 +101,28 @@ renderPipeline::renderPipeline(vbaGL *globj) {
     shd_draw = new glslProg(ctx);
     shd_draw->attachShader(draw_f);
     shd_draw->attachShader(draw_v);
-    shd_draw->init();
+    shd_draw->link();
     shd_draw->setNeedsFlip(true);
     shd_draw->setSrcTexUnit(0);
+
+    is_init = true;
+
+    return true;
 }
 
 bool renderPipeline::addStage(renderStage *stg) {
+    if (!is_init) {
+        return false;
+    }
     stg->setIndex(pipeline.size());
     pipeline.push_back(stg);
     return true;
 }
 
 bool renderPipeline::removeStage(uint idx) {
+    if (!is_init) {
+        return false;
+    }
     pipeline.erase(pipeline.begin() + idx);
 
     if (idx || (pipeline.begin() + (idx - 1) == pipeline.end())) {
@@ -103,6 +139,9 @@ bool renderPipeline::removeStage(uint idx) {
 }
 
 bool renderPipeline::refreshStages() {
+    if (!is_init) {
+        return false;
+    }
     if (pipeline.empty())
         return true;
     std::deque<renderStage *>::iterator  iter = pipeline.begin();
@@ -115,10 +154,16 @@ bool renderPipeline::refreshStages() {
 }
 
 uint renderPipeline::getSize() {
+    if (!is_init) {
+        return 0;
+    }
     return pipeline.size();
 }
 
 bool renderPipeline::render(const void *data) {
+    if (!is_init) {
+        return false;
+    }
     vbaTex *prev;
     base->setData((const GLvoid *)data);
 
@@ -135,6 +180,9 @@ bool renderPipeline::render(const void *data) {
 }
 
 bool renderPipeline::draw() {
+    if (!is_init) {
+        return false;
+    }
     pipeline.back()->texture->bind(0);
     shd_draw->activate();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

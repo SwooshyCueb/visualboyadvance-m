@@ -1,19 +1,28 @@
 Priority TODOs:
 Destructors for classes
 Dummy constructors and init functions for classes
-OSD (Freetype or stb_truetype?)
-Per-stage user-configurable options
-Port more upscalers to glsl
+Assignment operators, copy constructors, and so on for classes
 Provide proper access methods for class variables which should be private or protected
-One pipeline for each graphics "layer"
+actually implement the error handling you worked so hard on, dummy
 Scale should be float everywhere possible
 vbaSize needs operator overrides for float arithmetic
+Move shader attribute/uniform handling into stage class
+Method for setting glsl precompiler directives
+Make awful code less awful
+OSD (Freetype or stb_truetype?)
+slim down error handling for non-debug builds
+Per-stage user-configurable options
+Allow separate source files for vertex and fragment shader components in the same shader object
+Port more upscalers to glsl
+One pipeline for each graphics "layer"
 Better/more comments
 Figure out why audio only works after restarting emulation
+Come up with a better name than "swooshboy"
 
 
 Potential TODOs:
 Use glib for data structures?
+Look into individual compiled shader re-use?
 
 
 Distant goals:

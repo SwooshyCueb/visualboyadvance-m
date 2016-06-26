@@ -4,11 +4,18 @@
 #include "vbaerr.h"
 #include "shader/glsl.h"
 
+/*
+ * Still needs destructor
+ * Still needs copy constructor
+ * Still needs assignment operator
+ */
 class renderStage {
     friend class vbaGL;
     friend class renderPipeline;
 public:
+    renderStage(); //dummy constructor
     renderStage(vbaGL *globj);
+    bool init(vbaGL *globj);
 
     // Needs to be protected
     vbaTex *texture; //Texutre we are rendering TO
@@ -28,6 +35,8 @@ protected:
     bool init_t = false;
     bool init_s = false;
     bool init_b = false;
+
+    bool is_init = false;
 private:
     bool init_m = false;
     EH_DECLARE();
@@ -36,11 +45,19 @@ private:
     float scale; // Scale as compared to first stage
 };
 
+/*
+ * Still needs destructor
+ * Still needs copy constructor
+ * Still needs assignment operator
+ */
 class renderPipeline {
     friend class vbaGL;
     friend class renderStage;
 public:
+    renderPipeline(); //dummy constructor
     renderPipeline(vbaGL *globj);
+    bool init(vbaGL *globj);
+
     bool addStage(renderStage *stg);
     bool removeStage(uint idx);
     bool refreshStages();
@@ -60,6 +77,8 @@ private:
     glslProg *shd_draw; //Should be passthrough shader
 
     vbaGL *ctx;
+
+    bool is_init = false;
 };
 
 

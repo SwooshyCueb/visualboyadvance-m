@@ -6,17 +6,23 @@
 
 /* glslProg
  * Class for handling glsl programs
+ *
+ * Still needs destructor
+ * Still needs copy constructor
+ * Still needs assignment operator
  */
 class glslProg {
     friend class vbaGL;
     friend class glslShader;
 public:
+    glslProg(); // dummy constructor
     glslProg(vbaGL *globj);
+    bool init(vbaGL *globj);
 
     bool printInfoLog();
     bool attachShader(glslShader shader);
 
-    bool init();
+    bool link();
     bool activate();
 
     void setPassQty(uint n);
@@ -26,7 +32,7 @@ public:
     void setDstSz(vbaSize sz);
     void setNeedsFlip(bool flip);
 
-protected:
+private:
     EH_DECLARE();
 
     GLint getUniformPtr(const char *name);
@@ -46,6 +52,8 @@ protected:
     GLint linked;
     bool hasVtx = false;
     bool hasFrag = false;
+
+    bool is_init = false;
 
     vbaGL *ctx;
 

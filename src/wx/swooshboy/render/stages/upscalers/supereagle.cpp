@@ -1,14 +1,15 @@
 #include "swooshboy.h"
 #include "render/pipeline.h"
 
-#define STAGE_SUPEREAGLE
 #include "supereagle.h"
-
 #define STAGE_MULT 2
 
 stgSuperEagle::stgSuperEagle(vbaGL *globj)
     : renderStage(globj) {
+    init(globj);
+}
 
+bool stgSuperEagle::init(vbaGL *globj) {
     CREATE_GLSL_SRC_OBJ(se_src, supereagle);
 
     glslShader shd_f(globj, GL_FRAGMENT_SHADER);
@@ -23,13 +24,18 @@ stgSuperEagle::stgSuperEagle(vbaGL *globj)
     renderStage::shader->attachShader(shd_f);
     renderStage::shader->attachShader(shd_v);
 
-    renderStage::shader->init();
+    renderStage::shader->link();
 
     renderStage::setMult(STAGE_MULT);
 
+    renderStage::is_init = true;
+    return true;
 }
 
 bool stgSuperEagle::setIndex(uint idx) {
+    if (!renderStage::is_init) {
+        return false;
+    }
     renderStage::setIndex(idx);
     renderStage::shader->setSrcTexUnit(idx);
     renderStage::shader->setNeedsFlip(false);
@@ -48,6 +54,9 @@ bool stgSuperEagle::setIndex(uint idx) {
 }
 
 bool stgSuperEagle::render(vbaTex *src) {
+    if (!renderStage::is_init) {
+        return false;
+    }
     renderStage::render(src);
 
     return true;

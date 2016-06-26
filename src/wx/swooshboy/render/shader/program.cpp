@@ -1,16 +1,29 @@
 #include "swooshboy.h"
 #include "program.h"
 
+glslProg::glslProg() {
+    is_init = false;
+}
+
 glslProg::glslProg(vbaGL *globj) {
+    init(globj);
+}
+
+bool glslProg::init(vbaGL *globj) {
     ctx = globj;
     program = glCreateProgram();
     errGLCheck();
     hasVtx = hasFrag = false;
+    is_init = true;
+    return true;
 }
 
 EH_DEFINE(glslProg);
 
 bool glslProg::attachShader(glslShader shader) {
+    if (!is_init) {
+        return false;
+    }
     glAttachShader(program, shader.shader);
     errGLCheck();
     if (shader.type == GL_VERTEX_SHADER) {
@@ -24,6 +37,9 @@ bool glslProg::attachShader(glslShader shader) {
 }
 
 inline GLint glslProg::getUniformPtr(const char *name) {
+    if (!is_init) {
+        return false;
+    }
     GLint ret = glGetUniformLocation(program, name);
     errGLCheck();
     if (ret < 0)
@@ -32,6 +48,9 @@ inline GLint glslProg::getUniformPtr(const char *name) {
 }
 
 inline GLint glslProg::getAttrPtr(const char *name) {
+    if (!is_init) {
+        return false;
+    }
     GLint ret = glGetAttribLocation(program, name);
     errGLCheck();
     if (ret < 0)
@@ -40,6 +59,9 @@ inline GLint glslProg::getAttrPtr(const char *name) {
 }
 
 inline bool glslProg::enableVertAttrArr(const GLint arr) {
+    if (!is_init) {
+        return false;
+    }
     if (arr < 0)
         return false;
     glEnableVertexAttribArray(arr);
@@ -48,6 +70,9 @@ inline bool glslProg::enableVertAttrArr(const GLint arr) {
 }
 
 inline bool glslProg::disableVertAttrArr(const GLint arr) {
+    if (!is_init) {
+        return false;
+    }
     if (arr < 0)
         return false;
     glDisableVertexAttribArray(arr);
@@ -58,6 +83,9 @@ inline bool glslProg::disableVertAttrArr(const GLint arr) {
 inline bool glslProg::setVtxAttrPtr(const GLint arr, GLint sz, GLenum typ,
                                     GLboolean norm, GLsizei stride,
                                     const GLvoid *ptr) {
+    if (!is_init) {
+        return false;
+    }
     if (arr < 0)
         return false;
     glVertexAttribPointer(arr, sz, typ, norm, stride, ptr);
@@ -65,7 +93,10 @@ inline bool glslProg::setVtxAttrPtr(const GLint arr, GLint sz, GLenum typ,
     return true;
 }
 
-bool glslProg::init() {
+bool glslProg::link() {
+    if (!is_init) {
+        return false;
+    }
     glLinkProgram(program);
     errGLCheck();
     glGetProgramiv(program, GL_LINK_STATUS, &linked);
@@ -123,11 +154,17 @@ bool glslProg::init() {
 }
 
 bool glslProg::activate() {
+    if (!is_init) {
+        return false;
+    }
     glUseProgram(program);
     return !errGLCheck();
 }
 
 inline void glslProg::setVar1i(GLint var, GLint val) {
+    if (!is_init) {
+        return;
+    }
     if (var < 0)
         return;
 
@@ -140,6 +177,9 @@ inline void glslProg::setVar1i(GLint var, GLint val) {
 }
 
 inline void glslProg::setVar2i(GLint var, GLint val1, GLint val2) {
+    if (!is_init) {
+        return;
+    }
     if (var < 0)
         return;
 
@@ -152,6 +192,9 @@ inline void glslProg::setVar2i(GLint var, GLint val1, GLint val2) {
 }
 
 inline void glslProg::setVar2f(GLint var, GLfloat val1, GLfloat val2) {
+    if (!is_init) {
+        return;
+    }
     if (var < 0)
         return;
 
@@ -164,34 +207,55 @@ inline void glslProg::setVar2f(GLint var, GLfloat val1, GLfloat val2) {
 }
 
 void glslProg::setPassQty(uint n) {
+    if (!is_init) {
+        return;
+    }
     setVar1i(vars.v.pass_qty, n);
     setVar1i(vars.f.pass_qty, n);
 }
 
 void glslProg::setPassIdx(uint n) {
+    if (!is_init) {
+        return;
+    }
     setVar1i(vars.v.pass_idx, n);
     setVar1i(vars.f.pass_idx, n);
 }
 
 void glslProg::setSrcTexUnit(GLuint n) {
+    if (!is_init) {
+        return;
+    }
     setVar1i(vars.f.src_tex, GLint(n));
 }
 
 void glslProg::setSrcSz(vbaSize sz) {
+    if (!is_init) {
+        return;
+    }
     setVar2f(vars.v.src_sz, sz.x, sz.y);
     setVar2f(vars.f.src_sz, sz.x, sz.y);
 }
 
 void glslProg::setDstSz(vbaSize sz) {
+    if (!is_init) {
+        return;
+    }
     setVar2f(vars.v.dst_sz, sz.x, sz.y);
     setVar2f(vars.f.dst_sz, sz.x, sz.y);
 }
 
 void glslProg::setNeedsFlip(bool flip) {
+    if (!is_init) {
+        return;
+    }
     setVar1i(vars.needs_flip, flip ? 1 : 0);
 }
 
 bool glslProg::printInfoLog() {
+    if (!is_init) {
+        return false;
+    }
     GLint len = 0;
     GLint out = 0;
     GLchar *log;

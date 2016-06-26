@@ -7,6 +7,7 @@
 class stgSuperEagle : public renderStage {
 public:
     stgSuperEagle(vbaGL *globj);
+    bool init(vbaGL *globj);
     bool setIndex(uint idx);
     bool render(vbaTex *src);
 };

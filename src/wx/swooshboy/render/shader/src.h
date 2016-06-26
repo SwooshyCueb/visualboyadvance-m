@@ -13,15 +13,22 @@
  * file can contain multiple glsl shaders, and can be reused. Thanks to the way
  * glShaderSource() handles these variables, we can prepend preprocessor
  * directives without modifying the glsl source variable.
+ *
+ *
+ * Still needs destructor
+ * Still needs copy constructor
+ * Still needs assignment operator
  */
 class glslSrc {
     friend class glslShader;
     friend class vbaGL;
 public:
+    glslSrc(); //dummy constructor
     // Constructor sets source pointer and length
     glslSrc(char *src_in, const uint len);
-
+    bool init(char *src_in, const uint len);
 protected:
+    bool is_init;
     // The glsl source
     char *src_main;
     // Length of the array
