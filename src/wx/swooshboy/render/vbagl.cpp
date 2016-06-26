@@ -182,11 +182,25 @@ void vbaGL::setBaseScale(float scale) {
     base_scale = scale;
 }
 
-inline bool vbaGL::glVwpt(vbaSize sz) {
+vbaSize vbaGL::getBaseSize() {
+    vbaSize ret(base_sz);
+    return ret;
+}
+
+vbaSize vbaGL::getVwptSize() {
+    vbaSize ret(vwpt_sz);
+    return ret;
+}
+
+float vbaGL::getBaseScale() {
+    return base_scale;
+}
+
+bool vbaGL::glVwpt(vbaSize sz) {
     return glVwpt(sz.x, sz.y);
 }
 
-inline bool vbaGL::glVwpt(uint x, uint y) {
+bool vbaGL::glVwpt(uint x, uint y) {
     glViewport(0, 0, x, y);
     return !errGLCheck();
 }

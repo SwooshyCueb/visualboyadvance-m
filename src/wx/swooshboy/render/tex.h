@@ -23,6 +23,7 @@ public:
     ~vbaTex();
 
     void updSize(float scale);
+    vbaSize getSize();
 
     void setResizeFilter(GLint filter);
     void setOobBehavior(GLint behavior);
@@ -33,9 +34,6 @@ public:
     bool bind();
     bool bind(uint num);
 
-    // move back to private and create getter and setter
-    GLuint scale;
-    vbaSize size;
 
 private:
     EH_DECLARE();
@@ -43,6 +41,9 @@ private:
     GLuint texture;
     GLint resizefilt;
     GLint blitmask;
+
+    GLuint scale;
+    vbaSize size;
 
     vbaGL *ctx;
 

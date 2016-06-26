@@ -39,12 +39,11 @@ bool stgSuperEagle::setIndex(uint idx, renderPipeline *rdrpth) {
     renderStage::setIndex(idx, rdrpth);
     renderStage::shader->setSrcTexUnit(idx);
     renderStage::shader->setNeedsFlip(false);
-    renderStage::shader->setDstSz(renderStage::texture->size);
+    renderStage::shader->setDstSz(getSize());
     if (idx) {
-        // TODO: Make this less horrible
-        renderStage::shader->setSrcSz(renderStage::pipeline->pipeline[idx-1]->texture->size);
+        renderStage::shader->setSrcSz(stageAt(idx-1)->getSize());
     } else {
-        renderStage::shader->setSrcSz(ctx->base_sz * ctx->base_scale);
+        renderStage::shader->setSrcSz(ctx->getBaseSize() * ctx->getBaseScale());
     }
 
     renderStage::init_s = true;

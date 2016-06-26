@@ -16,6 +16,15 @@ bool renderStage::init(vbaGL *globj) {
     return true;
 }
 
+vbaSize renderStage::getSize() {
+    vbaSize ret(texture->getSize());
+    return ret;
+}
+
+renderStage *renderStage::stageAt(uint idx) {
+    return pipeline->stageAt(idx);
+}
+
 bool renderStage::setMult(uint coeff) {
     if (!is_init) {
         return false;
@@ -37,10 +46,9 @@ bool renderStage::setIndex(uint idx, renderPipeline *rdrpth) {
     pipeline = rdrpth;
 
     if (idx) {
-        // TODO: Make this less horrible
-        scale = rdrpth->pipeline[idx-1]->scale * mult;
+        scale = stageAt(idx-1)->scale * mult;
     } else {
-        scale = ctx->base_scale * mult;
+        scale = ctx->getBaseScale() * mult;
     }
 
     if (!init_t) {
@@ -67,9 +75,7 @@ bool renderStage::render(vbaTex *src) {
     shader->activate();
     glPixelStorei(GL_UNPACK_ROW_LENGTH, src->size.x + 1);
     glBindFramebuffer(GL_FRAMEBUFFER, buffer);
-    // This should work but ld complains
-    //ctx->glVwpt(texture->size);
-    glViewport(0, 0, texture->size.x, texture->size.y);
+    ctx->glVwpt(texture->size);
     ctx->draw();
     glUseProgram(0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -188,12 +194,14 @@ bool renderPipeline::draw() {
     pipeline.back()->texture->bind(0);
     shd_draw->activate();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    // This should work but ld complains
-    //ctx->glVwpt(ctx->vwpt_sz);
-    glViewport(0, 0, ctx->vwpt_sz.x, ctx->vwpt_sz.y);
+    ctx->glVwpt(ctx->getVwptSize());
     ctx->draw();
     glUseProgram(0);
     return true;
+}
+
+renderStage *renderPipeline::stageAt(uint idx) {
+    return pipeline[idx];
 }
 
 EH_DEFINE(renderPipeline);

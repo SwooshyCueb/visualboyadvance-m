@@ -114,3 +114,8 @@ void vbaTex::setOobBehavior(GLint behavior) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, behavior);
     errGLCheck();
 }
+
+vbaSize vbaTex::getSize() {
+    vbaSize ret(size);
+    return ret;
+}

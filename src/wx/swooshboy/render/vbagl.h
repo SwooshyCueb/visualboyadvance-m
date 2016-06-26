@@ -39,10 +39,14 @@ public:
     void setBaseSize(uint x, uint y);
     void setVwptSize(uint x, uint y);
     void setBaseScale(float scale);
+    bool setVsyncState(int vsync);
+
+    vbaSize getBaseSize();
+    vbaSize getVwptSize();
+    float getBaseScale();
 
     bool initPipeline(uint scale);
     bool render(const GLvoid *data);
-    bool setVsyncState(int vsync);
 
     bool glVwpt(uint x, uint y);
     bool glVwpt(vbaSize sz);
@@ -51,17 +55,16 @@ public:
     vbaErr errGet();
     bool errPrint();
 
-    // Move these back to private and create some getters
-    vbaSize base_sz;
-    vbaSize vwpt_sz;
-    float base_scale;
-
 private:
     bool draw();
 
     renderPipeline *pipeline;
 
     EH_DECLARE();
+
+    vbaSize base_sz;
+    vbaSize vwpt_sz;
+    float base_scale;
 
     GLuint largest_scale;
     std::queue<vbaErr> vbaErrs;

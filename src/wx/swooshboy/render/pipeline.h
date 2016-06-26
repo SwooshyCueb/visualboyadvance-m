@@ -17,16 +17,17 @@ public:
     renderStage(vbaGL *globj);
     bool init(vbaGL *globj);
 
-    // Needs to be protected
-    vbaTex *texture; //Texutre we are rendering TO
+    vbaSize getSize();
 
 protected:
     virtual bool setIndex(uint idx, renderPipeline *rdrpth);
     virtual bool render(vbaTex *src);
+    renderStage *stageAt(uint idx);
 
     bool setMult(uint coeff);
 
     uint index;
+    vbaTex *texture; //Texutre we are rendering TO
     glslProg *shader;
     GLuint buffer;
 
@@ -66,14 +67,15 @@ public:
     bool render(const void* data);
     bool draw();
 
-    // Make this private
-    std::deque<renderStage *> pipeline;
-
 private:
+
+    renderStage *stageAt(uint idx);
+
 
     EH_DECLARE();
 
     vbaTex *base;
+    std::deque<renderStage *> pipeline;
 
     glslProg *shd_draw; //Should be passthrough shader
 
