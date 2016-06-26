@@ -32,11 +32,11 @@ bool stgPassthrough::init(vbaGL *globj) {
     return true;
 }
 
-bool stgPassthrough::setIndex(uint idx) {
+bool stgPassthrough::setIndex(uint idx, renderPipeline *rdrpth) {
     if (!renderStage::is_init) {
         return false;
     }
-    renderStage::setIndex(idx);
+    renderStage::setIndex(idx, rdrpth);
     renderStage::shader->setSrcTexUnit(idx);
     renderStage::shader->setNeedsFlip(false);
     renderStage::init_s = true;

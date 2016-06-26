@@ -26,7 +26,7 @@ bool renderStage::setMult(uint coeff) {
     return true;
 }
 
-bool renderStage::setIndex(uint idx) {
+bool renderStage::setIndex(uint idx, renderPipeline *rdrpth) {
     if (!is_init) {
         return false;
     }
@@ -34,9 +34,11 @@ bool renderStage::setIndex(uint idx) {
         return false;
     }
 
+    pipeline = rdrpth;
+
     if (idx) {
         // TODO: Make this less horrible
-        scale = ctx->pipeline->pipeline[idx-1]->scale * mult;
+        scale = rdrpth->pipeline[idx-1]->scale * mult;
     } else {
         scale = ctx->base_scale * mult;
     }
@@ -114,7 +116,7 @@ bool renderPipeline::addStage(renderStage *stg) {
     if (!is_init) {
         return false;
     }
-    stg->setIndex(pipeline.size());
+    stg->setIndex(pipeline.size(), this);
     pipeline.push_back(stg);
     return true;
 }
@@ -132,7 +134,7 @@ bool renderPipeline::removeStage(uint idx) {
     std::deque<renderStage *>::iterator  iter = pipeline.begin() + idx;
 
     while(iter != pipeline.end()) {
-        (*iter)->setIndex((*iter)->index - 1);
+        (*iter)->setIndex((*iter)->index - 1, this);
         iter++;
     }
     return true;
@@ -147,7 +149,7 @@ bool renderPipeline::refreshStages() {
     std::deque<renderStage *>::iterator  iter = pipeline.begin();
 
     while(iter != pipeline.end()) {
-        (*iter)->setIndex((*iter)->index);
+        (*iter)->setIndex((*iter)->index, this);
         iter++;
     }
     return true;

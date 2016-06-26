@@ -56,11 +56,10 @@ public:
     vbaSize vwpt_sz;
     float base_scale;
 
-    // This needs to be private
-    renderPipeline *pipeline;
-
 private:
     bool draw();
+
+    renderPipeline *pipeline;
 
     EH_DECLARE();
 

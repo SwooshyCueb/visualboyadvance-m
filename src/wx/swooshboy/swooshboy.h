@@ -60,6 +60,7 @@ class vbaErr;
 class vbaGL;
 class vbaTex;
 class vbaOSD;
+class renderPipeline;
 
 //#define VBA_TRIANGLE_STRIP
 

@@ -32,17 +32,17 @@ bool stgSuperEagle::init(vbaGL *globj) {
     return true;
 }
 
-bool stgSuperEagle::setIndex(uint idx) {
+bool stgSuperEagle::setIndex(uint idx, renderPipeline *rdrpth) {
     if (!renderStage::is_init) {
         return false;
     }
-    renderStage::setIndex(idx);
+    renderStage::setIndex(idx, rdrpth);
     renderStage::shader->setSrcTexUnit(idx);
     renderStage::shader->setNeedsFlip(false);
     renderStage::shader->setDstSz(renderStage::texture->size);
     if (idx) {
         // TODO: Make this less horrible
-        renderStage::shader->setSrcSz(ctx->pipeline->pipeline[idx-1]->texture->size);
+        renderStage::shader->setSrcSz(renderStage::pipeline->pipeline[idx-1]->texture->size);
     } else {
         renderStage::shader->setSrcSz(ctx->base_sz * ctx->base_scale);
     }

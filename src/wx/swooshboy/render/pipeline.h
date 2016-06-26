@@ -21,7 +21,7 @@ public:
     vbaTex *texture; //Texutre we are rendering TO
 
 protected:
-    virtual bool setIndex(uint idx);
+    virtual bool setIndex(uint idx, renderPipeline *rdrpth);
     virtual bool render(vbaTex *src);
 
     bool setMult(uint coeff);
@@ -31,6 +31,7 @@ protected:
     GLuint buffer;
 
     vbaGL *ctx;
+    renderPipeline *pipeline;
 
     bool init_t = false;
     bool init_s = false;
