@@ -147,8 +147,23 @@ public:
     char *file; //source filename
     char *func; //function name
     uint line; //line number
-    bool init = false; //is the instance actually initalized?
+    bool is_init = false; //is the instance actually initalized?
 };
+
+bool operator == (const vbaErr &left, const vbaErr &right);
+bool operator != (const vbaErr &left, const vbaErr &right);
+bool operator == (const vbaErr &obj, const vbaErrVal &num);
+bool operator != (const vbaErr &obj, const vbaErrVal &num);
+bool operator == (const vbaErrVal &num, const vbaErr &obj);
+bool operator != (const vbaErrVal &num, const vbaErr &obj);
+bool operator == (const vbaErr &obj, const GLenum &num);
+bool operator != (const vbaErr &obj, const GLenum &num);
+bool operator == (const GLenum &num, const vbaErr &obj);
+bool operator != (const GLenum &num, const vbaErr &obj);
+bool operator == (const vbaErr &obj, const FT_Error &num);
+bool operator != (const vbaErr &obj, const FT_Error &num);
+bool operator == (const FT_Error &num, const vbaErr &obj);
+bool operator != (const FT_Error &num, const vbaErr &obj);
 
 #define errThrowVBA(err) throw vbaErr(err, __FILE__, __LINE__, __func__)
 

@@ -1,7 +1,15 @@
 #include "swooshboy.h"
 #include "tex.h"
 
+vbaTex::vbaTex() {
+    is_init = false;
+}
+
 vbaTex::vbaTex(float scale, vbaGL *globj) {
+    init(scale, globj);
+}
+
+bool vbaTex::init(float scale, vbaGL *globj) {
     ctx = globj;
     if (scale) {
         size.x = ctx->base_sz.x * scale;
@@ -18,10 +26,15 @@ vbaTex::vbaTex(float scale, vbaGL *globj) {
                 (scale > ctx->largest_scale) ? scale : ctx->largest_scale;
     }
     glClearColor(0.0, 0.0, 0.0, 1.0);
+
+    return true;
 }
 
 vbaTex::~vbaTex() {
-    glDeleteTextures(1, &texture);
+    if (is_init) {
+        glDeleteTextures(1, &texture);
+        is_init = false;
+    }
 }
 
 EH_DEFINE(vbaTex);
@@ -36,6 +49,9 @@ bool vbaTex::remBuffer() {
 #endif
 
 bool vbaTex::bind() {
+    if (is_init) {
+        return false;
+    }
     //glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(GL_TEXTURE_2D, texture);
     //bind(0);
@@ -43,12 +59,18 @@ bool vbaTex::bind() {
 }
 
 bool vbaTex::bind(uint num) {
+    if (is_init) {
+        return false;
+    }
     glActiveTexture(GL_TEXTURE0 + num);
     glBindTexture(GL_TEXTURE_2D, texture);
     return !errGLCheck();
 }
 
 bool vbaTex::setData(const GLvoid *data) {
+    if (is_init) {
+        return false;
+    }
     bind();
     glPixelStorei(GL_UNPACK_ROW_LENGTH, size.x + 1);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA,
@@ -57,6 +79,9 @@ bool vbaTex::setData(const GLvoid *data) {
 }
 
 void vbaTex::updSize(float scale) {
+    if (is_init) {
+        return;
+    }
     if (scale) {
         size.x = ctx->base_sz.x * scale;
         size.y = ctx->base_sz.y * scale;
@@ -66,6 +91,9 @@ void vbaTex::updSize(float scale) {
 }
 
 void vbaTex::setResizeFilter(GLint filter) {
+    if (is_init) {
+        return;
+    }
     resizefilt = filter;
     bind();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
@@ -78,6 +106,9 @@ void vbaTex::setResizeFilter(GLint filter) {
 }
 
 void vbaTex::setOobBehavior(GLint behavior) {
+    if (is_init) {
+        return;
+    }
     bind();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, behavior);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, behavior);

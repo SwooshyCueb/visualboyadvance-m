@@ -1,8 +1,8 @@
 Priority TODOs:
 Destructors for classes
-Dummy constructors and init functions for classes
 Assignment operators, copy constructors, and so on for classes
 Provide proper access methods for class variables which should be private or protected
+Allow setting texture size explicitly
 actually implement the error handling you worked so hard on, dummy
 Scale should be float everywhere possible
 vbaSize needs operator overrides for float arithmetic

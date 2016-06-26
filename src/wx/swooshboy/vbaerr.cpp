@@ -39,7 +39,7 @@ void vbaErr::set(vbaErrVal val, GLenum glval, const char *src, uint loc,
 void vbaErr::set(vbaErrVal val, GLenum glval, FT_Error ftval,
                  const char *src, uint loc, const char *fnc) {
     // If we are already initialized, free those strings!
-    if (init) {
+    if (is_init) {
         free(file);
         free(func);
     }
@@ -56,16 +56,16 @@ void vbaErr::set(vbaErrVal val, GLenum glval, FT_Error ftval,
     strcpy(file, src);
     strcpy(func, fnc);
 
-    init = true;
+    is_init = true;
 }
 
 vbaErr::vbaErr() {
     // Dummy constructor
-    init = false;
+    is_init = false;
 }
 
 vbaErr::~vbaErr() {
-    if (init) {
+    if (is_init) {
         free(file);
         free(func);
     }
@@ -88,7 +88,7 @@ const char* vbaErr::ftGetStr(FT_Error val) {
 }
 
 void vbaErr::print() {
-    if (!init)
+    if (!is_init)
         return;
     // Should probably use dprintf here
     fprintf(stderr, "%s:%u in func %s: error: %s\n", file, line, func,

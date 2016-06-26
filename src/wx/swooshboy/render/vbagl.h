@@ -19,6 +19,10 @@
 
 /* vbaGL
  * OpenGL stuff.
+ *
+ * Destructor needs work
+ * Still needs copy constructor
+ * Still needs assignment operator
  */
 class vbaGL {
     friend class vbaTex;

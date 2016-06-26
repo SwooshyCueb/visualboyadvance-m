@@ -7,13 +7,19 @@
 
 /* vbaTex
  * Texture object for use in vbaGL
+ *
+ * Destructor needs work
+ * Still needs copy constructor
+ * Still needs assignment operator
  */
 class vbaTex {
     friend class vbaGL;
     friend class renderStage;
 public:
+    vbaTex(); //dummy constructor
     //TODO: Allow texture creation with explicit width and height
     vbaTex(float scale, vbaGL *globj);
+    bool init(float scale, vbaGL *globj);
     ~vbaTex();
 
     void updSize(float scale);
@@ -39,6 +45,8 @@ private:
     GLint blitmask;
 
     vbaGL *ctx;
+
+    bool is_init = false;
 };
 
 #endif
