@@ -1,23 +1,19 @@
 #include "swooshboy.h"
 #include "tex.h"
 
-vbaTex::vbaTex(uint mult, vbaGL *globj) {
+vbaTex::vbaTex(float scale, vbaGL *globj) {
     ctx = globj;
-    scale = mult;
-    if (mult) {
+    if (scale) {
         size.x = ctx->base_sz.x * scale;
         size.y = ctx->base_sz.y * scale;
     } else {
         size = ctx->vwpt_sz;
     }
-    unit = ctx->textures.size();
     glGenTextures(1, &texture);
     setData(NULL);
     setResizeFilter(GL_NEAREST);
     setOobBehavior(GL_CLAMP_TO_EDGE);
-    hasBuffer = false;
-    hasShader = false;
-    if (mult) {
+    if (scale) {
         ctx->largest_scale =
                 (scale > ctx->largest_scale) ? scale : ctx->largest_scale;
     }
@@ -25,24 +21,11 @@ vbaTex::vbaTex(uint mult, vbaGL *globj) {
 }
 
 vbaTex::~vbaTex() {
-    if (hasBuffer)
-        remBuffer();
     glDeleteTextures(1, &texture);
 }
 
 EH_DEFINE(vbaTex);
-
-bool vbaTex::initBuffer() {
-    glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                           GL_TEXTURE_2D, texture, 0);
-    glDrawBuffers(1, ctx->DrawBuffers);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    hasBuffer = true;
-    return !errGLCheck();
-}
-
+#if 0
 bool vbaTex::remBuffer() {
     if (!hasBuffer)
         return false;
@@ -50,6 +33,7 @@ bool vbaTex::remBuffer() {
     hasBuffer = false;
     return !errGLCheck();
 }
+#endif
 
 bool vbaTex::bind() {
     //glActiveTexture(GL_TEXTURE0 + unit);
@@ -64,27 +48,6 @@ bool vbaTex::bind(uint num) {
     return !errGLCheck();
 }
 
-bool vbaTex::bindBuffer(GLenum target) {
-    if (hasBuffer) {
-        glBindFramebuffer(target, fbo);
-        return !errGLCheck();
-    } else {
-        return false;
-    }
-}
-
-bool vbaTex::bindBuffer() {
-    return bindBuffer(GL_FRAMEBUFFER);
-}
-
-bool vbaTex::bindBufferRead() {
-    return bindBuffer(GL_READ_FRAMEBUFFER);
-}
-
-bool vbaTex::bindBufferWrite() {
-    return bindBuffer(GL_DRAW_FRAMEBUFFER);
-}
-
 bool vbaTex::setData(const GLvoid *data) {
     bind();
     glPixelStorei(GL_UNPACK_ROW_LENGTH, size.x + 1);
@@ -93,7 +56,7 @@ bool vbaTex::setData(const GLvoid *data) {
     return !errGLCheck();
 }
 
-void vbaTex::updSize() {
+void vbaTex::updSize(float scale) {
     if (scale) {
         size.x = ctx->base_sz.x * scale;
         size.y = ctx->base_sz.y * scale;
@@ -119,9 +82,4 @@ void vbaTex::setOobBehavior(GLint behavior) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, behavior);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, behavior);
     errGLCheck();
-}
-
-void vbaTex::setShaderProg(glslProg *program) {
-    prog = program;
-    hasShader = true;
 }

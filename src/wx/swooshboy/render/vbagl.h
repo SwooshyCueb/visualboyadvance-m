@@ -2,8 +2,7 @@
 #define VBA_GL_H
 
 #include "swooshboy.h"
-#include "glsl.h"
-#include "shaders.h"
+#include "pipeline.h"
 #include <GL/glxew.h>
 #include <GL/glut.h>
 #include <deque>
@@ -27,38 +26,42 @@ class vbaGL {
     friend class glslShader;
     friend class glslProg;
     friend class vbaOSD;
+    friend class renderPipeline;
+    friend class renderStage;
 public:
     vbaGL();
     ~vbaGL();
 
     void setBaseSize(uint x, uint y);
     void setVwptSize(uint x, uint y);
+    void setBaseScale(float scale);
 
-    bool genTextures(uint scale);
-    bool setTexData(const GLvoid *data);
+    bool initPipeline(uint scale);
+    bool render(const GLvoid *data);
     bool setVsyncState(int vsync);
-
-    bool initShaders();
 
     bool glVwpt(uint x, uint y);
     bool glVwpt(vbaSize sz);
 
-    bool render();
     void clear();
     vbaErr errGet();
     bool errPrint();
+
+    // Move these back to private and create some getters
+    vbaSize base_sz;
+    vbaSize vwpt_sz;
+    float base_scale;
+
+    // This needs to be private
+    renderPipeline *pipeline;
 
 private:
     bool draw();
 
     EH_DECLARE();
 
-    vbaSize base_sz;
-    vbaSize vwpt_sz;
-    std::deque<vbaTex> textures;
     GLuint largest_scale;
     std::queue<vbaErr> vbaErrs;
-    vbaOSD *osd;
 
     #ifndef VBA_TRIANGLE_STRIP
     static GLfloat draw_vert[8];
@@ -68,15 +71,13 @@ private:
     static GLfloat draw_coord[8];
     static GLenum DrawBuffers[1];
 
-    GLfloat* mtx_ortho;
-
     GLuint vtxArr;
     GLuint vb_vtx;
     GLuint vb_texcoord;
 
-    shdPassthrough *shd_passthru1;
-    shdSuperEagle  *shd_supereagle;
     glslCommonSrc glsl_common;
+
+    bool init_p = false;
 };
 
 #endif

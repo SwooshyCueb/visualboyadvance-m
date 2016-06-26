@@ -2,7 +2,6 @@
 #include <GL/glut.h>
 #include "swooshboy.h"
 #include "vbagl.h"
-#include "glsl.h"
 
 #ifdef __APPLE__
 #include "TargetConditionals.h"
@@ -35,7 +34,7 @@ vbaGL::vbaGL() {
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    osd = new vbaOSD(this);
+    //osd = new vbaOSD(this);
 
     GLenum err = errGLCheck();
     if (err != GL_NO_ERROR) {
@@ -166,9 +165,8 @@ void vbaGL::setBaseSize(uint x, uint y) {
     base_sz.x = x;
     base_sz.y = y;
 
-    for (uint i = 0; i < textures.size(); i++) {
-        textures[i].updSize();
-    }
+    if (init_p)
+        pipeline->refreshStages();
 }
 
 void vbaGL::setVwptSize(uint x, uint y) {
@@ -176,9 +174,12 @@ void vbaGL::setVwptSize(uint x, uint y) {
     vwpt_sz.y = y;
     glVwpt(x, y);
 
-    for (uint i = 0; i < textures.size(); i++) {
-        textures[i].updSize();
-    }
+    if (init_p)
+        pipeline->refreshStages();
+}
+
+void vbaGL::setBaseScale(float scale) {
+    base_scale = scale;
 }
 
 inline bool vbaGL::glVwpt(vbaSize sz) {
@@ -190,38 +191,9 @@ inline bool vbaGL::glVwpt(uint x, uint y) {
     return !errGLCheck();
 }
 
-bool vbaGL::render() {
-    for (uint i = 0; i < textures.size(); i++) {
-        textures[i].bind(textures[i].unit);
-        if (textures[i].hasShader) {
-            textures[i].prog->activate();
-            textures[i].prog->setPassIdx(i+1);
-            textures[i].prog->setSrcTexUnit(textures[i].unit);
-            textures[i].prog->setDstSz(
-                        (i != textures.size() - 1)
-                        ? textures[i+1].size
-                        : vwpt_sz
-            );
-            textures[i].prog->setNeedsFlip(
-                        (i == textures.size() - 1)
-                        ? true
-                        : false
-            );
-            textures[i].prog->setSrcSz(textures[i].size);
-
-        }
-        if (i != textures.size() - 1) {
-            glPixelStorei(GL_UNPACK_ROW_LENGTH, textures[i].size.x + 1);
-            textures[i+1].bindBuffer();
-            glVwpt(textures[i+1].size);
-        } else {
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            glVwpt(vwpt_sz);
-        }
-        draw();
-        glUseProgram(0);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
+bool vbaGL::render(const void *data) {
+    pipeline->render(data);
+    pipeline->draw();
     return !errGLCheck();
 }
 
@@ -238,45 +210,23 @@ void vbaGL::clear() {
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-bool vbaGL::initShaders() {
-    shd_passthru1 = new shdPassthrough(this);
-    shd_supereagle = new shdSuperEagle(this);
-    return true;
-}
-
 /* Might do this differently */
-bool vbaGL::genTextures(uint scale) {
-    // Initial texture
-    textures.emplace_back(scale, this);
-    textures.back().setShaderProg(shd_passthru1);
+bool vbaGL::initPipeline(uint scale) {
+    base_scale = scale;
 
-    // Intermediate texture 1
-    textures.emplace_back(scale, this);
-    textures.back().initBuffer();
-    textures.back().setShaderProg(shd_supereagle);
+    pipeline = new renderPipeline(this);
 
-    // Intermediate texture 2
-    textures.emplace_back(scale * 2, this);
-    textures.back().initBuffer();
-    textures.back().setShaderProg(shd_passthru1);
+    init_p = true;
 
-    // Final texture
-    textures.emplace_back(0, this);
-    textures.back().initBuffer();
-    textures.back().setShaderProg(shd_passthru1);
+    renderStage *passthru1 = new stgPassthrough(this);
+    renderStage *supereagle1 = new stgSuperEagle(this);
+    renderStage *passthru2 = new stgPassthrough(this);
 
-    // For now, pass_qty will just be the number of textures we have
-    for (uint i = 0; i < textures.size(); i++) {
-        if (textures[i].hasShader)
-            textures[i].prog->setPassQty(textures.size());
-    }
+    pipeline->addStage(passthru1);
+    pipeline->addStage(supereagle1);
+    pipeline->addStage(passthru2);
 
     return true;
-}
-
-/* Might do this differently */
-bool vbaGL::setTexData(const GLvoid *data) {
-    return textures.front().setData(data);
 }
 
 bool vbaGL::setVsyncState(int vsync) {

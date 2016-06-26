@@ -74,6 +74,9 @@ include_directories(widgets)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+# swooshboy
+include_directories(swooshboy)
+
 # wxrc does not support xrs files in -c output (> 10x compression)
 # so do it manually using slow but portable bin2c.cmake script
 ADD_CUSTOM_COMMAND(OUTPUT wxvbam.xrs
@@ -105,12 +108,16 @@ FUNCTION(ADD_RESOURCES out_var)
         SET(out_s "${CMAKE_CURRENT_BINARY_DIR}/${in_f}.content.o")
         SET(out_c "${CMAKE_CURRENT_BINARY_DIR}/${in_f}.ptrs.c")
         SET(out_p "${CMAKE_CURRENT_BINARY_DIR}/${in_f}.ptrs.o")
+        GET_FILENAME_COMPONENT(out_d ${out_f} DIRECTORY)
+        EXECUTE_PROCESS(
+            COMMAND mkdir -p ${out_d}
+            OUTPUT_QUIET
+        )
         EXECUTE_PROCESS(
             COMMAND objdump -i
             COMMAND head -2
             COMMAND tail -1
             OUTPUT_VARIABLE o_tgt
-            ERROR_QUIET
         )
         STRING(STRIP "${o_tgt}" o_tgt)
         EXECUTE_PROCESS(
@@ -118,7 +125,6 @@ FUNCTION(ADD_RESOURCES out_var)
             COMMAND head -4
             COMMAND tail -1
             OUTPUT_VARIABLE o_arch
-            ERROR_QUIET
         )
         STRING(STRIP "${o_arch}" o_arch)
 
@@ -191,14 +197,18 @@ SET( SRC_WX
    widgets/joyedit.cpp
    widgets/sdljoy.cpp
    widgets/wxmisc.cpp
-   swooshboy/glsl.cpp
-   swooshboy/osd.cpp
-   swooshboy/shaders.cpp
-   swooshboy/size.cpp
    swooshboy/swooshboy.cpp
-   swooshboy/tex.cpp
    swooshboy/vbaerr.cpp
-   swooshboy/vbagl.cpp
+   swooshboy/render/pipeline.cpp
+   swooshboy/render/size.cpp
+   swooshboy/render/tex.cpp
+   swooshboy/render/vbagl.cpp
+   swooshboy/render/shader/program.cpp
+   swooshboy/render/shader/shader.cpp
+   swooshboy/render/shader/src.cpp
+   swooshboy/render/stages/osd.cpp
+   swooshboy/render/stages/passthrough.cpp
+   swooshboy/render/stages/upscalers/supereagle.cpp
    # probably ought to be in common
    ../sdl/text.cpp
    # from external source with minor modifications
@@ -228,15 +238,22 @@ SET( HDR_WX
    widgets/wx/sdljoy.h
    widgets/wx/webupdatedef.h
    widgets/wx/wxmisc.h
-   swooshboy/glsl.h
-   swooshboy/osd.h
-   swooshboy/shaders.h
-   swooshboy/size.h
    swooshboy/swooshboy.h
-   swooshboy/tex.h
    swooshboy/vbaerr.h
-   swooshboy/vbaerr_defs.h
-   swooshboy/vbagl.h
+   swooshboy/render/pipeline.h
+   swooshboy/render/render.h
+   swooshboy/render/size.h
+   swooshboy/render/tex.h
+   swooshboy/render/vbagl.h
+   swooshboy/render/shader/glsl.h
+   swooshboy/render/shader/program.h
+   swooshboy/render/shader/shader.h
+   swooshboy/render/shader/src.h
+   swooshboy/render/stages/osd.h
+   swooshboy/render/stages/passthrough.h
+   swooshboy/render/stages/stages.h
+   swooshboy/render/stages/upscalers/supereagle.h
+   swooshboy/render/stages/upscalers/upscalers.h
    # probably ought to be in common
    ../sdl/text.h
    # from external source with minor modifications
@@ -246,15 +263,15 @@ SET( HDR_WX
 FILE(GLOB XRC_WX xrc/*.xrc)
 
 SET( GLSL_SRC
-    swooshboy/glsl/passthrough.glsl
-    swooshboy/glsl/osd.glsl
-    swooshboy/glsl/supereagle.glsl
-    swooshboy/glsl/common.glsl
+    swooshboy/render/shader/glsl/passthrough.glsl
+    swooshboy/render/shader/glsl/osd.glsl
+    swooshboy/render/shader/glsl/supereagle.glsl
+    swooshboy/render/shader/glsl/common.glsl
 )
 
 SET(RES_WX_LN
     ${GLSL_SRC}
-    swooshboy/font/neoletters.ttf
+    swooshboy/res/fonts/neoletters.ttf
 )
 
 SET( RES_WX

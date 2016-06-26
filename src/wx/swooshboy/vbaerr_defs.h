@@ -27,6 +27,18 @@ VBAERR_DEF_(NO_MORE,
             0x0003
 )
 
+// VBA-pipeline related errors
+
+VBAERR_DEF_(UNSET_MULT,
+            "Stage multiplier has not been set",
+            0x0010
+)
+
+VBAERR_DEF_(UNSET_INDEX,
+            "Stage index has not been set",
+            0x0010
+)
+
 //GL-related errors
 
 VBAERR_DEF_(GL_ERR,

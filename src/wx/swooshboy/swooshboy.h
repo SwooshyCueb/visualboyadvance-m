@@ -41,14 +41,19 @@
  * http://scumways.com/happyhttp/happyhttp.html (update checking? surely we have curl) (zlib)
  */
 
-#ifndef VBA_SB_H
-#define VBA_SB_H
-
 #include <cstdint>
+#include <cstdio>
+#include <cstddef>
+#include <deque>
+#include <queue>
+#include <stack>
 
 #include <GL/glxew.h>
 #include <GL/glut.h>
 //#include <wx/glcanvas.h>
+
+#ifndef VBA_SB_H_1
+#define VBA_SB_H_1
 
 // Forward declarations to make life easier.
 class vbaErr;
@@ -58,19 +63,13 @@ class vbaOSD;
 
 //#define VBA_TRIANGLE_STRIP
 
-#include "osd.h"
-#include "vbaerr.h"
-#include "size.h"
-#include "vbagl.h"
-#include "tex.h"
-#include "glsl.h"
-#include "shaders.h"
+//#endif
 
-#include <cstdio>
-#include <cstddef>
-#include <deque>
-#include <queue>
-#include <stack>
+#include "vbaerr.h"
+#include "render/render.h"
+
+//#ifndef VBA_SB_H_2
+//#define VBA_SB_H_2
 
 
 #ifdef _DEBUG

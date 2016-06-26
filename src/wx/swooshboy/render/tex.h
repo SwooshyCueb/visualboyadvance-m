@@ -4,18 +4,19 @@
 #include "swooshboy.h"
 #include <GL/glxew.h>
 #include <GL/glut.h>
-#include "glsl.h"
 
 /* vbaTex
  * Texture object for use in vbaGL
  */
 class vbaTex {
     friend class vbaGL;
+    friend class renderStage;
 public:
-    vbaTex(uint mult, vbaGL *globj);
+    //TODO: Allow texture creation with explicit width and height
+    vbaTex(float scale, vbaGL *globj);
     ~vbaTex();
 
-    void updSize();
+    void updSize(float scale);
 
     void setResizeFilter(GLint filter);
     void setOobBehavior(GLint behavior);
@@ -26,31 +27,18 @@ public:
     bool bind();
     bool bind(uint num);
 
-    bool initBuffer();
-    bool remBuffer();
-
-    bool bindBuffer(GLenum target);
-    bool bindBuffer();
-    bool bindBufferRead();
-    bool bindBufferWrite();
+    // move back to private and create getter and setter
+    GLuint scale;
+    vbaSize size;
 
 private:
     EH_DECLARE();
 
     GLuint texture;
-    GLuint unit;
-    GLuint scale;
     GLint resizefilt;
     GLint blitmask;
-    vbaSize size;
-
-    bool hasBuffer = false;
-    bool hasShader = false;
-
-    GLuint fbo;
 
     vbaGL *ctx;
-    glslProg *prog;
 };
 
 #endif
