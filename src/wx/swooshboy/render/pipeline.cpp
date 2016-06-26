@@ -52,10 +52,16 @@ bool renderStage::setIndex(uint idx, renderPipeline *rdrpth) {
     }
 
     if (!init_t) {
-        texture = new vbaTex(scale, ctx);
+        if (scale)
+            texture = new vbaTex(ctx, scale * ctx->getBaseSize());
+        else
+            texture = new vbaTex(ctx, ctx->getVwptSize());
         init_t = true;
     } else {
-        texture->updSize(scale);
+        if (scale)
+            texture->setSize(scale * ctx->getBaseSize());
+        else
+            texture->setSize(ctx->getVwptSize());
     }
     if (!init_b) {
         glGenFramebuffers(1, &buffer);
@@ -96,7 +102,7 @@ bool renderPipeline::init(vbaGL *globj) {
     ctx = globj;
 
     // Initialize base texture
-    base = new vbaTex(1, ctx);
+    base = new vbaTex(ctx, ctx->getBaseSize() * ctx->getBaseScale());
 
     // Setup drawing shader
     CREATE_GLSL_SRC_OBJ(draw_src, passthrough);

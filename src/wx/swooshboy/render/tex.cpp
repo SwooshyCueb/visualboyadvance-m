@@ -5,26 +5,34 @@ vbaTex::vbaTex() {
     is_init = false;
 }
 
-vbaTex::vbaTex(float scale, vbaGL *globj) {
-    init(scale, globj);
+vbaTex::vbaTex(vbaGL *globj, vbaSize sz) {
+    init(globj, sz);
 }
 
-bool vbaTex::init(float scale, vbaGL *globj) {
+vbaTex::vbaTex(vbaGL *globj, uint x, uint y) {
+    init(globj, x, y);
+}
+
+bool vbaTex::init(vbaGL *globj, vbaSize sz) {
     ctx = globj;
-    if (scale) {
-        size.x = ctx->base_sz.x * scale;
-        size.y = ctx->base_sz.y * scale;
-    } else {
-        size = ctx->vwpt_sz;
-    }
+    size = sz;
     glGenTextures(1, &texture);
     setData(NULL);
     setResizeFilter(GL_NEAREST);
     setOobBehavior(GL_CLAMP_TO_EDGE);
-    if (scale) {
-        ctx->largest_scale =
-                (scale > ctx->largest_scale) ? scale : ctx->largest_scale;
-    }
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+
+    return true;
+}
+
+bool vbaTex::init(vbaGL *globj, uint x, uint y) {
+    ctx = globj;
+    size.x = x;
+    size.y = y;
+    glGenTextures(1, &texture);
+    setData(NULL);
+    setResizeFilter(GL_NEAREST);
+    setOobBehavior(GL_CLAMP_TO_EDGE);
     glClearColor(0.0, 0.0, 0.0, 1.0);
 
     return true;
@@ -38,15 +46,6 @@ vbaTex::~vbaTex() {
 }
 
 EH_DEFINE(vbaTex);
-#if 0
-bool vbaTex::remBuffer() {
-    if (!hasBuffer)
-        return false;
-    glDeleteFramebuffers(1, &fbo);
-    hasBuffer = false;
-    return !errGLCheck();
-}
-#endif
 
 bool vbaTex::bind() {
     if (is_init) {
@@ -78,16 +77,19 @@ bool vbaTex::setData(const GLvoid *data) {
     return !errGLCheck();
 }
 
-void vbaTex::updSize(float scale) {
+void vbaTex::setSize(vbaSize sz) {
     if (is_init) {
         return;
     }
-    if (scale) {
-        size.x = ctx->base_sz.x * scale;
-        size.y = ctx->base_sz.y * scale;
-    } else {
-        size = ctx->vwpt_sz;
+    size = sz;
+}
+
+void vbaTex::setSize(uint x, uint y) {
+    if (is_init) {
+        return;
     }
+    size.x = x;
+    size.y = y;
 }
 
 void vbaTex::setResizeFilter(GLint filter) {

@@ -17,12 +17,14 @@ class vbaTex {
     friend class renderStage;
 public:
     vbaTex(); //dummy constructor
-    //TODO: Allow texture creation with explicit width and height
-    vbaTex(float scale, vbaGL *globj);
-    bool init(float scale, vbaGL *globj);
+    vbaTex(vbaGL *globj, vbaSize sz);
+    bool init(vbaGL *globj, vbaSize sz);
+    vbaTex(vbaGL *globj, uint x, uint y);
+    bool init(vbaGL *globj, uint x, uint y);
     ~vbaTex();
 
-    void updSize(float scale);
+    void setSize(vbaSize sz);
+    void setSize(uint x, uint y);
     vbaSize getSize();
 
     void setResizeFilter(GLint filter);
@@ -42,7 +44,6 @@ private:
     GLint resizefilt;
     GLint blitmask;
 
-    GLuint scale;
     vbaSize size;
 
     vbaGL *ctx;
