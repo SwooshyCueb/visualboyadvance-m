@@ -19,40 +19,40 @@ bool stgSuperEagle::init(vbaGL *globj) {
     shd_v.setSrc(&se_src);
     shd_v.compile();
 
-    renderStage::shader = new glslProg(ctx);
+    shader = new glslProg(ctx);
 
-    renderStage::shader->attachShader(shd_f);
-    renderStage::shader->attachShader(shd_v);
+    shader->attachShader(shd_f);
+    shader->attachShader(shd_v);
 
-    renderStage::shader->link();
+    shader->link();
 
-    renderStage::setMult(STAGE_MULT);
+    setMult(STAGE_MULT);
 
-    renderStage::is_init = true;
+    is_init = true;
     return true;
 }
 
 bool stgSuperEagle::setIndex(uint idx, renderPipeline *rdrpth) {
-    if (!renderStage::is_init) {
+    if (!is_init) {
         return false;
     }
     renderStage::setIndex(idx, rdrpth);
-    renderStage::shader->setSrcTexUnit(idx);
-    renderStage::shader->setNeedsFlip(false);
-    renderStage::shader->setDstSz(getSize());
+    shader->setSrcTexUnit(idx);
+    shader->setNeedsFlip(false);
+    shader->setDstSz(getSize());
     if (idx) {
-        renderStage::shader->setSrcSz(stageAt(idx-1)->getSize());
+        shader->setSrcSz(stageAt(idx-1)->getSize());
     } else {
-        renderStage::shader->setSrcSz(ctx->getBaseSize() * ctx->getBaseScale());
+        shader->setSrcSz(ctx->getBaseSize() * ctx->getBaseScale());
     }
 
-    renderStage::init_s = true;
+    init_s = true;
 
     return true;
 }
 
 bool stgSuperEagle::render(vbaTex *src) {
-    if (!renderStage::is_init) {
+    if (!is_init) {
         return false;
     }
     renderStage::render(src);

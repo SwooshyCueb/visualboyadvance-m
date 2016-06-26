@@ -19,33 +19,33 @@ bool stgPassthrough::init(vbaGL *globj) {
     shd_v.setSrc(&pt_src);
     shd_v.compile();
 
-    renderStage::shader = new glslProg(ctx);
+    shader = new glslProg(ctx);
 
-    renderStage::shader->attachShader(shd_f);
-    renderStage::shader->attachShader(shd_v);
+    shader->attachShader(shd_f);
+    shader->attachShader(shd_v);
 
-    renderStage::shader->link();
+    shader->link();
 
-    renderStage::setMult(STAGE_MULT);
+    setMult(STAGE_MULT);
 
-    renderStage::is_init = true;
+    is_init = true;
     return true;
 }
 
 bool stgPassthrough::setIndex(uint idx, renderPipeline *rdrpth) {
-    if (!renderStage::is_init) {
+    if (!is_init) {
         return false;
     }
     renderStage::setIndex(idx, rdrpth);
-    renderStage::shader->setSrcTexUnit(idx);
-    renderStage::shader->setNeedsFlip(false);
-    renderStage::init_s = true;
+    shader->setSrcTexUnit(idx);
+    shader->setNeedsFlip(false);
+    init_s = true;
 
     return true;
 }
 
 bool stgPassthrough::render(vbaTex *src) {
-    if (!renderStage::is_init) {
+    if (!is_init) {
         return false;
     }
     renderStage::render(src);
