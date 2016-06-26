@@ -1,0 +1,27 @@
+Priority TODOs:
+Destructors for classes
+Dummy constructors and init functions for classes
+OSD (Freetype or stb_truetype?)
+Per-stage user-configurable options
+Port more upscalers to glsl
+Provide proper access methods for class variables which should be private or protected
+One pipeline for each graphics "layer"
+Scale should be float everywhere possible
+vbaSize needs operator overrides for float arithmetic
+Better/more comments
+Figure out why audio only works after restarting emulation
+
+
+Potential TODOs:
+Use glib for data structures?
+
+
+Distant goals:
+EGL stuff?
+SDL for audio output?
+SDL for video output?
+GL UI (nuklear?)
+100% GLES 2.0 compliance
+Steam Controller API?
+Steam Link port
+Update checker?
