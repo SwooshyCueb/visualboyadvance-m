@@ -93,12 +93,22 @@ vbaSize operator * (const vbaSize &sz, const int &scale) {
     return vbaSize(sz.x * scale, sz.y * scale);
 }
 
+vbaSize operator * (const vbaSize &sz, const float &scale) {
+    return vbaSize(uint(float(sz.x) * scale),
+                   uint(float(sz.y) * scale));
+}
+
 vbaSize operator * (const uint &scale, const vbaSize &sz) {
     return vbaSize(sz.x * scale, sz.y * scale);
 }
 
 vbaSize operator * (const int &scale, const vbaSize &sz) {
     return vbaSize(sz.x * scale, sz.y * scale);
+}
+
+vbaSize operator * (const float &scale, const vbaSize &sz) {
+    return vbaSize(uint(float(sz.x) * scale),
+                   uint(float(sz.y) * scale));
 }
 
 vbaSize &vbaSize::operator *= (const uint &num) {
@@ -113,12 +123,23 @@ vbaSize &vbaSize::operator *= (const int &num) {
     return *this;
 }
 
+vbaSize &vbaSize::operator *= (const float &num) {
+    x = uint(float(x) * num);
+    y = uint(float(y) * num);
+    return *this;
+}
+
 vbaSize operator / (const vbaSize &sz, const uint &scale) {
     return vbaSize(sz.x / scale, sz.y / scale);
 }
 
 vbaSize operator / (const vbaSize &sz, const int &scale) {
     return vbaSize(sz.x / scale, sz.y / scale);
+}
+
+vbaSize operator / (const vbaSize &sz, const float &scale) {
+    return vbaSize(uint(float(sz.x) / scale),
+                   uint(float(sz.y) / scale));
 }
 
 vbaSize &vbaSize::operator /= (const uint &num) {
@@ -130,6 +151,12 @@ vbaSize &vbaSize::operator /= (const uint &num) {
 vbaSize &vbaSize::operator /= (const int &num) {
     x /= num;
     y /= num;
+    return *this;
+}
+
+vbaSize &vbaSize::operator /= (const float &num) {
+    x = uint(float(x) / num);
+    y = uint(float(y) / num);
     return *this;
 }
 

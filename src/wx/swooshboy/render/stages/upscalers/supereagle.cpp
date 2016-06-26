@@ -44,8 +44,7 @@ bool stgSuperEagle::setIndex(uint idx) {
         // TODO: Make this less horrible
         renderStage::shader->setSrcSz(ctx->pipeline->pipeline[idx-1]->texture->size);
     } else {
-        // Need to be able to do arithmetic with vbaSize and floats
-        renderStage::shader->setSrcSz(ctx->base_sz * int(ctx->base_scale));
+        renderStage::shader->setSrcSz(ctx->base_sz * ctx->base_scale);
     }
 
     renderStage::init_s = true;

@@ -5,7 +5,6 @@ Provide proper access methods for class variables which should be private or pro
 Allow setting texture size explicitly
 actually implement the error handling you worked so hard on, dummy
 Scale should be float everywhere possible
-vbaSize needs operator overrides for float arithmetic
 Move shader attribute/uniform handling into stage class
 Method for setting glsl precompiler directives
 Make awful code less awful
