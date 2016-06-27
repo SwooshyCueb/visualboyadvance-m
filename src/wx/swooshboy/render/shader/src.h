@@ -15,7 +15,6 @@
  * directives without modifying the glsl source variable.
  *
  *
- * Still needs destructor
  * Still needs copy constructor
  * Still needs assignment operator
  */
@@ -27,6 +26,8 @@ public:
     // Constructor sets source pointer and length
     glslSrc(char *src_in, const uint len);
     bool init(char *src_in, const uint len);
+    ~glslSrc();
+
 protected:
     bool is_init;
     // The glsl source
@@ -41,6 +42,7 @@ protected:
 class glslCommonSrc : public glslSrc {
 public:
     glslCommonSrc();
+    ~glslCommonSrc();
 };
 
 #endif

@@ -6,7 +6,6 @@
 /* glslShader
  * Class for handling unlinked shaders
  *
- * Still needs destructor
  * Still needs copy constructor
  * Still needs assignment operator
  */
@@ -22,6 +21,7 @@ public:
      */
     glslShader(vbaGL *globj, GLenum type_in);
     bool init(vbaGL *globj, GLenum type_in);
+    ~glslShader();
 
     /* The source file object is not specified in the constructor
      * because reasons. Do it here instead.

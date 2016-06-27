@@ -15,6 +15,12 @@ bool renderStage::init(vbaGL *globj) {
     return true;
 }
 
+renderStage::~renderStage() {
+    if (has_buffer) {
+        glDeleteFramebuffers(1, &buffer);
+    }
+}
+
 vbaSize renderStage::getSize() {
     vbaSize ret(texture.getSize());
     return ret;
@@ -29,7 +35,7 @@ bool renderStage::setMult(uint coeff) {
         return false;
     }
     mult = coeff;
-    init_m = true;
+    mult_set = true;
 
     return true;
 }
@@ -38,7 +44,7 @@ bool renderStage::setIndex(uint idx, renderPipeline *rdrpth) {
     if (!is_init) {
         return false;
     }
-    if (!init_m) {
+    if (!mult_set) {
         return false;
     }
 
@@ -50,26 +56,26 @@ bool renderStage::setIndex(uint idx, renderPipeline *rdrpth) {
         scale = ctx->getBaseScale() * mult;
     }
 
-    if (!init_t) {
+    if (!has_texture) {
         if (scale)
             texture.init(ctx, scale * ctx->getBaseSize());
         else
             texture.init(ctx, ctx->getVwptSize());
-        init_t = true;
+        has_texture = true;
     } else {
         if (scale)
             texture.setSize(scale * ctx->getBaseSize());
         else
             texture.setSize(ctx->getVwptSize());
     }
-    if (!init_b) {
+    if (!has_buffer) {
         glGenFramebuffers(1, &buffer);
         glBindFramebuffer(GL_FRAMEBUFFER, buffer);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                GL_TEXTURE_2D, texture.texture, 0);
         glDrawBuffers(1, ctx->DrawBuffers);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        init_b = true;
+        has_buffer = true;
     }
     index = idx;
     return true;

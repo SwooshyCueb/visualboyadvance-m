@@ -8,6 +8,8 @@ class stgPassthrough : public renderStage {
 public:
     stgPassthrough(vbaGL *globj);
     bool init(vbaGL *globj);
+    ~stgPassthrough();
+
     bool setIndex(uint idx, renderPipeline *rdrpth);
     bool render(vbaTex *src);
 };

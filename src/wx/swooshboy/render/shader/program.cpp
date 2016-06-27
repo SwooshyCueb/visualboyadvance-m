@@ -13,25 +13,39 @@ bool glslProg::init(vbaGL *globj) {
     ctx = globj;
     program = glCreateProgram();
     errGLCheck();
-    hasVtx = hasFrag = false;
+    has_vtx = has_frag = false;
     is_init = true;
     return true;
 }
 
+glslProg::~glslProg() {
+    if (has_vtx) {
+        glDetachShader(program, v->shader);
+    }
+
+    if (has_frag) {
+        glDetachShader(program, f->shader);
+    }
+
+    if (is_init) {
+        glDeleteProgram(program);
+    }
+}
+
 EH_DEFINE(glslProg);
 
-bool glslProg::attachShader(glslShader shader) {
+bool glslProg::attachShader(glslShader *shader) {
     if (!is_init) {
         return false;
     }
-    glAttachShader(program, shader.shader);
+    glAttachShader(program, shader->shader);
     errGLCheck();
-    if (shader.type == GL_VERTEX_SHADER) {
-        v = &shader;
-        hasVtx = true;
-    } else if (shader.type == GL_FRAGMENT_SHADER) {
-        f = &shader;
-        hasFrag = true;
+    if (shader->type == GL_VERTEX_SHADER) {
+        v = shader;
+        has_vtx = true;
+    } else if (shader->type == GL_FRAGMENT_SHADER) {
+        f = shader;
+        has_frag = true;
     }
     return !errGLCheck();
 }
@@ -107,7 +121,7 @@ bool glslProg::link() {
     if (!linked)
         return false;
 
-    if (hasVtx) {
+    if (has_vtx) {
         vars.v.position = getAttrPtr("v_pos");
         vars.v.texcoord = getAttrPtr("v_texcoord");
 
@@ -118,7 +132,7 @@ bool glslProg::link() {
         vars.v.pass_qty = getUniformPtr("v_pass_qty");
     }
 
-    if (hasFrag) {
+    if (has_frag) {
         vars.f.src_tex = getUniformPtr("src_tex");
 
         vars.f.src_sz = getUniformPtr("f_src_sz");
@@ -132,7 +146,7 @@ bool glslProg::link() {
 
     errGLCheck();
 
-    if(hasVtx) {
+    if(has_vtx) {
         activate();
         glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_vtx);
         #ifndef VBA_TRIANGLE_STRIP

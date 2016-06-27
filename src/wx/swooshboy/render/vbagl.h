@@ -20,7 +20,6 @@
 /* vbaGL
  * OpenGL stuff.
  *
- * Destructor needs work
  * Still needs copy constructor
  * Still needs assignment operator
  */

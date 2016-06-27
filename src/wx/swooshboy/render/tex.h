@@ -8,7 +8,6 @@
 /* vbaTex
  * Texture object for use in vbaGL
  *
- * Destructor needs work
  * Still needs copy constructor
  * Still needs assignment operator
  */

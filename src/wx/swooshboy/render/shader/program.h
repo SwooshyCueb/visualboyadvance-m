@@ -7,7 +7,6 @@
 /* glslProg
  * Class for handling glsl programs
  *
- * Still needs destructor
  * Still needs copy constructor
  * Still needs assignment operator
  */
@@ -18,9 +17,10 @@ public:
     glslProg(); // dummy constructor
     glslProg(vbaGL *globj);
     bool init(vbaGL *globj);
+    ~glslProg();
 
     bool printInfoLog();
-    bool attachShader(glslShader shader);
+    bool attachShader(glslShader *shader);
 
     bool link();
     bool activate();
@@ -46,12 +46,10 @@ private:
     bool setVtxAttrPtr(const GLint arr, GLint sz, GLenum typ, GLboolean norm,
                        GLsizei stride, const GLvoid *ptr);
 
-    void updMatrices();
-
     GLuint program;
     GLint linked;
-    bool hasVtx = false;
-    bool hasFrag = false;
+    bool has_vtx = false;
+    bool has_frag = false;
 
     bool is_init = false;
 

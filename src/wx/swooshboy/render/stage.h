@@ -6,9 +6,14 @@
 #include "tex.h"
 
 /*
- * Still needs destructor
  * Still needs copy constructor
  * Still needs assignment operator
+ *
+ * Maybe implement separate functions for initializing/deinitializing texture,
+ * shader, and buffer?
+ *
+ * Maybe implement a more elegant method of updating internal information than
+ * just calling setIndex again?
  */
 class renderStage {
     friend class vbaGL;
@@ -17,6 +22,7 @@ public:
     renderStage(); //dummy constructor
     renderStage(vbaGL *globj);
     bool init(vbaGL *globj);
+    virtual ~renderStage();
 
     vbaSize getSize();
 
@@ -35,13 +41,13 @@ protected:
     vbaGL *ctx;
     renderPipeline *pipeline;
 
-    bool init_t = false;
-    bool init_s = false;
-    bool init_b = false;
+    bool has_texture = false;
+    bool has_shader = false;
+    bool has_buffer = false;
 
     bool is_init = false;
 private:
-    bool init_m = false;
+    bool mult_set = false;
     EH_DECLARE();
 
     float mult; // Scale as compared to previous stage

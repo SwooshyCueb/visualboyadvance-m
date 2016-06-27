@@ -42,6 +42,16 @@ vbaGL::vbaGL() {
     }
 }
 
+vbaGL::~vbaGL() {
+    glDeleteBuffers(1, &vb_vtx);
+    glDeleteBuffers(1, &vb_texcoord);
+    glDeleteVertexArrays(1, &vtxArr);
+
+    while(!vbaErrs.empty()) {
+        vbaErrs.pop();
+    }
+}
+
 /* pushErr/errVBASet
  * add a VBA error to the error queue
  *

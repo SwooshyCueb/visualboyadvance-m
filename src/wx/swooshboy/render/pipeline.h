@@ -7,7 +7,7 @@
 #include "tex.h"
 
 /*
- * Still needs destructor
+ * Destructor needs work
  * Still needs copy constructor
  * Still needs assignment operator
  */
@@ -18,6 +18,7 @@ public:
     renderPipeline(); //dummy constructor
     renderPipeline(vbaGL *globj);
     bool init(vbaGL *globj);
+    ~renderPipeline();
 
     bool addStage(renderStage *stg);
     bool removeStage(uint idx);
@@ -34,6 +35,7 @@ private:
     EH_DECLARE();
 
     vbaTex base;
+    // TODO: store actual renderStage objects here instead of pointers
     std::deque<renderStage *> pipeline;
 
     glslProg shd_draw; //Should be passthrough shader

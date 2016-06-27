@@ -17,7 +17,16 @@ bool glslSrc::init(char *src_in, const uint len) {
     return true;
 }
 
+glslSrc::~glslSrc() {
+    // Nothing to do here
+}
+
 DECLARE_RES(glsl_common);
+
 glslCommonSrc::glslCommonSrc()
     : glslSrc(res_glsl_common, res_glsl_common_len) {
+}
+
+glslCommonSrc::~glslCommonSrc() {
+    // Nothing to do here
 }

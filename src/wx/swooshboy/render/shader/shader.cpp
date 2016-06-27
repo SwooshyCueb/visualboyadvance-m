@@ -28,6 +28,10 @@ bool glslShader::init(vbaGL *globj, GLenum type_in) {
     return true;
 }
 
+glslShader::~glslShader() {
+    glDeleteShader(shader);
+}
+
 bool glslShader::setSrc(glslSrc *srcobj) {
     if (!is_init) {
         return false;

@@ -25,8 +25,8 @@ bool renderPipeline::init(vbaGL *globj) {
     draw_v.setSrc(&draw_src);
     draw_v.compile();
     shd_draw.init(ctx);
-    shd_draw.attachShader(draw_f);
-    shd_draw.attachShader(draw_v);
+    shd_draw.attachShader(&draw_f);
+    shd_draw.attachShader(&draw_v);
     shd_draw.link();
     shd_draw.setNeedsFlip(true);
     shd_draw.setSrcTexUnit(0);
@@ -34,6 +34,11 @@ bool renderPipeline::init(vbaGL *globj) {
     is_init = true;
 
     return true;
+}
+
+renderPipeline::~renderPipeline() {
+    //when pipeline stores objects instead of pointers, uncomment this
+    //pipeline.clear();
 }
 
 bool renderPipeline::addStage(renderStage *stg) {

@@ -21,8 +21,8 @@ bool stgPassthrough::init(vbaGL *globj) {
 
     shader.init(ctx);
 
-    shader.attachShader(shd_f);
-    shader.attachShader(shd_v);
+    shader.attachShader(&shd_f);
+    shader.attachShader(&shd_v);
 
     shader.link();
 
@@ -32,6 +32,10 @@ bool stgPassthrough::init(vbaGL *globj) {
     return true;
 }
 
+stgPassthrough::~stgPassthrough() {
+    // Nothing to do here yet
+}
+
 bool stgPassthrough::setIndex(uint idx, renderPipeline *rdrpth) {
     if (!is_init) {
         return false;
@@ -39,7 +43,7 @@ bool stgPassthrough::setIndex(uint idx, renderPipeline *rdrpth) {
     renderStage::setIndex(idx, rdrpth);
     shader.setSrcTexUnit(idx);
     shader.setNeedsFlip(false);
-    init_s = true;
+    has_shader = true;
 
     return true;
 }

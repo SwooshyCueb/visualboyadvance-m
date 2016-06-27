@@ -21,8 +21,8 @@ bool stgSuperEagle::init(vbaGL *globj) {
 
     shader.init(ctx);
 
-    shader.attachShader(shd_f);
-    shader.attachShader(shd_v);
+    shader.attachShader(&shd_f);
+    shader.attachShader(&shd_v);
 
     shader.link();
 
@@ -30,6 +30,10 @@ bool stgSuperEagle::init(vbaGL *globj) {
 
     is_init = true;
     return true;
+}
+
+stgSuperEagle::~stgSuperEagle() {
+    // Nothing to do here yet
 }
 
 bool stgSuperEagle::setIndex(uint idx, renderPipeline *rdrpth) {
@@ -46,7 +50,7 @@ bool stgSuperEagle::setIndex(uint idx, renderPipeline *rdrpth) {
         shader.setSrcSz(ctx->getBaseSize() * ctx->getBaseScale());
     }
 
-    init_s = true;
+    has_shader = true;
 
     return true;
 }
