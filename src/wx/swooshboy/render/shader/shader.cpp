@@ -29,7 +29,15 @@ bool glslShader::init(vbaGL *globj, GLenum type_in) {
 }
 
 glslShader::~glslShader() {
-    glDeleteShader(shader);
+    deinit();
+}
+
+bool glslShader::deinit() {
+    if (is_init) {
+        glDeleteShader(shader);
+        is_init = false;
+    }
+    return true;
 }
 
 bool glslShader::setSrc(glslSrc *srcobj) {
@@ -59,6 +67,7 @@ bool glslShader::setSrc(glslSrc *srcobj) {
     glsl_len[4] = src->src_main_len;
 
     glShaderSource(shader, 5, glsl, glsl_len);
+    src_set = true;
     return !errGLCheck();
 }
 
@@ -94,4 +103,93 @@ bool glslShader::printInfoLog() {
         free(log);
     }
     return true;
+}
+
+bool glslShader::shallowCopy(const glslShader &other) {
+    if (is_init) {
+        dprintf("WARN: shallowCopy called on initialized glslShader.");
+        deinit();
+    }
+
+    if (!other.is_init) {
+        // No need to go any further.
+        return true;
+    }
+
+    commonCopy(other);
+    compiled = other.compiled;
+    shader = other.shader;
+    return true;
+}
+
+bool glslShader::deepCopy(const glslShader &other) {
+    if (is_init) {
+        dprintf("WARN: deepCopy called on initialized glslShader.");
+        deinit();
+    }
+
+    if (!other.is_init) {
+        // No need to go any further.
+        return true;
+    }
+
+    commonCopy(other);
+    if(src_set)
+        glShaderSource(shader, 5, glsl, glsl_len);
+    shader = glCreateShader(type);
+    if (other.compiled) {
+        compile();
+    }
+    return true;
+}
+
+glslShader::glslShader(const glslShader &other) {
+    dprintf("WARN: ");
+    dprintf("Using copy constructor on glslShader object.\n");
+    dprintf("\tYou probably don't want to do this.\n");
+
+    #ifdef SHADER_COPYCONS_DEEP
+    dprintf("Copying shader by recompiling.");
+    deepCopy(other);
+    #else
+    dprintf("Both glslShader objects will point to the same shader.\n");
+    shallowCopy(other);
+    #endif
+}
+
+glslShader &glslShader::operator = (const glslShader &other) {
+    dprintf("WARN: ");
+    dprintf("Using assignment operator on glslShader object.\n");
+    dprintf("\tYou probably don't want to do this.\n");
+
+    #ifdef SHADER_ASSIGN_DEEP
+    dprintf("Copying shader by recompiling.");
+    deepCopy(other);
+    #else
+    dprintf("Both glslShader objects will point to the same shader.\n");
+    shallowCopy(other);
+    #endif
+
+    return *this;
+}
+
+// This will likely need to be reworked when we implement precompiler stuff
+void glslShader::commonCopy(const glslShader &other) {
+    is_init = other.is_init;
+    type = other.type;
+    ctx = ctx;
+    src_set = other.src_set;
+
+    src = other.src;
+    glsl[0] = other.glsl[0];
+    glsl[1] = other.glsl[1];
+    glsl[2] = other.glsl[2];
+    glsl[3] = other.glsl[3];
+    glsl[4] = other.glsl[4];
+
+    glsl_len[0] = other.glsl_len[0];
+    glsl_len[1] = other.glsl_len[1];
+    glsl_len[2] = other.glsl_len[2];
+    glsl_len[3] = other.glsl_len[3];
+    glsl_len[4] = other.glsl_len[4];
 }

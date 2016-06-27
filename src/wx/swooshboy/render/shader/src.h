@@ -13,10 +13,6 @@
  * file can contain multiple glsl shaders, and can be reused. Thanks to the way
  * glShaderSource() handles these variables, we can prepend preprocessor
  * directives without modifying the glsl source variable.
- *
- *
- * Still needs copy constructor
- * Still needs assignment operator
  */
 class glslSrc {
     friend class glslShader;
@@ -27,6 +23,12 @@ public:
     glslSrc(char *src_in, const uint len);
     bool init(char *src_in, const uint len);
     ~glslSrc();
+
+    glslSrc(const glslSrc &other);
+    glslSrc &operator  = (const glslSrc &other);
+    // TODO: (in)equality operators?
+    // TODO: Constructor with just char*?
+    // TODO: Assignment operator with just char*?
 
 protected:
     bool is_init;

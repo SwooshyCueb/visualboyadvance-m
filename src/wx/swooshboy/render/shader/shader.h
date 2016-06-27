@@ -5,9 +5,6 @@
 
 /* glslShader
  * Class for handling unlinked shaders
- *
- * Still needs copy constructor
- * Still needs assignment operator
  */
 class glslShader {
     friend class glslProg;
@@ -33,20 +30,39 @@ public:
     // Prints the compile log to stderr
     bool printInfoLog();
 
-protected:
+    /* Copies another glslShader object into this one.
+     * Both objects will reference the same shader.
+     */
+    bool shallowCopy(const glslShader &other);
+
+    /* Copies another glslShader object into this one.
+     * Creates a NEW shader.
+     */
+    bool deepCopy(const glslShader &other);
+
+    glslShader(const glslShader &other);
+    glslShader &operator  = (const glslShader &other);
+    // TODO: (in)equality operator?
+
+private:
     EH_DECLARE();
 
     bool is_init = false;
+    bool deinit();
 
     GLuint shader;
 
-    GLint compiled;
+    GLint compiled = 0;
     GLenum type;
 
     glslSrc *src;
     GLchar *glsl[5];
     GLint glsl_len[5];
+    bool src_set = false;
+
     vbaGL *ctx;
+
+    void commonCopy(const glslShader &other);
 
     // Our preprocessor directive strings are declared here
     static GLchar *glsl_version;
