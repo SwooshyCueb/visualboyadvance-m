@@ -148,7 +148,7 @@ glslShader::glslShader(const glslShader &other) {
     dprintf("Using copy constructor on glslShader object.\n");
     dprintf("\tYou probably don't want to do this.\n");
 
-    #ifdef SHADER_COPYCONS_DEEP
+    #ifndef SHADER_COPYCONS_SHALLOW
     dprintf("Copying shader by recompiling.");
     deepCopy(other);
     #else
@@ -162,7 +162,7 @@ glslShader &glslShader::operator = (const glslShader &other) {
     dprintf("Using assignment operator on glslShader object.\n");
     dprintf("\tYou probably don't want to do this.\n");
 
-    #ifdef SHADER_ASSIGN_DEEP
+    #ifndef SHADER_ASSIGN_SHALLOW
     dprintf("Copying shader by recompiling.");
     deepCopy(other);
     #else

@@ -32,6 +32,15 @@ public:
     void setDstSz(vbaSize sz);
     void setNeedsFlip(bool flip);
 
+    // same program, same shaders
+    bool shallowCopy(const glslProg &other);
+    // new program, same shaders
+    bool deepCopy(const glslProg &other);
+
+    glslProg(const glslProg &other);
+    glslProg &operator  = (const glslProg &other);
+    // TODO: (in)equality operator?
+
 private:
     EH_DECLARE();
 
@@ -47,11 +56,12 @@ private:
                        GLsizei stride, const GLvoid *ptr);
 
     GLuint program;
-    GLint linked;
+    GLint linked = 0;
     bool has_vtx = false;
     bool has_frag = false;
 
     bool is_init = false;
+    bool deinit();
 
     vbaGL *ctx;
 

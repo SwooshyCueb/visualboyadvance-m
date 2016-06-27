@@ -19,17 +19,25 @@ bool glslProg::init(vbaGL *globj) {
 }
 
 glslProg::~glslProg() {
-    if (has_vtx) {
-        glDetachShader(program, v->shader);
-    }
+    deinit();
+}
 
-    if (has_frag) {
-        glDetachShader(program, f->shader);
-    }
-
+bool glslProg::deinit() {
     if (is_init) {
+        if (has_vtx) {
+            glDetachShader(program, v->shader);
+            has_vtx = false;
+        }
+
+        if (has_frag) {
+            glDetachShader(program, f->shader);
+            has_vtx = false;
+        }
+
         glDeleteProgram(program);
+        is_init = false;
     }
+    return true;
 }
 
 EH_DEFINE(glslProg);
@@ -284,4 +292,105 @@ bool glslProg::printInfoLog() {
         free(log);
     }
     return true;
+}
+
+bool glslProg::shallowCopy(const glslProg &other) {
+    if (is_init) {
+        dprintf("WARN: shallowCopy called on initialized glslProg.");
+        deinit();
+    }
+
+    if (!other.is_init) {
+        //No need to go any further
+        return true;
+    }
+
+    is_init = other.is_init;
+    ctx = other.ctx;
+
+    has_vtx = other.has_vtx;
+    v = other.v;
+
+    has_frag = other.has_frag;
+    f = other.f;
+
+    program = other.program;
+    linked = other.linked;
+
+    vars.needs_flip = other.vars.needs_flip;
+    vars.v.position = other.vars.v.position;
+    vars.v.texcoord = other.vars.v.texcoord;
+    vars.v.src_sz =   other.vars.v.src_sz;
+    vars.v.dst_sz =   other.vars.v.dst_sz;
+    vars.v.pass_idx = other.vars.v.pass_idx;
+    vars.v.pass_qty = other.vars.v.pass_qty;
+    vars.f.src_sz =   other.vars.f.src_sz;
+    vars.f.dst_sz =   other.vars.f.dst_sz;
+    vars.f.pass_idx = other.vars.f.pass_idx;
+    vars.f.pass_qty = other.vars.f.pass_qty;
+    vars.f.src_tex =  other.vars.f.src_tex;
+
+    return true;
+}
+
+bool glslProg::deepCopy(const glslProg &other) {
+    if (is_init) {
+        dprintf("WARN: deepCopy called on initialized glslProg.");
+        deinit();
+    }
+
+    if (!other.is_init) {
+        //No need to go any further
+        return true;
+    }
+
+    is_init = other.is_init;
+    ctx = other.ctx;
+
+    program = glCreateProgram();
+
+    if (other.has_vtx) {
+        attachShader(other.v);
+    }
+
+    if (other.has_frag) {
+        attachShader(other.f);
+    }
+
+    if (other.linked) {
+        link();
+    }
+
+}
+
+glslProg::glslProg(const glslProg &other) {
+    dprintf("WARN: ");
+    dprintf("Using copy constructor on glslProg object.\n");
+    dprintf("\tYou probably don't want to do this.\n");
+
+    #ifndef PROG_COPYCONS_SHALLOW
+    dprintf("Copying program by relinking.");
+    deepCopy(other);
+    #else
+    dprintf("Both glslProg objects will point to the same program.\n");
+    shallowCopy(other);
+    #endif
+
+
+}
+
+glslProg &glslProg::operator  = (const glslProg &other) {
+    dprintf("WARN: ");
+    dprintf("Using assignment operator on glslProg object.\n");
+    dprintf("\tYou probably don't want to do this.\n");
+
+    #ifndef PROG_ASSIGN_SHALLOW
+    dprintf("Copying program by relinking.");
+    deepCopy(other);
+    #else
+    dprintf("Both glslProg objects will point to the same program.\n");
+    shallowCopy(other);
+    #endif
+
+    return *this;
 }
