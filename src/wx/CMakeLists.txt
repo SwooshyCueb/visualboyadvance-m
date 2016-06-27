@@ -201,6 +201,7 @@ SET( SRC_WX
    swooshboy/vbaerr.cpp
    swooshboy/render/pipeline.cpp
    swooshboy/render/size.cpp
+   swooshboy/render/stage.cpp
    swooshboy/render/tex.cpp
    swooshboy/render/vbagl.cpp
    swooshboy/render/shader/program.cpp
@@ -243,6 +244,7 @@ SET( HDR_WX
    swooshboy/render/pipeline.h
    swooshboy/render/render.h
    swooshboy/render/size.h
+   swooshboy/render/stage.h
    swooshboy/render/tex.h
    swooshboy/render/vbagl.h
    swooshboy/render/shader/glsl.h

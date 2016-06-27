@@ -1,5 +1,6 @@
 #include "pipeline.h"
 #include "size.h"
+#include "stage.h"
 #include "tex.h"
 #include "vbagl.h"
 #include "render/shader/glsl.h"

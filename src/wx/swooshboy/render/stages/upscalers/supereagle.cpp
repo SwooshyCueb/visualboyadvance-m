@@ -1,5 +1,5 @@
 #include "swooshboy.h"
-#include "render/pipeline.h"
+#include "render/stage.h"
 
 #include "supereagle.h"
 #define STAGE_MULT 2

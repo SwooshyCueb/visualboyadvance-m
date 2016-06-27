@@ -1,7 +1,7 @@
 #ifndef VBA_STG_PASSTHROUGH_H
 #define VBA_STG_PASSTHROUGH_H
 
-#include "render/pipeline.h"
+#include "render/stage.h"
 #include "swooshboy.h"
 
 class stgPassthrough : public renderStage {
