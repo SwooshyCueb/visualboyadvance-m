@@ -166,7 +166,7 @@ void vbaGL::setBaseSize(uint x, uint y) {
     base_sz.y = y;
 
     if (init_p)
-        pipeline->refreshStages();
+        pipeline.refreshStages();
 }
 
 void vbaGL::setVwptSize(uint x, uint y) {
@@ -175,7 +175,7 @@ void vbaGL::setVwptSize(uint x, uint y) {
     glVwpt(x, y);
 
     if (init_p)
-        pipeline->refreshStages();
+        pipeline.refreshStages();
 }
 
 void vbaGL::setBaseScale(float scale) {
@@ -206,8 +206,8 @@ bool vbaGL::glVwpt(uint x, uint y) {
 }
 
 bool vbaGL::render(const void *data) {
-    pipeline->render(data);
-    pipeline->draw();
+    pipeline.render(data);
+    pipeline.draw();
     return !errGLCheck();
 }
 
@@ -228,7 +228,7 @@ void vbaGL::clear() {
 bool vbaGL::initPipeline(uint scale) {
     base_scale = scale;
 
-    pipeline = new renderPipeline(this);
+    pipeline.init(this);
 
     init_p = true;
 
@@ -236,9 +236,9 @@ bool vbaGL::initPipeline(uint scale) {
     renderStage *supereagle1 = new stgSuperEagle(this);
     renderStage *passthru2 = new stgPassthrough(this);
 
-    pipeline->addStage(passthru1);
-    pipeline->addStage(supereagle1);
-    pipeline->addStage(passthru2);
+    pipeline.addStage(passthru1);
+    pipeline.addStage(supereagle1);
+    pipeline.addStage(passthru2);
 
     return true;
 }

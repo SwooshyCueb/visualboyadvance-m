@@ -19,12 +19,12 @@ bool stgSuperEagle::init(vbaGL *globj) {
     shd_v.setSrc(&se_src);
     shd_v.compile();
 
-    shader = new glslProg(ctx);
+    shader.init(ctx);
 
-    shader->attachShader(shd_f);
-    shader->attachShader(shd_v);
+    shader.attachShader(shd_f);
+    shader.attachShader(shd_v);
 
-    shader->link();
+    shader.link();
 
     setMult(STAGE_MULT);
 
@@ -37,13 +37,13 @@ bool stgSuperEagle::setIndex(uint idx, renderPipeline *rdrpth) {
         return false;
     }
     renderStage::setIndex(idx, rdrpth);
-    shader->setSrcTexUnit(idx);
-    shader->setNeedsFlip(false);
-    shader->setDstSz(getSize());
+    shader.setSrcTexUnit(idx);
+    shader.setNeedsFlip(false);
+    shader.setDstSz(getSize());
     if (idx) {
-        shader->setSrcSz(stageAt(idx-1)->getSize());
+        shader.setSrcSz(stageAt(idx-1)->getSize());
     } else {
-        shader->setSrcSz(ctx->getBaseSize() * ctx->getBaseScale());
+        shader.setSrcSz(ctx->getBaseSize() * ctx->getBaseScale());
     }
 
     init_s = true;

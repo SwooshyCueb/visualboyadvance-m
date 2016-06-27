@@ -58,7 +58,7 @@ public:
 private:
     bool draw();
 
-    renderPipeline *pipeline;
+    renderPipeline pipeline;
 
     EH_DECLARE();
 

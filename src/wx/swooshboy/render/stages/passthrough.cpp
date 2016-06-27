@@ -19,12 +19,12 @@ bool stgPassthrough::init(vbaGL *globj) {
     shd_v.setSrc(&pt_src);
     shd_v.compile();
 
-    shader = new glslProg(ctx);
+    shader.init(ctx);
 
-    shader->attachShader(shd_f);
-    shader->attachShader(shd_v);
+    shader.attachShader(shd_f);
+    shader.attachShader(shd_v);
 
-    shader->link();
+    shader.link();
 
     setMult(STAGE_MULT);
 
@@ -37,8 +37,8 @@ bool stgPassthrough::setIndex(uint idx, renderPipeline *rdrpth) {
         return false;
     }
     renderStage::setIndex(idx, rdrpth);
-    shader->setSrcTexUnit(idx);
-    shader->setNeedsFlip(false);
+    shader.setSrcTexUnit(idx);
+    shader.setNeedsFlip(false);
     init_s = true;
 
     return true;

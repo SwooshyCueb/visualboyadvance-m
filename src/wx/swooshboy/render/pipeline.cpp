@@ -17,7 +17,7 @@ bool renderStage::init(vbaGL *globj) {
 }
 
 vbaSize renderStage::getSize() {
-    vbaSize ret(texture->getSize());
+    vbaSize ret(texture.getSize());
     return ret;
 }
 
@@ -53,21 +53,21 @@ bool renderStage::setIndex(uint idx, renderPipeline *rdrpth) {
 
     if (!init_t) {
         if (scale)
-            texture = new vbaTex(ctx, scale * ctx->getBaseSize());
+            texture.init(ctx, scale * ctx->getBaseSize());
         else
-            texture = new vbaTex(ctx, ctx->getVwptSize());
+            texture.init(ctx, ctx->getVwptSize());
         init_t = true;
     } else {
         if (scale)
-            texture->setSize(scale * ctx->getBaseSize());
+            texture.setSize(scale * ctx->getBaseSize());
         else
-            texture->setSize(ctx->getVwptSize());
+            texture.setSize(ctx->getVwptSize());
     }
     if (!init_b) {
         glGenFramebuffers(1, &buffer);
         glBindFramebuffer(GL_FRAMEBUFFER, buffer);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                               GL_TEXTURE_2D, texture->texture, 0);
+                               GL_TEXTURE_2D, texture.texture, 0);
         glDrawBuffers(1, ctx->DrawBuffers);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         init_b = true;
@@ -78,10 +78,10 @@ bool renderStage::setIndex(uint idx, renderPipeline *rdrpth) {
 
 bool renderStage::render(vbaTex *src) {
     src->bind(index);
-    shader->activate();
+    shader.activate();
     glPixelStorei(GL_UNPACK_ROW_LENGTH, src->size.x + 1);
     glBindFramebuffer(GL_FRAMEBUFFER, buffer);
-    ctx->glVwpt(texture->size);
+    ctx->glVwpt(texture.size);
     ctx->draw();
     glUseProgram(0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -102,7 +102,7 @@ bool renderPipeline::init(vbaGL *globj) {
     ctx = globj;
 
     // Initialize base texture
-    base = new vbaTex(ctx, ctx->getBaseSize() * ctx->getBaseScale());
+    base.init(ctx, ctx->getBaseSize() * ctx->getBaseScale());
 
     // Setup drawing shader
     CREATE_GLSL_SRC_OBJ(draw_src, passthrough);
@@ -112,12 +112,12 @@ bool renderPipeline::init(vbaGL *globj) {
     draw_f.compile();
     draw_v.setSrc(&draw_src);
     draw_v.compile();
-    shd_draw = new glslProg(ctx);
-    shd_draw->attachShader(draw_f);
-    shd_draw->attachShader(draw_v);
-    shd_draw->link();
-    shd_draw->setNeedsFlip(true);
-    shd_draw->setSrcTexUnit(0);
+    shd_draw.init(ctx);
+    shd_draw.attachShader(draw_f);
+    shd_draw.attachShader(draw_v);
+    shd_draw.link();
+    shd_draw.setNeedsFlip(true);
+    shd_draw.setSrcTexUnit(0);
 
     is_init = true;
 
@@ -179,14 +179,14 @@ bool renderPipeline::render(const void *data) {
         return false;
     }
     vbaTex *prev;
-    base->setData((const GLvoid *)data);
+    base.setData((const GLvoid *)data);
 
     std::deque<renderStage *>::iterator  iter = pipeline.begin();
-    prev = base;
+    prev = &base;
 
     while(iter != pipeline.end()) {
         (*iter)->render(prev);
-        prev = (*iter)->texture;
+        prev = &((*iter)->texture);
         iter++;
     }
 
@@ -197,8 +197,8 @@ bool renderPipeline::draw() {
     if (!is_init) {
         return false;
     }
-    pipeline.back()->texture->bind(0);
-    shd_draw->activate();
+    pipeline.back()->texture.bind(0);
+    shd_draw.activate();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     ctx->glVwpt(ctx->getVwptSize());
     ctx->draw();

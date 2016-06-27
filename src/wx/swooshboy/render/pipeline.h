@@ -3,6 +3,7 @@
 #include "swooshboy.h"
 #include "vbaerr.h"
 #include "shader/glsl.h"
+#include "tex.h"
 
 /*
  * Still needs destructor
@@ -27,8 +28,8 @@ protected:
     bool setMult(uint coeff);
 
     uint index;
-    vbaTex *texture; //Texutre we are rendering TO
-    glslProg *shader;
+    vbaTex texture; //Texutre we are rendering TO
+    glslProg shader;
     GLuint buffer;
 
     vbaGL *ctx;
@@ -74,10 +75,10 @@ private:
 
     EH_DECLARE();
 
-    vbaTex *base;
+    vbaTex base;
     std::deque<renderStage *> pipeline;
 
-    glslProg *shd_draw; //Should be passthrough shader
+    glslProg shd_draw; //Should be passthrough shader
 
     vbaGL *ctx;
 
