@@ -66,6 +66,7 @@ class renderPipeline;
 
 //#endif
 
+#include "sharedvar.h"
 #include "vbaerr.h"
 #include "render/render.h"
 
