@@ -105,26 +105,9 @@ bool glslShader::printInfoLog() {
     return true;
 }
 
-bool glslShader::shallowCopy(const glslShader &other) {
+bool glslShader::copy(const glslShader &other) {
     if (is_init) {
-        dprintf("WARN: shallowCopy called on initialized glslShader.");
-        deinit();
-    }
-
-    if (!other.is_init) {
-        // No need to go any further.
-        return true;
-    }
-
-    commonCopy(other);
-    compiled = other.compiled;
-    shader = other.shader;
-    return true;
-}
-
-bool glslShader::deepCopy(const glslShader &other) {
-    if (is_init) {
-        dprintf("WARN: deepCopy called on initialized glslShader.");
+        dprintf("WARN: copy called on initialized glslShader.");
         deinit();
     }
 
@@ -138,6 +121,7 @@ bool glslShader::deepCopy(const glslShader &other) {
         glShaderSource(shader, 5, glsl, glsl_len);
     shader = glCreateShader(type);
     if (other.compiled) {
+        dprintf("WARN: copying an already compiled shader.");
         compile();
     }
     return true;
@@ -147,28 +131,14 @@ glslShader::glslShader(const glslShader &other) {
     dprintf("WARN: ");
     dprintf("Using copy constructor on glslShader object.\n");
     dprintf("\tYou probably don't want to do this.\n");
-
-    #ifndef SHADER_COPYCONS_SHALLOW
-    dprintf("Copying shader by recompiling.");
-    deepCopy(other);
-    #else
-    dprintf("Both glslShader objects will point to the same shader.\n");
-    shallowCopy(other);
-    #endif
+    copy(other);
 }
 
 glslShader &glslShader::operator = (const glslShader &other) {
     dprintf("WARN: ");
     dprintf("Using assignment operator on glslShader object.\n");
     dprintf("\tYou probably don't want to do this.\n");
-
-    #ifndef SHADER_ASSIGN_SHALLOW
-    dprintf("Copying shader by recompiling.");
-    deepCopy(other);
-    #else
-    dprintf("Both glslShader objects will point to the same shader.\n");
-    shallowCopy(other);
-    #endif
+    copy(other);
 
     return *this;
 }

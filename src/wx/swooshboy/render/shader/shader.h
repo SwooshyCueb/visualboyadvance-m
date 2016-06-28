@@ -4,7 +4,7 @@
 #include "swooshboy.h"
 
 /* glslShader
- * Class for handling unlinked shaders
+ * Class for handling individual shaders
  */
 class glslShader {
     friend class glslProg;
@@ -31,14 +31,9 @@ public:
     bool printInfoLog();
 
     /* Copies another glslShader object into this one.
-     * Both objects will reference the same shader.
+     * Creates a NEW glShader.
      */
-    bool shallowCopy(const glslShader &other);
-
-    /* Copies another glslShader object into this one.
-     * Creates a NEW shader.
-     */
-    bool deepCopy(const glslShader &other);
+    bool copy(const glslShader &other);
 
     glslShader(const glslShader &other);
     glslShader &operator  = (const glslShader &other);
