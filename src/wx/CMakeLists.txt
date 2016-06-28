@@ -243,6 +243,7 @@ SET( HDR_WX
    swooshboy/sharedvar.h
    swooshboy/swooshboy.h
    swooshboy/vbaerr.h
+   swooshboy/vbaerr_defs.h
    swooshboy/render/pipeline.h
    swooshboy/render/render.h
    swooshboy/render/size.h
