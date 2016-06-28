@@ -197,6 +197,7 @@ SET( SRC_WX
    widgets/joyedit.cpp
    widgets/sdljoy.cpp
    widgets/wxmisc.cpp
+   swooshboy/sharedvar.cpp
    swooshboy/swooshboy.cpp
    swooshboy/vbaerr.cpp
    swooshboy/render/pipeline.cpp
@@ -239,6 +240,7 @@ SET( HDR_WX
    widgets/wx/sdljoy.h
    widgets/wx/webupdatedef.h
    widgets/wx/wxmisc.h
+   swooshboy/sharedvar.h
    swooshboy/swooshboy.h
    swooshboy/vbaerr.h
    swooshboy/render/pipeline.h

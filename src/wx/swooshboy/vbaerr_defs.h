@@ -27,6 +27,11 @@ VBAERR_DEF_(NO_MORE,
             0x0003
 )
 
+VBAERR_DEF_(DEINIT_OBJ_IN_USE,
+            "Attempted to deinitialize a shared object that was still in use",
+            0x0004
+)
+
 // VBA-pipeline related errors
 
 VBAERR_DEF_(UNSET_MULT,

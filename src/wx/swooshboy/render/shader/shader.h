@@ -8,6 +8,7 @@
  */
 class glslShader {
     friend class glslProg;
+    friend class sharedGlProg;
     friend class vbaGL;
 public:
     glslShader(); // dummy constructor

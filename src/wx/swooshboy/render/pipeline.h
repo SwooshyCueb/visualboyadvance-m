@@ -35,7 +35,6 @@ private:
     EH_DECLARE();
 
     vbaTex base;
-    // TODO: store actual renderStage objects here instead of pointers
     std::deque<renderStage *> pipeline;
 
     glslProg shd_draw; //Should be passthrough shader

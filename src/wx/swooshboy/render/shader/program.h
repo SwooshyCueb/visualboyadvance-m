@@ -3,6 +3,32 @@
 
 #include "swooshboy.h"
 #include "render/size.h"
+#include "sharedvar.h"
+
+/* sharedGlProg
+ * Comtainer for OpenGL program objects
+ * Ensures shader programs are not deinitialized while still in use
+ */
+class sharedGlProg : public vbaSharedObj {
+    friend class glslProg;
+public:
+    sharedGlProg();
+    ~sharedGlProg();
+
+private:
+    bool attachShader(glslShader *shader);
+    bool detachShaders();
+
+    bool link();
+
+    GLuint program;
+    glslShader *v;
+    glslShader *f;
+
+    GLint linked = 0;
+    bool has_vtx = false;
+    bool has_frag = false;
+};
 
 /* glslProg
  * Class for handling glsl programs
@@ -21,6 +47,7 @@ public:
 
     bool printInfoLog();
     bool attachShader(glslShader *shader);
+    bool detachShaders();
 
     bool link();
     bool activate();
@@ -36,6 +63,7 @@ public:
     bool shallowCopy(const glslProg &other);
     // new program, same shaders
     bool deepCopy(const glslProg &other);
+    // If you need a new program with new shaders, just make a new glslProg
 
     glslProg(const glslProg &other);
     glslProg &operator  = (const glslProg &other);
@@ -55,18 +83,12 @@ private:
     bool setVtxAttrPtr(const GLint arr, GLint sz, GLenum typ, GLboolean norm,
                        GLsizei stride, const GLvoid *ptr);
 
-    GLuint program;
-    GLint linked = 0;
-    bool has_vtx = false;
-    bool has_frag = false;
+    sharedGlProg *program;
 
     bool is_init = false;
     bool deinit();
 
     vbaGL *ctx;
-
-    glslShader *v;
-    glslShader *f;
 
     struct {
         struct {

@@ -1,6 +1,54 @@
 #include "swooshboy.h"
 #include "program.h"
 
+sharedGlProg::sharedGlProg() {
+    program = glCreateProgram();
+}
+
+sharedGlProg::~sharedGlProg() {
+    if (refcount) {
+        errThrowVBA(VBA_ERR_DEINIT_OBJ_IN_USE);
+    }
+
+    detachShaders();
+    glDeleteProgram(program);
+}
+
+bool sharedGlProg::attachShader(glslShader *shader) {
+    glAttachShader(program, shader->shader);
+
+    if (shader->type == GL_VERTEX_SHADER) {
+        v = shader;
+        has_vtx = true;
+    } else if (shader->type == GL_FRAGMENT_SHADER) {
+        f = shader;
+        has_frag = true;
+    }
+
+    return true;
+}
+
+bool sharedGlProg::detachShaders() {
+    if (has_vtx) {
+        glDetachShader(program, v->shader);
+        has_vtx = false;
+    }
+
+    if (has_frag) {
+        glDetachShader(program, f->shader);
+        has_vtx = false;
+    }
+
+    linked = 0;
+    return true;
+}
+
+bool sharedGlProg::link() {
+    glLinkProgram(program);
+    glGetProgramiv(program, GL_LINK_STATUS, &linked);
+    return true;
+}
+
 glslProg::glslProg() {
     is_init = false;
 }
@@ -10,10 +58,13 @@ glslProg::glslProg(vbaGL *globj) {
 }
 
 bool glslProg::init(vbaGL *globj) {
+    if (is_init) {
+        // Already initialized.
+        return false;
+    }
     ctx = globj;
-    program = glCreateProgram();
+    program = new sharedGlProg();
     errGLCheck();
-    has_vtx = has_frag = false;
     is_init = true;
     return true;
 }
@@ -24,17 +75,7 @@ glslProg::~glslProg() {
 
 bool glslProg::deinit() {
     if (is_init) {
-        if (has_vtx) {
-            glDetachShader(program, v->shader);
-            has_vtx = false;
-        }
-
-        if (has_frag) {
-            glDetachShader(program, f->shader);
-            has_vtx = false;
-        }
-
-        glDeleteProgram(program);
+        program->unref();
         is_init = false;
     }
     return true;
@@ -46,23 +87,24 @@ bool glslProg::attachShader(glslShader *shader) {
     if (!is_init) {
         return false;
     }
-    glAttachShader(program, shader->shader);
-    errGLCheck();
-    if (shader->type == GL_VERTEX_SHADER) {
-        v = shader;
-        has_vtx = true;
-    } else if (shader->type == GL_FRAGMENT_SHADER) {
-        f = shader;
-        has_frag = true;
+
+    return program->attachShader(shader);
+}
+
+bool glslProg::detachShaders() {
+    if (!is_init) {
+        return false;
     }
-    return !errGLCheck();
+
+    return program->detachShaders();
 }
 
 inline GLint glslProg::getUniformPtr(const char *name) {
     if (!is_init) {
         return false;
     }
-    GLint ret = glGetUniformLocation(program, name);
+
+    GLint ret = glGetUniformLocation(program->program, name);
     errGLCheck();
     if (ret < 0)
         dprintf("Could not bind %s\n", name);
@@ -73,7 +115,7 @@ inline GLint glslProg::getAttrPtr(const char *name) {
     if (!is_init) {
         return false;
     }
-    GLint ret = glGetAttribLocation(program, name);
+    GLint ret = glGetAttribLocation(program->program, name);
     errGLCheck();
     if (ret < 0)
         dprintf("Could not bind %s\n", name);
@@ -119,17 +161,13 @@ bool glslProg::link() {
     if (!is_init) {
         return false;
     }
-    glLinkProgram(program);
-    errGLCheck();
-    glGetProgramiv(program, GL_LINK_STATUS, &linked);
-    errGLCheck();
-
+    program->link();
     printInfoLog();
 
-    if (!linked)
+    if (!program->linked)
         return false;
 
-    if (has_vtx) {
+    if (program->has_vtx) {
         vars.v.position = getAttrPtr("v_pos");
         vars.v.texcoord = getAttrPtr("v_texcoord");
 
@@ -140,7 +178,7 @@ bool glslProg::link() {
         vars.v.pass_qty = getUniformPtr("v_pass_qty");
     }
 
-    if (has_frag) {
+    if (program->has_frag) {
         vars.f.src_tex = getUniformPtr("src_tex");
 
         vars.f.src_sz = getUniformPtr("f_src_sz");
@@ -154,7 +192,7 @@ bool glslProg::link() {
 
     errGLCheck();
 
-    if(has_vtx) {
+    if(program->has_vtx) {
         activate();
         glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_vtx);
         #ifndef VBA_TRIANGLE_STRIP
@@ -179,7 +217,7 @@ bool glslProg::activate() {
     if (!is_init) {
         return false;
     }
-    glUseProgram(program);
+    glUseProgram(program->program);
     return !errGLCheck();
 }
 
@@ -192,7 +230,7 @@ inline void glslProg::setVar1i(GLint var, GLint val) {
 
     GLint curr_prog;
     glGetIntegerv(GL_CURRENT_PROGRAM, &curr_prog);
-    glUseProgram(program);
+    glUseProgram(program->program);
     glUniform1i(var, val);
     glUseProgram(curr_prog);
     errGLCheck();
@@ -207,7 +245,7 @@ inline void glslProg::setVar2i(GLint var, GLint val1, GLint val2) {
 
     GLint curr_prog;
     glGetIntegerv(GL_CURRENT_PROGRAM, &curr_prog);
-    glUseProgram(program);
+    glUseProgram(program->program);
     glUniform2i(var, val1, val2);
     glUseProgram(curr_prog);
     errGLCheck();
@@ -222,7 +260,7 @@ inline void glslProg::setVar2f(GLint var, GLfloat val1, GLfloat val2) {
 
     GLint curr_prog;
     glGetIntegerv(GL_CURRENT_PROGRAM, &curr_prog);
-    glUseProgram(program);
+    glUseProgram(program->program);
     glUniform2f(var, val1, val2);
     glUseProgram(curr_prog);
     errGLCheck();
@@ -282,12 +320,12 @@ bool glslProg::printInfoLog() {
     GLint out = 0;
     GLchar *log;
 
-    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
+    glGetProgramiv(program->program, GL_INFO_LOG_LENGTH, &len);
     if (len > 0) {
         log = (GLchar *)malloc(len);
         if (log == NULL)
             return false;
-        glGetProgramInfoLog(program, len, &out, log);
+        glGetProgramInfoLog(program->program, len, &out, log);
         dprintf("Program InfoLog:\n%s\n\n", log);
         free(log);
     }
@@ -308,14 +346,8 @@ bool glslProg::shallowCopy(const glslProg &other) {
     is_init = other.is_init;
     ctx = other.ctx;
 
-    has_vtx = other.has_vtx;
-    v = other.v;
-
-    has_frag = other.has_frag;
-    f = other.f;
-
     program = other.program;
-    linked = other.linked;
+    program->ref();
 
     vars.needs_flip = other.vars.needs_flip;
     vars.v.position = other.vars.v.position;
@@ -347,20 +379,21 @@ bool glslProg::deepCopy(const glslProg &other) {
     is_init = other.is_init;
     ctx = other.ctx;
 
-    program = glCreateProgram();
+    program = new sharedGlProg();
 
-    if (other.has_vtx) {
-        attachShader(other.v);
+    if (other.program->has_vtx) {
+        attachShader(other.program->v);
     }
 
-    if (other.has_frag) {
-        attachShader(other.f);
+    if (other.program->has_frag) {
+        attachShader(other.program->f);
     }
 
-    if (other.linked) {
+    if (other.program->linked) {
         link();
     }
 
+    return true;
 }
 
 glslProg::glslProg(const glslProg &other) {
@@ -375,7 +408,6 @@ glslProg::glslProg(const glslProg &other) {
     dprintf("Both glslProg objects will point to the same program.\n");
     shallowCopy(other);
     #endif
-
 
 }
 
