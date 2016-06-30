@@ -247,6 +247,7 @@ SET( HDR_WX
    widgets/wx/webupdatedef.h
    widgets/wx/wxmisc.h
    swooshboy/logging.h
+   swooshboy/logging_defs.h
    swooshboy/sharedvar.h
    swooshboy/swooshboy.h
    swooshboy/vbaerr.h

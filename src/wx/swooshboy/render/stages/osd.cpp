@@ -34,7 +34,7 @@ vbaOSD::vbaOSD(vbaGL *globj) {
     placeholder.sz_tex = vbaSize(ft.gs->bitmap.width, ft.gs->bitmap.rows);
     placeholder.sz_glyph = vbaSize(ft.gs->bitmap_left, ft.gs->bitmap_top);
     placeholder.adv = ft.gs->advance;
-    log_debug("Placeholder glyph info:\n"
+    log_debug("Placeholder glyph info",
               "sz_tex: %u * %u\n"
               "sz_glyph: %u * %u\n",
               "adv: %u * %u",
@@ -92,7 +92,7 @@ void vbaOSD::getGlyph(char character) {
         memcpy(ng.data, ft.gs->bitmap.buffer, ng.sz_tex.x * ng.sz_tex.y * 4);
     }
 
-    log_debug("%c glyph info:\n"
+    log_debug("%c glyph info:",
               "sz_tex: %u * %u\n"
               "sz_glyph: %u * %u\n",
               "adv: %u * %u",

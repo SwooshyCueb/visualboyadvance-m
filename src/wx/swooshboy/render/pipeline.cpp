@@ -33,6 +33,16 @@ bool renderPipeline::init(vbaGL *globj) {
 
     is_init = true;
 
+    log_fixme("Logging demo", "So I wrote a bunch of ugly code,");
+    log_todo("Logging demo", "and this ugly code has some pretty results.");
+    log_debug("Logging demo", "It handles logging in a way similar to glib,");
+    log_info("Logging demo", "and it makes the loging output easy to read.");
+    log_warning_debug("Logging demo", "The code used to be a lot uglier.");
+    log_message("Logging demo", "It also makes debugging a bit easier.");
+    log_warning("Logging demo", "It's not quite done yet,");
+    log_critical("Logging demo", "but it's good enough for now.");
+    log_error_pass("Logging demo", "Actually it's not but LOOK PRETTY TERMINAL OUTPUT");
+
     return true;
 }
 

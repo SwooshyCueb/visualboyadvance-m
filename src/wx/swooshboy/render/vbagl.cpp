@@ -18,25 +18,30 @@ static struct sigaction sigst;
 static struct winsize termsz;
 static void SIGWINCHhandler(int sig) {
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &termsz);
+    termwidth = termsz.ws_col;
 }
 
 vbaGL::vbaGL() {
     // The following code will be moved once we have rid ourselves of wx
-    sigemptyset(&sigst.sa_mask);
-    sigst.sa_flags = 0;
-    sigst.sa_handler = SIGWINCHhandler;
-    sigaction(SIGWINCH, &sigst, NULL);
 
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &termsz);
 
     if(isatty(STDOUT_FILENO)) {
-        g_log_set_handler(G_LOG_DOMAIN, (GLogLevelFlags)(~(0)), logfunc_color, (gpointer)&termsz);
+        sigemptyset(&sigst.sa_mask);
+        sigst.sa_flags = 0;
+        sigst.sa_handler = SIGWINCHhandler;
+        sigaction(SIGWINCH, &sigst, NULL);
+
+        ioctl(STDOUT_FILENO, TIOCGWINSZ, &termsz);
+        termwidth = termsz.ws_col;
+
+        vba_loglevel_strings = vba_loglevel_strings_256;
     } else {
-        g_log_set_handler(G_LOG_DOMAIN, (GLogLevelFlags)(~(0)), logfunc_plain, NULL);
+        termwidth = 0;
+        vba_loglevel_strings = vba_loglevel_strings_0;
     }
     // End of code to be moved
 
-    log_debug("test test");
+    log_debug("logging test", "test test");
 
     if (glewInit() != GLEW_OK) {
         errThrowVBA(VBA_ERR_GL_INIT);
