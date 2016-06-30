@@ -107,7 +107,7 @@ inline GLint glslProg::getUniformPtr(const char *name) {
     GLint ret = glGetUniformLocation(program->program, name);
     errGLCheck();
     if (ret < 0)
-        dprintf("Could not bind %s\n", name);
+        log_debug("Could not bind %s", name);
     return ret;
 }
 
@@ -118,7 +118,7 @@ inline GLint glslProg::getAttrPtr(const char *name) {
     GLint ret = glGetAttribLocation(program->program, name);
     errGLCheck();
     if (ret < 0)
-        dprintf("Could not bind %s\n", name);
+        log_debug("Could not bind %s", name);
     return ret;
 }
 
@@ -326,7 +326,7 @@ bool glslProg::printInfoLog() {
         if (log == NULL)
             return false;
         glGetProgramInfoLog(program->program, len, &out, log);
-        dprintf("Program InfoLog:\n%s\n\n", log);
+        log_info("Program InfoLog:\n%s\n", log);
         free(log);
     }
     return true;
@@ -334,7 +334,7 @@ bool glslProg::printInfoLog() {
 
 bool glslProg::shallowCopy(const glslProg &other) {
     if (is_init) {
-        dprintf("WARN: shallowCopy called on initialized glslProg.");
+        log_warning_debug("shallowCopy called on initialized glslProg.");
         deinit();
     }
 
@@ -367,7 +367,7 @@ bool glslProg::shallowCopy(const glslProg &other) {
 
 bool glslProg::deepCopy(const glslProg &other) {
     if (is_init) {
-        dprintf("WARN: deepCopy called on initialized glslProg.");
+        log_warning_debug("deepCopy called on initialized glslProg.");
         deinit();
     }
 
@@ -397,30 +397,28 @@ bool glslProg::deepCopy(const glslProg &other) {
 }
 
 glslProg::glslProg(const glslProg &other) {
-    dprintf("WARN: ");
-    dprintf("Using copy constructor on glslProg object.\n");
-    dprintf("\tYou probably don't want to do this.\n");
+    log_warning_debug("Using copy constructor on glslProg object.\n"
+                      "You probably don't want to do this.");
 
     #ifndef PROG_COPYCONS_SHALLOW
-    dprintf("Copying program by relinking.");
+    log_debug("Copying program by relinking.");
     deepCopy(other);
     #else
-    dprintf("Both glslProg objects will point to the same program.\n");
+    log_debug("Both glslProg objects will point to the same program.");
     shallowCopy(other);
     #endif
 
 }
 
 glslProg &glslProg::operator  = (const glslProg &other) {
-    dprintf("WARN: ");
-    dprintf("Using assignment operator on glslProg object.\n");
-    dprintf("\tYou probably don't want to do this.\n");
+    log_warning_debug("Using assignment operator on glslProg object.\n"
+                      "You probably don't want to do this.");
 
     #ifndef PROG_ASSIGN_SHALLOW
-    dprintf("Copying program by relinking.");
+    log_debug("Copying program by relinking.");
     deepCopy(other);
     #else
-    dprintf("Both glslProg objects will point to the same program.\n");
+    log_debug("Both glslProg objects will point to the same program.");
     shallowCopy(other);
     #endif
 

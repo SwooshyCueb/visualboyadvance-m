@@ -9,6 +9,12 @@
 #include <queue>
 #include <stack>
 
+// There's no reason to pretend I'm targeting anything but linux at this point
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <termios.h>
+#include <signal.h>
+
 
 // Moving these here for my reference
 /*

@@ -47,8 +47,10 @@ FIND_PROGRAM(MSGINIT msginit)
 if(ENABLE_NLS AND (NOT XGETTEXT OR NOT MSGINIT))
    message(SEND_ERROR "Cannot find gettext ${XGETTEXT} ${MSGINIT}")
 endif(ENABLE_NLS AND (NOT XGETTEXT OR NOT MSGINIT))
+
+FIND_PACKAGE ( PkgConfig REQUIRED )
+
 IF(ENABLE_CAIRO)
-    FIND_PACKAGE ( PkgConfig REQUIRED )
     PKG_CHECK_MODULES(CAIRO REQUIRED cairo)
     include_directories(${CAIRO_INCLUDE_DIRS})
     IF(WIN32)
@@ -66,6 +68,9 @@ ENDIF(WIN32 AND ENABLE_DIRECTX)
 
 FIND_PACKAGE(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
+
+PKG_CHECK_MODULES(GLIB REQUIRED glib-2.0)
+include_directories(${GLIB_INCLUDE_DIRS})
 
 # contrib widgets
 include_directories(widgets)
@@ -197,6 +202,7 @@ SET( SRC_WX
    widgets/joyedit.cpp
    widgets/sdljoy.cpp
    widgets/wxmisc.cpp
+   swooshboy/logging.cpp
    swooshboy/sharedvar.cpp
    swooshboy/swooshboy.cpp
    swooshboy/vbaerr.cpp
@@ -240,6 +246,7 @@ SET( HDR_WX
    widgets/wx/sdljoy.h
    widgets/wx/webupdatedef.h
    widgets/wx/wxmisc.h
+   swooshboy/logging.h
    swooshboy/sharedvar.h
    swooshboy/swooshboy.h
    swooshboy/vbaerr.h
@@ -338,6 +345,7 @@ TARGET_LINK_LIBRARIES (
     ${DIRECTX_LIBRARIES}
     ${CAIRO_LIBRARIES}
     ${FREETYPE_LIBRARIES}
+    ${GLIB_LIBRARIES}
 )
 IF(WIN32)
     INSTALL(PROGRAMS ${PROJECT_BINARY_DIR}/visualboyadvance-m${CMAKE_EXECUTABLE_SUFFIX} DESTINATION ${CMAKE_BINARY_DIR})

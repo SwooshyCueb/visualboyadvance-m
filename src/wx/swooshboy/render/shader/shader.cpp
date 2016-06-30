@@ -99,7 +99,7 @@ bool glslShader::printInfoLog() {
         if (log == NULL)
             return false;
         glGetShaderInfoLog(shader, len, &out, log);
-        dprintf("Shader InfoLog:\n%s\n\n", log);
+        log_info("Shader InfoLog:\n%s\n", log);
         free(log);
     }
     return true;
@@ -107,7 +107,7 @@ bool glslShader::printInfoLog() {
 
 bool glslShader::copy(const glslShader &other) {
     if (is_init) {
-        dprintf("WARN: copy called on initialized glslShader.");
+        log_warning_debug("copy called on initialized glslShader.");
         deinit();
     }
 
@@ -121,23 +121,21 @@ bool glslShader::copy(const glslShader &other) {
         glShaderSource(shader, 5, glsl, glsl_len);
     shader = glCreateShader(type);
     if (other.compiled) {
-        dprintf("WARN: copying an already compiled shader.");
+        log_warning_debug("copying an already compiled shader.");
         compile();
     }
     return true;
 }
 
 glslShader::glslShader(const glslShader &other) {
-    dprintf("WARN: ");
-    dprintf("Using copy constructor on glslShader object.\n");
-    dprintf("\tYou probably don't want to do this.\n");
+    log_warning_debug("Using copy constructor on glslShader object.\n"
+                      "You probably don't want to do this.");
     copy(other);
 }
 
 glslShader &glslShader::operator = (const glslShader &other) {
-    dprintf("WARN: ");
-    dprintf("Using assignment operator on glslShader object.\n");
-    dprintf("\tYou probably don't want to do this.\n");
+    log_warning_debug("Using assignment operator on glslShader object.\n"
+                      "You probably don't want to do this.");
     copy(other);
 
     return *this;

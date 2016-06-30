@@ -47,6 +47,7 @@
 #include <deque>
 #include <queue>
 #include <stack>
+#include <glib.h>
 
 #include <GL/glxew.h>
 #include <GL/glut.h>
@@ -54,6 +55,8 @@
 
 #ifndef VBA_SB_H_1
 #define VBA_SB_H_1
+
+extern GLogLevelFlags vbalog_enabled_levels;
 
 // Forward declarations to make life easier.
 class vbaErr;
@@ -66,19 +69,13 @@ class renderPipeline;
 
 //#endif
 
+#include "logging.h"
 #include "sharedvar.h"
 #include "vbaerr.h"
 #include "render/render.h"
 
 //#ifndef VBA_SB_H_2
 //#define VBA_SB_H_2
-
-
-#ifdef _DEBUG
-#define dprintf(format, ...) fprintf(stderr, format, ##__VA_ARGS__)
-#else
-#define dprintf(format, ...)
-#endif
 
 #define DECLARE_RES(name) \
     extern char *res_##name __attribute__((nocommon)); \

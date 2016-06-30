@@ -2,12 +2,42 @@
 #include <GL/glut.h>
 #include "swooshboy.h"
 #include "vbagl.h"
+#include <glib.h>
+
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <termios.h>
+#include <signal.h>
 
 #ifdef __APPLE__
 #include "TargetConditionals.h"
 #endif
 
+
+static struct sigaction sigst;
+static struct winsize termsz;
+static void SIGWINCHhandler(int sig) {
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &termsz);
+}
+
 vbaGL::vbaGL() {
+    // The following code will be moved once we have rid ourselves of wx
+    sigemptyset(&sigst.sa_mask);
+    sigst.sa_flags = 0;
+    sigst.sa_handler = SIGWINCHhandler;
+    sigaction(SIGWINCH, &sigst, NULL);
+
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &termsz);
+
+    if(isatty(STDOUT_FILENO)) {
+        g_log_set_handler(G_LOG_DOMAIN, (GLogLevelFlags)(~(0)), logfunc_color, (gpointer)&termsz);
+    } else {
+        g_log_set_handler(G_LOG_DOMAIN, (GLogLevelFlags)(~(0)), logfunc_plain, NULL);
+    }
+    // End of code to be moved
+
+    log_debug("test test");
+
     if (glewInit() != GLEW_OK) {
         errThrowVBA(VBA_ERR_GL_INIT);
     }
