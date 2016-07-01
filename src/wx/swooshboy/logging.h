@@ -108,7 +108,8 @@ extern uint termwidth;
     logfunc_bkt(levelstr, title, logstr, fileline, __PRETTY_FUNCTION__, \
         traceaddrs, tracelen); \
     g_free(fileline); \
-    g_free(logstr)
+    g_free(logstr); \
+    g_free(traceaddrs)
 
 /* This makes inlusion of line-dependant "macros" easier. */
 #define log_error(title, args...) \
