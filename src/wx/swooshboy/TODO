@@ -28,14 +28,18 @@ For class variables that are expected to be freed upon object destruction, but
  *****************************************************************************
 Eliminate unneeded class friendships. Add friend functions when appropriate.
 Add more comments and improve existing comments.
+Make the logging code less awful.
+Write classes to wrap used glib functionality, when appropriate.
 
  *****************************************************************************
- * Error handling                                                            *
+ * Logging and error handling                                                *
  *****************************************************************************
 Use error checking, catching, throwing, and handling when appropriate.
 Have bool class methods check for errors more frequently.
 Have non-bool class methods throw vbaErr objects when appropriate.
 Slim down error handling for non-debug builds.
+Currently, our error handling and our logging system don't mesh well. Fix this.
+Have the logging wwrap function print instead of returning a queue.
 
  *****************************************************************************
  * Data integrity                                                            *
@@ -63,6 +67,11 @@ Port more upscalers and filters to glsl/renderStages
 Separate each graphics "component" into individual pipelines
     This will require implementing a final render step that combines each 
         pipeline
+
+ *****************************************************************************
+ * Configuration                                                             *
+ *****************************************************************************
+Implement a new configuration system. Use glib's key-value file parser.
 
  *****************************************************************************
  * Bug squashing                                                             *
