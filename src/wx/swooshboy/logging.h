@@ -21,6 +21,18 @@
 #include <cxxabi.h>
 #include <cstdlib>
 
+/* Our log flags and log levels have values that can be put together to form a
+ * single value that can be passed around. In order to do this, the flag and
+ * level values are defined by "1 << [number]".
+ *
+ * In order to avoid the potential human error that could come from manually
+ * setting the values for our log flags and levels, we need to populate an enum
+ * whose values we will later use to define the actual flag and level values.
+ */
+
+/* At this point in our journey, it is not necessary to differentiate between
+ * flags and levels.
+ */
 #define VBA_LOG_PREENUM_(name) \
     VBA_LOG_SEQ_##name,
 
@@ -38,6 +50,7 @@ enum vba_logenum_seq {
 #undef VBA_LOG_FLAG_DEF_
 #undef VBA_LOG_LEVEL_DEF_
 
+/* Now, we can set the actual values for our flags and levels. */
 #define VBA_LOG_FLAG_DEF_(name) \
     VBA_LOG_FLAG_##name = 1 << VBA_LOG_SEQ_##name,
 
@@ -50,6 +63,7 @@ enum vba_loglevels {
     #undef VBA_LOG_FLAG_DEF_
     #undef VBA_LOG_LEVEL_DEF_
 
+    /* We also need a mask that can filter flags from provided values. */
     #define VBA_LOG_FLAG_DEF_(name) \
         VBA_LOG_FLAG_##name |
     #define VBA_LOG_LEVEL_DEF_(name, str, pad, c256, c16, c8, f256, f16,f8)
@@ -62,6 +76,19 @@ enum vba_loglevels {
 #undef VBA_LOG_FLAG_DEF_
 #undef VBA_LOG_LEVEL_DEF_
 
+/* Each log level has a string which is shown in the log output. Predictably,
+ * this string tends to match the log level's name. This string is surrounded in
+ * brackets and potential escape codes which result in different text formatting
+ * in certian terminals. It may also be padded out to facilitate log
+ * readability.
+ *
+ * Because we might or might not be outputing to a terminal that supports
+ * the aformentioned escape codes, and because the level of support for these
+ * escape codes can vary, we must define strings for each log level, for each
+ * level of support. In order to do this, we declare a struct for containing
+ * these strings. One for each log level, and some for any other bits of text
+ * formatting we decide to do.
+ */
 #define VBA_LOG_FLAG_DEF_(name)
 #define VBA_LOG_LEVEL_DEF_(name, str, pad, c256, c16, c8, f256, f16,f8) \
     gchar* VBA_LOG_LEVEL_##name##_STR;
@@ -75,11 +102,16 @@ struct vba_ll_str {
 #undef VBA_LOG_LEVEL_DEF_
 #undef VBA_LOG_FLAG_DEF_
 
+/* These variables will hold the strings for each level of support. */
 extern struct vba_ll_str vba_loglevel_strings_256;
 extern struct vba_ll_str vba_loglevel_strings_16;
 extern struct vba_ll_str vba_loglevel_strings_8;
 extern struct vba_ll_str vba_loglevel_strings_0;
+
+/* This variable will contain the set of strings in use. */
 extern struct vba_ll_str vba_loglevel_strings;
+
+/* This variable holds the width of the terminal. */
 extern uint termwidth;
 
 #define TRACE_DEPTH 16
