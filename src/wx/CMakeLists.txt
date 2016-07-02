@@ -297,7 +297,13 @@ ADD_RESOURCES( RES_LN
     ${RES_WX_LN}
 )
 
+SET( PROJ_STUFF
+    swooshboy/TODO
+    swooshboy/res/fonts/neoletters.license
+)
+
 SET( CM_STUFF
+    ${PROJ_STUFF}
     bin2c.cmake
     copy-events.cmake
 )
