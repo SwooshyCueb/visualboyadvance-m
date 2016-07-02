@@ -79,8 +79,8 @@ include_directories(widgets)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-# swooshboy
-include_directories(swooshboy)
+# oxygen
+include_directories(oxygen)
 
 # wxrc does not support xrs files in -c output (> 10x compression)
 # so do it manually using slow but portable bin2c.cmake script
@@ -188,6 +188,48 @@ ADD_CUSTOM_COMMAND(OUTPUT cmdtab.cpp cmdhandlers.h cmd-evtable.h
 # then again, the main file should be split up into separate dirs anyway
 #
 
+SET( SRC_O2
+    oxygen/logging.cpp
+    oxygen/sharedvar.cpp
+    oxygen/oxygen.cpp
+    oxygen/vbaerr.cpp
+    oxygen/render/pipeline.cpp
+    oxygen/render/size.cpp
+    oxygen/render/stage.cpp
+    oxygen/render/tex.cpp
+    oxygen/render/vbagl.cpp
+    oxygen/render/shader/program.cpp
+    oxygen/render/shader/shader.cpp
+    oxygen/render/shader/src.cpp
+    oxygen/render/stages/osd.cpp
+    oxygen/render/stages/passthrough.cpp
+    oxygen/render/stages/upscalers/supereagle.cpp
+)
+
+SET (HDR_O2
+    oxygen/logging.h
+    oxygen/logging_defs.h
+    oxygen/sharedvar.h
+    oxygen/oxygen.h
+    oxygen/vbaerr.h
+    oxygen/vbaerr_defs.h
+    oxygen/render/pipeline.h
+    oxygen/render/render.h
+    oxygen/render/size.h
+    oxygen/render/stage.h
+    oxygen/render/tex.h
+    oxygen/render/vbagl.h
+    oxygen/render/shader/glsl.h
+    oxygen/render/shader/program.h
+    oxygen/render/shader/shader.h
+    oxygen/render/shader/src.h
+    oxygen/render/stages/osd.h
+    oxygen/render/stages/passthrough.h
+    oxygen/render/stages/stages.h
+    oxygen/render/stages/upscalers/supereagle.h
+    oxygen/render/stages/upscalers/upscalers.h
+)
+
 SET( SRC_WX
    wxvbam.cpp
    guiinit.cpp
@@ -202,21 +244,8 @@ SET( SRC_WX
    widgets/joyedit.cpp
    widgets/sdljoy.cpp
    widgets/wxmisc.cpp
-   swooshboy/logging.cpp
-   swooshboy/sharedvar.cpp
-   swooshboy/swooshboy.cpp
-   swooshboy/vbaerr.cpp
-   swooshboy/render/pipeline.cpp
-   swooshboy/render/size.cpp
-   swooshboy/render/stage.cpp
-   swooshboy/render/tex.cpp
-   swooshboy/render/vbagl.cpp
-   swooshboy/render/shader/program.cpp
-   swooshboy/render/shader/shader.cpp
-   swooshboy/render/shader/src.cpp
-   swooshboy/render/stages/osd.cpp
-   swooshboy/render/stages/passthrough.cpp
-   swooshboy/render/stages/upscalers/supereagle.cpp
+   # Oxygen
+   ${SRC_O2}
    # probably ought to be in common
    ../sdl/text.cpp
    # from external source with minor modifications
@@ -228,7 +257,6 @@ SET( SRC_WX
    builtin-over.h
    cmdhandlers.h
    cmd-evtable.h
-   swooshboy/glsl/dummy.glsl.h
    #Icon File
    xrc/vbam.xpm
 )
@@ -246,27 +274,8 @@ SET( HDR_WX
    widgets/wx/sdljoy.h
    widgets/wx/webupdatedef.h
    widgets/wx/wxmisc.h
-   swooshboy/logging.h
-   swooshboy/logging_defs.h
-   swooshboy/sharedvar.h
-   swooshboy/swooshboy.h
-   swooshboy/vbaerr.h
-   swooshboy/vbaerr_defs.h
-   swooshboy/render/pipeline.h
-   swooshboy/render/render.h
-   swooshboy/render/size.h
-   swooshboy/render/stage.h
-   swooshboy/render/tex.h
-   swooshboy/render/vbagl.h
-   swooshboy/render/shader/glsl.h
-   swooshboy/render/shader/program.h
-   swooshboy/render/shader/shader.h
-   swooshboy/render/shader/src.h
-   swooshboy/render/stages/osd.h
-   swooshboy/render/stages/passthrough.h
-   swooshboy/render/stages/stages.h
-   swooshboy/render/stages/upscalers/supereagle.h
-   swooshboy/render/stages/upscalers/upscalers.h
+   # Oxygen
+   ${HDR_O2}
    # probably ought to be in common
    ../sdl/text.h
    # from external source with minor modifications
@@ -276,30 +285,30 @@ SET( HDR_WX
 FILE(GLOB XRC_WX xrc/*.xrc)
 
 SET( GLSL_SRC
-    swooshboy/render/shader/glsl/passthrough.glsl
-    swooshboy/render/shader/glsl/osd.glsl
-    swooshboy/render/shader/glsl/supereagle.glsl
-    swooshboy/render/shader/glsl/common.glsl
+    oxygen/render/shader/glsl/passthrough.glsl
+    oxygen/render/shader/glsl/osd.glsl
+    oxygen/render/shader/glsl/supereagle.glsl
+    oxygen/render/shader/glsl/common.glsl
 )
 
-SET(RES_WX_LN
+SET(RES_O2_LN
     ${GLSL_SRC}
-    swooshboy/res/fonts/neoletters.ttf
+    oxygen/res/fonts/neoletters.ttf
 )
 
 SET( RES_WX
     ${XRC_WX}
-    ${RES_WX_LN}
+    ${RES_O2_LN}
     ../vba-over.ini
 )
 
-ADD_RESOURCES( RES_LN
-    ${RES_WX_LN}
+ADD_RESOURCES( RES_O2
+    ${RES_O2_LN}
 )
 
 SET( PROJ_STUFF
-    swooshboy/TODO
-    swooshboy/res/fonts/neoletters.license
+    oxygen/TODO
+    oxygen/res/fonts/neoletters.license
 )
 
 SET( CM_STUFF
@@ -339,7 +348,7 @@ ADD_EXECUTABLE (
     ${SRC_WX}
     ${HDR_WX}
     ${RES_WX}
-    ${RES_LN}
+    ${RES_O2}
     ${VBAM_ICON}
     ${CM_STUFF}
 )

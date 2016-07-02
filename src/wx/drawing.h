@@ -20,7 +20,7 @@ protected:
 #include <GL/glxew.h>
 #include <GL/glut.h>
 #include <wx/glcanvas.h>
-#include "swooshboy/swooshboy.h"
+#include "oxygen/oxygen.h"
 
 class GLDrawingPanel : public DrawingPanel, public wxGLCanvas
 {
