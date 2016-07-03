@@ -65,72 +65,77 @@ GLogLevelFlags vbalog_enabled_levels = (GLogLevelFlags)(
     VBA_LOG_LEVEL_FIXME
 );
 
-// TODO: Go ahead and have this function print instead of returning a queue
-static GQueue *wwrap(const gchar *string, uint width) {
-    GQueue *ret = g_queue_new();
+void wwrap(const gchar *string, uint width, gpointer printfunc) {
     uint stringpos = 0;
-    int elementpos = 0;
+    int linepos = 0;
     uint backtrackpos;
 
+    void (*print)(const gchar*, ...);
+    print = (void (*)(const gchar*, ...))printfunc;
+
     while (stringpos < strlen(string)) {
-        // Allocate our queue element
-        gchar *element = (gchar *)g_malloc0(width * sizeof(gchar));
+        // Allocate our line string
+        gchar *line = (gchar *)g_malloc0(width * sizeof(gchar));
 
         // Copy our string until the end of the line is reached
-        for (elementpos = 0; elementpos < width-2; elementpos++) {
+        for (linepos = 0; linepos < width-2; linepos++) {
 
             // Check if we've hit the end of the string
             if (stringpos == strlen(string)) {
-                // Push the last line to the queue and return
-                g_queue_push_tail(ret, (gpointer)element);
-                return ret;
+                // Print the last line and return
+                print("    %s", line);
+                g_free(line);
+                return;
             }
-            element[elementpos] = string[stringpos];
+            line[linepos] = string[stringpos];
 
             // Check if we've hit a newline
-            if (element[elementpos] == '\n') {
-                /* Push the element to the queue, make a new element, and
-                 * reset the loop counter
+            if (line[linepos] == '\n') {
+                /* Print the line, reallocate the string, and reset the loop
+                 * counter
                  */
-                g_queue_push_tail(ret, (gpointer)element);
-                element = (gchar *)g_malloc0(width * sizeof(gchar));
-                elementpos = -1;
+                print("    %s", line);
+                g_free(line);
+                line = (gchar *)g_malloc0(width * sizeof(gchar));
+                linepos = -1;
             }
             stringpos++;
         }
-        // Do we need to increment elementpos here?
 
         // Did we get lucky?
         if (isspace(string[stringpos])) {
-            // Add a newline and push the element to the queue
-            element[elementpos] = '\n';
-            g_queue_push_tail(ret, (gpointer)element);
+            // Change whitespace to newline, print, and free
+            line[linepos] = '\n';
+            print("    %s", line);
+            g_free(line);
             stringpos++;
         } else {
             // Find previous whitespace
-            for(backtrackpos = elementpos; backtrackpos > 0; backtrackpos--) {
-                if (isspace(element[backtrackpos])) {
-                    element[backtrackpos] = '\n';
-                    element[backtrackpos + 1] = '\0';
-                    g_queue_push_tail(ret, (gpointer)element);
+            for(backtrackpos = linepos; backtrackpos > 0; backtrackpos--) {
+                if (isspace(line[backtrackpos])) {
+                    line[backtrackpos] = '\n';
+                    line[backtrackpos + 1] = '\0';
+                    print("    %s", line);
+                    g_free(line);
                     break;
                 }
                 stringpos--;
             }
             if (!backtrackpos) {
-                stringpos += elementpos;
-                element[elementpos+1] = '\n';
-                element[elementpos+2] = '\0';
-                g_queue_push_tail(ret, (gpointer)element);
+                stringpos += linepos;
+                line[linepos+1] = '\n';
+                line[linepos+2] = '\0';
+                print("    %s", line);
+                g_free(line);
             }
         }
     }
-    return ret;
+    return;
 }
 
 void logfunc_std(const gchar *levelstr, const gchar *title,
                  const gchar *message) {
-    gchar *line, *timestr;
+    gchar *timestr;
     GDateTime *time;
 
     void (*print)(const gchar*, ...);
@@ -147,21 +152,15 @@ void logfunc_std(const gchar *levelstr, const gchar *title,
     g_date_time_unref(time);
     g_free(timestr);
 
-    GQueue *msg = wwrap(message, termwidth);
-    while (g_queue_get_length(msg)) {
-        line = (gchar *)g_queue_pop_head(msg);
-        print("    %s", line);
-        g_free(line);
-    }
+    wwrap(message, termwidth, (gpointer)print);
     print("\n\n");
-    g_queue_free(msg);
 
 }
 
 void logfunc_dbg(const gchar *levelstr, const gchar *title,
                  const gchar *message, const gchar *fileline,
                  const gchar *func) {
-    gchar *line, *timestr;
+    gchar *timestr;
     GDateTime *time;
 
     void (*print)(const gchar*, ...);
@@ -178,21 +177,15 @@ void logfunc_dbg(const gchar *levelstr, const gchar *title,
     g_date_time_unref(time);
     g_free(timestr);
 
-    GQueue *msg = wwrap(message, termwidth);
-    while (g_queue_get_length(msg)) {
-        line = (gchar *)g_queue_pop_head(msg);
-        print("    %s", line);
-        g_free(line);
-    }
+    wwrap(message, termwidth, (gpointer)print);
     print("\n    %s %s\n\n", func, fileline);
-    g_queue_free(msg);
 
 }
 
 void logfunc_bkt(const gchar *levelstr, const gchar *title,
                  const gchar *message, const gchar *fileline,
                  const gchar *func, gpointer *traceaddrs, guint tracelen) {
-    gchar *line, *timestr, **symbols, *tracefunc;
+    gchar *timestr, **symbols, *tracefunc;
     GDateTime *time;
     size_t tracefunclen = FUNCSTR_MAXLEN;
 
@@ -210,12 +203,7 @@ void logfunc_bkt(const gchar *levelstr, const gchar *title,
     g_date_time_unref(time);
     g_free(timestr);
 
-    GQueue *msg = wwrap(message, termwidth);
-    while (g_queue_get_length(msg)) {
-        line = (gchar *)g_queue_pop_head(msg);
-        print("    %s", line);
-        g_free(line);
-    }
+    wwrap(message, termwidth, (gpointer)print);
     print("\n");
     print("    Stacktrace:\n");
     print("        %s %s\n", func, fileline);
@@ -268,6 +256,5 @@ void logfunc_bkt(const gchar *levelstr, const gchar *title,
     g_free(tracefunc);
 
     print("\n");
-    g_queue_free(msg);
 
 }

@@ -39,7 +39,6 @@ Have bool class methods check for errors more frequently.
 Have non-bool class methods throw vbaErr objects when appropriate.
 Slim down error handling for non-debug builds.
 Currently, our error handling and our logging system don't mesh well. Fix this.
-Have the logging wwrap function print instead of returning a queue.
 Handle glib errors.
 
  *****************************************************************************
