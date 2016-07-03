@@ -28,8 +28,26 @@ bool renderPipeline::init(vbaGL *globj) {
     shd_draw.attachShader(&draw_f);
     shd_draw.attachShader(&draw_v);
     shd_draw.link();
-    shd_draw.setNeedsFlip(true);
-    shd_draw.setSrcTexUnit(0);
+
+    glsl_vars.position = shd_draw.getAttrPtr("v_pos");
+    glsl_vars.texcoord = shd_draw.getAttrPtr("v_texcoord");
+    glsl_vars.src_tex = shd_draw.getUniformPtr("src_tex");
+    glsl_vars.needs_flip = shd_draw.getUniformPtr("needs_flip");
+
+    shd_draw.setVar1i(glsl_vars.needs_flip, 1);
+    shd_draw.setVar1i(glsl_vars.src_tex, 0);
+
+    shd_draw.activate();
+    glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_vtx);
+    shd_draw.setVtxAttrPtr(glsl_vars.position, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    shd_draw.enableVertAttrArr(glsl_vars.position);
+
+    glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_texcoord);
+    shd_draw.setVtxAttrPtr(glsl_vars.texcoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    shd_draw.enableVertAttrArr(glsl_vars.texcoord);
+
+    glUseProgram(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     is_init = true;
 

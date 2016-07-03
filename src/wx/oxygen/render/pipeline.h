@@ -38,6 +38,12 @@ private:
     std::deque<renderStage *> pipeline;
 
     glslProg shd_draw; //Should be passthrough shader
+    struct {
+        GLint texcoord = 0;
+        GLint position = 0;
+        GLint needs_flip = 0;
+        GLint src_tex = 0;
+    } glsl_vars;
 
     vbaGL *ctx;
 

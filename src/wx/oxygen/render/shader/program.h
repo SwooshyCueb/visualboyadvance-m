@@ -53,12 +53,16 @@ public:
     bool link();
     bool activate();
 
-    void setPassQty(uint n);
-    void setPassIdx(uint n);
-    void setSrcTexUnit(GLuint n);
-    void setSrcSz(vbaSize sz);
-    void setDstSz(vbaSize sz);
-    void setNeedsFlip(bool flip);
+    GLint getUniformPtr(const char *name);
+    void setVar1i(GLint var, GLint val);
+    void setVar2i(GLint var, GLint val1, GLint val2);
+    void setVar2f(GLint var, GLfloat val1, GLfloat val2);
+
+    GLint getAttrPtr(const char *name);
+    bool enableVertAttrArr(const GLint arr);
+    bool disableVertAttrArr(const GLint arr);
+    bool setVtxAttrPtr(const GLint arr, GLint sz, GLenum typ, GLboolean norm,
+                       GLsizei stride, const GLvoid *ptr);
 
     // same program, same shaders
     bool shallowCopy(const glslProg &other);
@@ -73,49 +77,12 @@ public:
 private:
     EH_DECLARE();
 
-    GLint getUniformPtr(const char *name);
-    void setVar1i(GLint var, GLint val);
-    void setVar2i(GLint var, GLint val1, GLint val2);
-    void setVar2f(GLint var, GLfloat val1, GLfloat val2);
-
-    GLint getAttrPtr(const char *name);
-    bool enableVertAttrArr(const GLint arr);
-    bool disableVertAttrArr(const GLint arr);
-    bool setVtxAttrPtr(const GLint arr, GLint sz, GLenum typ, GLboolean norm,
-                       GLsizei stride, const GLvoid *ptr);
-
     sharedGlProg *program;
 
     bool is_init = false;
     bool deinit();
 
     vbaGL *ctx;
-
-    struct {
-        struct {
-            GLint position = 0;
-            GLint texcoord = 0;
-
-            GLint src_sz = 0;
-            GLint dst_sz = 0;
-
-            GLint pass_idx = 0;
-            GLint pass_qty = 0;
-        } v;
-
-        struct {
-            GLint src_tex = 0;
-
-            GLint src_sz = 0;
-            GLint dst_sz = 0;
-
-            GLint pass_idx = 0;
-            GLint pass_qty = 0;
-        } f;
-
-        GLint needs_flip = 0; // Can be in either, but not both
-
-    } vars;
 };
 
 #endif

@@ -99,7 +99,7 @@ bool glslProg::detachShaders() {
     return program->detachShaders();
 }
 
-inline GLint glslProg::getUniformPtr(const char *name) {
+GLint glslProg::getUniformPtr(const char *name) {
     if (!is_init) {
         return false;
     }
@@ -111,7 +111,7 @@ inline GLint glslProg::getUniformPtr(const char *name) {
     return ret;
 }
 
-inline GLint glslProg::getAttrPtr(const char *name) {
+GLint glslProg::getAttrPtr(const char *name) {
     if (!is_init) {
         return false;
     }
@@ -122,7 +122,7 @@ inline GLint glslProg::getAttrPtr(const char *name) {
     return ret;
 }
 
-inline bool glslProg::enableVertAttrArr(const GLint arr) {
+bool glslProg::enableVertAttrArr(const GLint arr) {
     if (!is_init) {
         return false;
     }
@@ -133,7 +133,7 @@ inline bool glslProg::enableVertAttrArr(const GLint arr) {
     return true;
 }
 
-inline bool glslProg::disableVertAttrArr(const GLint arr) {
+bool glslProg::disableVertAttrArr(const GLint arr) {
     if (!is_init) {
         return false;
     }
@@ -144,9 +144,9 @@ inline bool glslProg::disableVertAttrArr(const GLint arr) {
     return true;
 }
 
-inline bool glslProg::setVtxAttrPtr(const GLint arr, GLint sz, GLenum typ,
-                                    GLboolean norm, GLsizei stride,
-                                    const GLvoid *ptr) {
+bool glslProg::setVtxAttrPtr(const GLint arr, GLint sz, GLenum typ,
+                             GLboolean norm, GLsizei stride,
+                             const GLvoid *ptr) {
     if (!is_init) {
         return false;
     }
@@ -167,49 +167,6 @@ bool glslProg::link() {
     if (!program->linked)
         return false;
 
-    if (program->has_vtx) {
-        vars.v.position = getAttrPtr("v_pos");
-        vars.v.texcoord = getAttrPtr("v_texcoord");
-
-        vars.v.src_sz = getUniformPtr("v_src_sz");
-        vars.v.dst_sz = getUniformPtr("v_dst_sz");
-
-        vars.v.pass_idx = getUniformPtr("v_pass_idx");
-        vars.v.pass_qty = getUniformPtr("v_pass_qty");
-    }
-
-    if (program->has_frag) {
-        vars.f.src_tex = getUniformPtr("src_tex");
-
-        vars.f.src_sz = getUniformPtr("f_src_sz");
-        vars.f.dst_sz = getUniformPtr("f_dst_sz");
-
-        vars.f.pass_idx = getUniformPtr("f_pass_idx");
-        vars.f.pass_qty = getUniformPtr("f_pass_qty");
-    }
-
-    vars.needs_flip = getUniformPtr("needs_flip");
-
-    errGLCheck();
-
-    if(program->has_vtx) {
-        activate();
-        glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_vtx);
-        #ifndef VBA_TRIANGLE_STRIP
-        setVtxAttrPtr(vars.v.position, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        #else
-        setVtxAttrPtr(vars.v.position, 3, GL_INT, GL_FALSE, 0, 0);
-        #endif
-        enableVertAttrArr(vars.v.position);
-
-        glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_texcoord);
-        setVtxAttrPtr(vars.v.texcoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        enableVertAttrArr(vars.v.texcoord);
-
-        glUseProgram(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-
     return !errGLCheck();
 }
 
@@ -221,7 +178,7 @@ bool glslProg::activate() {
     return !errGLCheck();
 }
 
-inline void glslProg::setVar1i(GLint var, GLint val) {
+void glslProg::setVar1i(GLint var, GLint val) {
     if (!is_init) {
         return;
     }
@@ -236,7 +193,7 @@ inline void glslProg::setVar1i(GLint var, GLint val) {
     errGLCheck();
 }
 
-inline void glslProg::setVar2i(GLint var, GLint val1, GLint val2) {
+void glslProg::setVar2i(GLint var, GLint val1, GLint val2) {
     if (!is_init) {
         return;
     }
@@ -251,7 +208,7 @@ inline void glslProg::setVar2i(GLint var, GLint val1, GLint val2) {
     errGLCheck();
 }
 
-inline void glslProg::setVar2f(GLint var, GLfloat val1, GLfloat val2) {
+void glslProg::setVar2f(GLint var, GLfloat val1, GLfloat val2) {
     if (!is_init) {
         return;
     }
@@ -264,52 +221,6 @@ inline void glslProg::setVar2f(GLint var, GLfloat val1, GLfloat val2) {
     glUniform2f(var, val1, val2);
     glUseProgram(curr_prog);
     errGLCheck();
-}
-
-void glslProg::setPassQty(uint n) {
-    if (!is_init) {
-        return;
-    }
-    setVar1i(vars.v.pass_qty, n);
-    setVar1i(vars.f.pass_qty, n);
-}
-
-void glslProg::setPassIdx(uint n) {
-    if (!is_init) {
-        return;
-    }
-    setVar1i(vars.v.pass_idx, n);
-    setVar1i(vars.f.pass_idx, n);
-}
-
-void glslProg::setSrcTexUnit(GLuint n) {
-    if (!is_init) {
-        return;
-    }
-    setVar1i(vars.f.src_tex, GLint(n));
-}
-
-void glslProg::setSrcSz(vbaSize sz) {
-    if (!is_init) {
-        return;
-    }
-    setVar2f(vars.v.src_sz, sz.x, sz.y);
-    setVar2f(vars.f.src_sz, sz.x, sz.y);
-}
-
-void glslProg::setDstSz(vbaSize sz) {
-    if (!is_init) {
-        return;
-    }
-    setVar2f(vars.v.dst_sz, sz.x, sz.y);
-    setVar2f(vars.f.dst_sz, sz.x, sz.y);
-}
-
-void glslProg::setNeedsFlip(bool flip) {
-    if (!is_init) {
-        return;
-    }
-    setVar1i(vars.needs_flip, flip ? 1 : 0);
 }
 
 bool glslProg::printInfoLog() {
@@ -349,19 +260,6 @@ bool glslProg::shallowCopy(const glslProg &other) {
 
     program = other.program;
     program->ref();
-
-    vars.needs_flip = other.vars.needs_flip;
-    vars.v.position = other.vars.v.position;
-    vars.v.texcoord = other.vars.v.texcoord;
-    vars.v.src_sz =   other.vars.v.src_sz;
-    vars.v.dst_sz =   other.vars.v.dst_sz;
-    vars.v.pass_idx = other.vars.v.pass_idx;
-    vars.v.pass_qty = other.vars.v.pass_qty;
-    vars.f.src_sz =   other.vars.f.src_sz;
-    vars.f.dst_sz =   other.vars.f.dst_sz;
-    vars.f.pass_idx = other.vars.f.pass_idx;
-    vars.f.pass_qty = other.vars.f.pass_qty;
-    vars.f.src_tex =  other.vars.f.src_tex;
 
     return true;
 }

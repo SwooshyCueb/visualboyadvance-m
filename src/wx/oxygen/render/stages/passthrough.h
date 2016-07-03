@@ -12,6 +12,14 @@ public:
 
     bool setIndex(uint idx, renderPipeline *rdrpth);
     bool render(vbaTex *src);
+
+private:
+    struct {
+        GLint texcoord = 0;
+        GLint position = 0;
+        GLint needs_flip = 0;
+        GLint src_tex = 0;
+    } glsl_vars;
 };
 
 #endif

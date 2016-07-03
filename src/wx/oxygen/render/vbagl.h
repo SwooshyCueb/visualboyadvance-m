@@ -60,6 +60,10 @@ public:
     vbaErr errGet();
     bool errPrint();
 
+    // Provide getters for these and move back to private
+    GLuint vb_vtx;
+    GLuint vb_texcoord;
+
 private:
     bool draw();
 
@@ -83,8 +87,6 @@ private:
     static GLenum DrawBuffers[1];
 
     GLuint vtxArr;
-    GLuint vb_vtx;
-    GLuint vb_texcoord;
 
     glslCommonSrc glsl_common;
 

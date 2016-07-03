@@ -51,7 +51,7 @@ Ensure that, inside your classes, scales and multipliers are always floats.
  *****************************************************************************
 Implement a way for renderStage child classes to expose user-configurable
     configuration options.
-Move shader attribute/uniform handling from glslProg into renderStage
+Make shader attribute/uniform handling more elegant.
 
  *****************************************************************************
  * Shader-related classes                                                    *
