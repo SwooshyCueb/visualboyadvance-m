@@ -78,7 +78,7 @@ void wwrap(const gchar *string, uint width, gpointer printfunc) {
         gchar *line = (gchar *)g_malloc0(width * sizeof(gchar));
 
         // Copy our string until the end of the line is reached
-        for (linepos = 0; linepos < width-2; linepos++) {
+        for (linepos = 0; linepos < (int)width-2; linepos++) {
 
             // Check if we've hit the end of the string
             if (stringpos == strlen(string)) {
