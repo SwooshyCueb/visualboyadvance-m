@@ -13,9 +13,26 @@ vbaTex::vbaTex(vbaGL *globj, uint x, uint y) {
     init(globj, x, y);
 }
 
+vbaTex::vbaTex(vbaGL *globj, vbaSize sz, GLenum fmt) {
+    init(globj, sz, fmt);
+}
+
+vbaTex::vbaTex(vbaGL *globj, uint x, uint y, GLenum fmt) {
+    init(globj, x, y, fmt);
+}
+
 bool vbaTex::init(vbaGL *globj, vbaSize sz) {
+    return init(globj, sz, DEFAULT_TEX_FMT);
+}
+
+bool vbaTex::init(vbaGL *globj, uint x, uint y) {
+    return init(globj, x, y, DEFAULT_TEX_FMT);
+}
+
+bool vbaTex::init(vbaGL *globj, vbaSize sz, GLenum fmt) {
     ctx = globj;
     size = sz;
+    format = fmt;
     glGenTextures(1, &texture);
     setData(NULL);
     setResizeFilter(GL_NEAREST);
@@ -25,8 +42,9 @@ bool vbaTex::init(vbaGL *globj, vbaSize sz) {
     return true;
 }
 
-bool vbaTex::init(vbaGL *globj, uint x, uint y) {
+bool vbaTex::init(vbaGL *globj, uint x, uint y, GLenum fmt) {
     ctx = globj;
+    format = fmt;
     size.x = x;
     size.y = y;
     glGenTextures(1, &texture);
@@ -72,7 +90,7 @@ bool vbaTex::setData(const GLvoid *data) {
     }
     bind();
     glPixelStorei(GL_UNPACK_ROW_LENGTH, size.x + 1);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA,
+    glTexImage2D(GL_TEXTURE_2D, 0, format, size.x, size.y, 0, format,
                  GL_UNSIGNED_BYTE, data);
     return !errGLCheck();
 }

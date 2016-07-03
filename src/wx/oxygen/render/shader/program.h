@@ -39,6 +39,7 @@ private:
 class glslProg {
     friend class vbaGL;
     friend class glslShader;
+    friend class stgOSD;
 public:
     glslProg(); // dummy constructor
     glslProg(vbaGL *globj);

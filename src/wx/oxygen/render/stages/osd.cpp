@@ -3,105 +3,86 @@
 #include "oxygen.h"
 #include "osd.h"
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
+#include <glib.h>
 
-vbaOSD::vbaOSD(vbaGL *globj) {
+#include "oxygen.h"
+#include "contrib/stb_rect_pack.h"
+#include "contrib/stb_truetype.h"
+
+#define STAGE_MULT 1
+
+stgOSD::stgOSD(vbaGL *globj)
+    : renderStage(globj) {
+    init(globj);
+}
+
+bool stgOSD::init(vbaGL *globj) {
     DECLARE_RES(ttf_neoletters);
-    ctx = globj;
 
-    FT_Error fterr;
-    if (fterr = FT_Init_FreeType(&ft.lib)) {
-        errThrowVBAFT(VBA_ERR_FT_INIT, fterr);
-    }
+    // We will eventually have our own shader for this.
+    CREATE_GLSL_SRC_OBJ(pt_src, passthrough);
 
-    if (fterr = FT_New_Memory_Face(ft.lib, (unsigned char*)res_ttf_neoletters, res_ttf_neoletters_len, 0, &ft.face)) {
-        errThrowVBAFT(VBA_ERR_FT_INIT, fterr);
-    }
+    glslShader shd_f(globj, GL_FRAGMENT_SHADER);
+    glslShader shd_v(globj, GL_VERTEX_SHADER);
+    shd_f.setSrc(&pt_src);
+    shd_f.compile();
+    shd_v.setSrc(&pt_src);
+    shd_v.compile();
 
-    if (fterr = FT_Set_Char_Size(ft.face, 0, 16*64, 96, 96)) {
-        errThrowVBAFT(VBA_ERR_FT_INIT, fterr);
-    }
+    shader.init(ctx);
 
-    if (fterr = FT_Load_Char(ft.face, '�', FT_LOAD_RENDER)) {
-        errThrowVBAFT(VBA_ERR_FT_INIT, fterr);
-    }
+    shader.attachShader(&shd_f);
+    shader.attachShader(&shd_v);
 
-    ft.gs = ft.face->glyph;
+    shader.link();
 
+    setMult(STAGE_MULT);
 
-    placeholder.character = '�';
-    placeholder.sz_tex = vbaSize(ft.gs->bitmap.width, ft.gs->bitmap.rows);
-    placeholder.sz_glyph = vbaSize(ft.gs->bitmap_left, ft.gs->bitmap_top);
-    placeholder.adv = ft.gs->advance;
-    log_debug("Placeholder glyph info",
-              "sz_tex: %u * %u\n"
-              "sz_glyph: %u * %u\n",
-              "adv: %u * %u",
-              placeholder.sz_tex.x, placeholder.sz_tex.y,
-              placeholder.sz_glyph.x, placeholder.sz_glyph.y,
-              placeholder.adv.x, placeholder.adv.y);
+    /* Might want to tweak this */
+    stbtt_PackBegin(&packctx, atlaspx, (NUM_GLYPHS * ATLAS_GLYPH_S),
+                    (NUM_GLYPHS * ATLAS_GLYPH_S), 0, 1, NULL);
+    stbtt_PackFontRange(&packctx, (unsigned char*)res_ttf_neoletters, 0,
+                         16.0f, 0x20, (0x100 - 0x20), chardata);
 
-    placeholder.data = new unsigned char[placeholder.sz_tex.x *
-                                         placeholder.sz_tex.y * 4];
-    memcpy(placeholder.data, ft.gs->bitmap.buffer,
-           placeholder.sz_tex.x * placeholder.sz_tex.y * 4);
+    stbtt_PackEnd(&packctx);
 
-    glyphs.push_back(placeholder);
+    tex_atlas.init(globj, (NUM_GLYPHS * ATLAS_GLYPH_S),
+                   (NUM_GLYPHS * ATLAS_GLYPH_S), GL_ALPHA);
+    tex_atlas.setData((GLvoid *)atlaspx);
 
-    init = true;
-    // Preload some glyphs here?
+    is_init = true;
 
 }
 
-vbaOSD::~vbaOSD() {
-    if (init) {
-        FT_Done_Face(ft.face);
-        FT_Done_FreeType(ft.lib);
+stgOSD::~stgOSD() {
+    if (is_init) {
+        is_init = false;
     }
 }
 
-EH_DEFINE(vbaOSD);
-
-void vbaOSD::getGlyph(char character) {
-    std::deque<ftGlyph>::iterator iter = glyphs.begin();
-    while (iter != glyphs.end()) {
-        if (iter->character == character) {
-            currGlyph = *iter;
-            return;
-        }
-        iter++;
+bool stgOSD::setIndex(uint idx, renderPipeline *rdrpth) {
+    if (!is_init) {
+        return false;
     }
+    renderStage::setIndex(idx, rdrpth);
+    shader.setSrcTexUnit(idx);
+    shader.setNeedsFlip(false);
+    has_shader = true;
 
-    ftGlyph ng;
-    ng.character = character;
-
-    if (FT_Load_Char(ft.face, character, FT_LOAD_RENDER)) {
-        ng.character = character;
-        ng.sz_tex = placeholder.sz_tex;
-        ng.sz_glyph = placeholder.sz_glyph;
-        ng.adv = placeholder.adv;
-        ng.data = placeholder.data;
-        return;
-    } else {
-        ng.sz_tex = vbaSize(ft.gs->bitmap.width, ft.gs->bitmap.rows);
-        ng.sz_glyph = vbaSize(ft.gs->bitmap_left, ft.gs->bitmap_top);
-        ng.adv = ft.gs->advance;
-
-        ng.data = new unsigned char[ng.sz_tex.x * ng.sz_tex.y * 4];
-        memcpy(ng.data, ft.gs->bitmap.buffer, ng.sz_tex.x * ng.sz_tex.y * 4);
-    }
-
-    log_debug("%c glyph info:",
-              "sz_tex: %u * %u\n"
-              "sz_glyph: %u * %u\n",
-              "adv: %u * %u",
-              character,
-              ng.sz_tex.x, ng.sz_tex.y,
-              ng.sz_glyph.x, ng.sz_glyph.y,
-              ng.adv.x, ng.adv.y);
-
-    currGlyph = ng;
-
-    glyphs.push_back(ng);
+    return true;
 }
+
+bool stgOSD::render(vbaTex *src) {
+    if (!is_init) {
+        return false;
+    }
+
+    char text[] = "This is a test, woo!\0";
+    int tx, yx;
+    tx = yx = 50;
+
+    renderStage::render(src);
+
+    return true;
+}
+

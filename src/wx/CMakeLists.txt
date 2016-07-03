@@ -193,6 +193,8 @@ SET( SRC_O2
     oxygen/sharedvar.cpp
     oxygen/oxygen.cpp
     oxygen/vbaerr.cpp
+    oxygen/contrib/stb_truetype.cpp
+    oxygen/contrib/stb_rect_pack.cpp
     oxygen/render/pipeline.cpp
     oxygen/render/size.cpp
     oxygen/render/stage.cpp
@@ -213,6 +215,8 @@ SET (HDR_O2
     oxygen/oxygen.h
     oxygen/vbaerr.h
     oxygen/vbaerr_defs.h
+    oxygen/contrib/stb_truetype.h
+    oxygen/contrib/stb_rect_pack.h
     oxygen/render/pipeline.h
     oxygen/render/render.h
     oxygen/render/size.h

@@ -4,48 +4,41 @@
 #define VBA_OSD_H
 
 #include "oxygen.h"
+#include "contrib/stb_rect_pack.h"
+#include "contrib/stb_truetype.h"
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
-#include <deque>
-
-class ftGlyph {
-public:
-    char character;
-
-    vbaSize sz_tex;
-    vbaSize sz_glyph;
-
-    unsigned char *data;
-    FT_Vector adv;
+class glyph {
+    int advance;
+    int leftSideBearing;
 };
 
-class vbaOSD {
-    friend class vbaGL;
+class stgOSD : public renderStage {
 public:
-    vbaOSD(vbaGL *globj);
-    ~vbaOSD();
+    stgOSD(vbaGL *globj);
+    bool init(vbaGL *globj);
+    ~stgOSD();
+
+    bool setIndex(uint idx, renderPipeline *rdrpth);
+    bool render(vbaTex *src);
 
 private:
-    void getGlyph(char character);
+    stbtt_pack_context packctx;
+    #define NUM_GLYPHS 256
+    #define ATLAS_GLYPH_S 24
+    #define FONT_SIZE 16
+    unsigned char atlaspx[NUM_GLYPHS * ATLAS_GLYPH_S * ATLAS_GLYPH_S];
+    vbaTex tex_atlas;
 
-    EH_DECLARE();
+    float scale;
 
-    bool init = false;
+    int vascent;
+    int vdescent;
+    int vlinegap;
+    int vbaseline;
 
-    struct {
-        FT_Library lib;
-        FT_Face face;
-        FT_GlyphSlot gs;
-    } ft;
+    stbtt_packedchar chardata[256];
 
-    std::deque<ftGlyph> glyphs;
-    ftGlyph currGlyph;
-    ftGlyph placeholder;
-
-    vbaGL *ctx;
-
+    //static stbtt_pack_range char_ranges[];
 };
 
 #endif

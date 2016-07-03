@@ -5,6 +5,8 @@
 #include <GL/glxew.h>
 #include <GL/glut.h>
 
+#define DEFAULT_TEX_FMT GL_RGBA
+
 /* vbaTex
  * Texture object for use in vbaGL
  *
@@ -20,6 +22,10 @@ public:
     bool init(vbaGL *globj, vbaSize sz);
     vbaTex(vbaGL *globj, uint x, uint y);
     bool init(vbaGL *globj, uint x, uint y);
+    vbaTex(vbaGL *globj, vbaSize sz, GLenum fmt);
+    bool init(vbaGL *globj, vbaSize sz, GLenum fmt);
+    vbaTex(vbaGL *globj, uint x, uint y, GLenum fmt);
+    bool init(vbaGL *globj, uint x, uint y, GLenum fmt);
     ~vbaTex();
 
     void setSize(vbaSize sz);
@@ -28,7 +34,6 @@ public:
 
     void setResizeFilter(GLint filter);
     void setOobBehavior(GLint behavior);
-    void setShaderProg(glslProg *program);
 
     bool setData(const GLvoid *data);
 
@@ -42,6 +47,7 @@ private:
     GLuint texture;
     GLint resizefilt;
     GLint blitmask;
+    GLenum format;
 
     vbaSize size;
 
