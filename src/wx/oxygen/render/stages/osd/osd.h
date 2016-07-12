@@ -4,8 +4,7 @@
 #define VBA_OSD_H
 
 #include "oxygen.h"
-#include "contrib/stb_rect_pack.h"
-#include "contrib/stb_truetype.h"
+#include "render/text.h"
 
 class glyph {
     int advance;
@@ -22,12 +21,16 @@ public:
     bool render(vbaTex *src);
 
 private:
-    stbtt_pack_context packctx;
+    ftLib ft;
+    ftFont fnt;
+
     #define NUM_GLYPHS 256
     #define ATLAS_GLYPH_S 24
     #define FONT_SIZE 16
-    unsigned char atlaspx[NUM_GLYPHS * ATLAS_GLYPH_S * ATLAS_GLYPH_S];
+    unsigned char atlaspx[NUM_GLYPHS * ATLAS_GLYPH_S * NUM_GLYPHS * ATLAS_GLYPH_S];
     vbaTex tex_atlas;
+    GLuint vb_vtx;
+    GLuint vb_texcoord;
 
     float scale;
 
@@ -36,7 +39,6 @@ private:
     int vlinegap;
     int vbaseline;
 
-    stbtt_packedchar chardata[256];
 
     //static stbtt_pack_range char_ranges[];
 
@@ -45,6 +47,7 @@ private:
         GLint position = 0;
         GLint needs_flip = 0;
         GLint src_tex = 0;
+        GLint is_passthrough = 0;
     } glsl_vars;
 };
 

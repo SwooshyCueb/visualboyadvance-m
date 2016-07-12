@@ -46,9 +46,10 @@ protected:
     bool has_buffer = false;
 
     bool is_init = false;
+    EH_DECLARE();
+
 private:
     bool mult_set = false;
-    EH_DECLARE();
 
     float mult; // Scale as compared to previous stage
     float scale; // Scale as compared to first stage

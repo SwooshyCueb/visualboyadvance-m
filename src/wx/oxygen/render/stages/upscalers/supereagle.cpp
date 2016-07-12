@@ -41,11 +41,9 @@ bool stgSuperEagle::init(vbaGL *globj) {
     shader.activate();
     glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_vtx);
     shader.setVtxAttrPtr(glsl_vars.position, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    shader.enableVertAttrArr(glsl_vars.position);
 
     glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_texcoord);
     shader.setVtxAttrPtr(glsl_vars.texcoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    shader.enableVertAttrArr(glsl_vars.texcoord);
 
     glUseProgram(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -88,7 +86,12 @@ bool stgSuperEagle::render(vbaTex *src) {
     if (!is_init) {
         return false;
     }
+
+    shader.enableVertAttrArr(glsl_vars.position);
+    shader.enableVertAttrArr(glsl_vars.texcoord);
     renderStage::render(src);
+    shader.disableVertAttrArr(glsl_vars.position);
+    shader.disableVertAttrArr(glsl_vars.texcoord);
 
     return true;
 }

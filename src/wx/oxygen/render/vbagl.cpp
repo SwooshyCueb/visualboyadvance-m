@@ -48,24 +48,23 @@ vbaGL::vbaGL() {
     }
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY_EXT);
+    //glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendEquation(GL_FUNC_ADD);
+    glBlendEquationSeparate(GL_FUNC_ADD, GL_MAX);
 
     glGenVertexArrays(1, &vtxArr);
     glBindVertexArray(vtxArr);
 
     glGenBuffers(1, &vb_vtx);
     glBindBuffer(GL_ARRAY_BUFFER, vb_vtx);
-    #ifndef VBA_TRIANGLE_STRIP
     glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), draw_vert, GL_STATIC_DRAW);
-    glVertexPointer(2, GL_FLOAT, 0, 0);
-    #else
-    glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLint), draw_vert, GL_STATIC_DRAW);
-    glVertexPointer(3, GL_INT, 0, 0);
-    #endif
+    //glVertexPointer(2, GL_FLOAT, 0, 0);
 
     glGenBuffers(1, &vb_texcoord);
     glBindBuffer(GL_ARRAY_BUFFER, vb_texcoord);
     glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), draw_coord, GL_STATIC_DRAW);
-    glTexCoordPointer(2, GL_FLOAT, 0, 0);
+    //glTexCoordPointer(2, GL_FLOAT, 0, 0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -96,7 +95,7 @@ vbaGL::~vbaGL() {
  *
  * The macro errVBASet takes the error value only.
  */
-inline void vbaGL::pushErr(vbaErrVal val, const char *file, int line,
+void vbaGL::pushErr(vbaErrVal val, const char *file, int line,
                            const char *func) {
     vbaErrs.emplace(val, file, line, func);
 }
@@ -105,7 +104,7 @@ inline void vbaGL::pushErr(vbaErrVal val, const char *file, int line,
  * add an FT error to the error queue
  * Sets the VBA error to VBA_ERR_FT_ERR in the vbaErr objects.
  */
-inline void vbaGL::pushErrFT(FT_Error ftval, const char *file, int line,
+void vbaGL::pushErrFT(FT_Error ftval, const char *file, int line,
                            const char *func) {
     vbaErrs.emplace(VBA_ERR_FT_ERR, ftval, file, line, func);
 }
@@ -114,7 +113,7 @@ inline void vbaGL::pushErrFT(FT_Error ftval, const char *file, int line,
  * add an FT error to the error queue
  * Sets the VBA error to the provided VBA error value in the vbaErr objects.
  */
-inline void vbaGL::pushErrFT(vbaErrVal val, FT_Error ftval, const char *file,
+void vbaGL::pushErrFT(vbaErrVal val, FT_Error ftval, const char *file,
                            int line, const char *func) {
     vbaErrs.emplace(val, ftval, file, line, func);
 }
@@ -124,7 +123,7 @@ inline void vbaGL::pushErrFT(vbaErrVal val, FT_Error ftval, const char *file,
  * Returns true if one or more GL errors are found.
  * Sets the VBA error to the provided VBA error value in the vbaErr objects.
  */
-inline bool vbaGL::pushErrGL(vbaErrVal val, const char *file, int line,
+bool vbaGL::pushErrGL(vbaErrVal val, const char *file, int line,
                              const char *func) {
     GLenum glErr;
     bool ret = false;
@@ -142,7 +141,7 @@ inline bool vbaGL::pushErrGL(vbaErrVal val, const char *file, int line,
  * Returns true if one or more GL errors are found.
  * Sets the VBA error to VBA_ERR_GL_ERR in the vbaErr objects.
  */
-inline bool vbaGL::pushErrGL(const char *file, int line, const char *func) {
+bool vbaGL::pushErrGL(const char *file, int line, const char *func) {
     return pushErrGL(VBA_ERR_GL_ERR, file, line, func);
 }
 
@@ -152,7 +151,7 @@ inline bool vbaGL::pushErrGL(const char *file, int line, const char *func) {
  * Ignores the first GL error if it matches a provided GL error value.
  * Sets the VBA error to VBA_ERR_GL_ERR in the vbaErr objects.
  */
-inline bool vbaGL::catchErrGL(GLenum ignore, vbaErrVal val, const char *file,
+bool vbaGL::catchErrGL(GLenum ignore, vbaErrVal val, const char *file,
                               int line, const char *func) {
     GLenum glErr;
     bool ret = false;
@@ -180,7 +179,7 @@ inline bool vbaGL::catchErrGL(GLenum ignore, vbaErrVal val, const char *file,
  * Ignores the first GL error if it matches a provided GL error value.
  * Sets the VBA error to the provided VBA error value in the vbaErr objects.
  */
-inline bool vbaGL::catchErrGL(GLenum ignore, const char *file, int line,
+bool vbaGL::catchErrGL(GLenum ignore, const char *file, int line,
                               const char *func) {
     return catchErrGL(ignore, VBA_ERR_GL_ERR, file, line, func);
 }
@@ -257,11 +256,7 @@ bool vbaGL::render(const void *data) {
 }
 
 bool vbaGL::draw() {
-    #ifndef VBA_TRIANGLE_STRIP
-    glDrawArrays(GL_QUADS, 0, 4);
-    #else
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    #endif
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     return !errGLCheck();
 }
 
@@ -278,10 +273,12 @@ bool vbaGL::initPipeline(uint scale) {
     init_p = true;
 
     renderStage *passthru1 = new stgPassthrough(this);
+    renderStage *osd = new stgOSD(this);
     renderStage *supereagle1 = new stgSuperEagle(this);
     renderStage *passthru2 = new stgPassthrough(this);
 
     pipeline.addStage(passthru1);
+    //pipeline.addStage(osd);
     pipeline.addStage(supereagle1);
     pipeline.addStage(passthru2);
 

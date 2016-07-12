@@ -193,18 +193,17 @@ SET( SRC_O2
     oxygen/sharedvar.cpp
     oxygen/oxygen.cpp
     oxygen/vbaerr.cpp
-    oxygen/contrib/stb_truetype.cpp
-    oxygen/contrib/stb_rect_pack.cpp
     oxygen/render/pipeline.cpp
     oxygen/render/size.cpp
     oxygen/render/stage.cpp
     oxygen/render/tex.cpp
+    oxygen/render/text.cpp
     oxygen/render/vbagl.cpp
     oxygen/render/shader/program.cpp
     oxygen/render/shader/shader.cpp
     oxygen/render/shader/src.cpp
-    oxygen/render/stages/osd.cpp
-    oxygen/render/stages/passthrough.cpp
+    oxygen/render/stages/osd/osd.cpp
+    oxygen/render/stages/passthrough/passthrough.cpp
     oxygen/render/stages/upscalers/supereagle.cpp
 )
 
@@ -215,20 +214,19 @@ SET (HDR_O2
     oxygen/oxygen.h
     oxygen/vbaerr.h
     oxygen/vbaerr_defs.h
-    oxygen/contrib/stb_truetype.h
-    oxygen/contrib/stb_rect_pack.h
     oxygen/render/pipeline.h
     oxygen/render/render.h
     oxygen/render/size.h
     oxygen/render/stage.h
     oxygen/render/tex.h
+    oxygen/render/text.h
     oxygen/render/vbagl.h
     oxygen/render/shader/glsl.h
     oxygen/render/shader/program.h
     oxygen/render/shader/shader.h
     oxygen/render/shader/src.h
-    oxygen/render/stages/osd.h
-    oxygen/render/stages/passthrough.h
+    oxygen/render/stages/osd/osd.h
+    oxygen/render/stages/passthrough/passthrough.h
     oxygen/render/stages/stages.h
     oxygen/render/stages/upscalers/supereagle.h
     oxygen/render/stages/upscalers/upscalers.h
@@ -297,6 +295,7 @@ SET( GLSL_SRC
 
 SET(RES_O2_LN
     ${GLSL_SRC}
+    oxygen/res/fonts/fira.ttf
     oxygen/res/fonts/neoletters.ttf
 )
 
@@ -312,6 +311,7 @@ ADD_RESOURCES( RES_O2
 
 SET( PROJ_STUFF
     oxygen/TODO
+    oxygen/res/fonts/fira.license
     oxygen/res/fonts/neoletters.license
 )
 
