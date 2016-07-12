@@ -45,6 +45,8 @@ Handle glib errors.
  * Data integrity                                                            *
  *****************************************************************************
 Ensure that, inside your classes, scales and multipliers are always floats.
+Behavior upon calling init on an already intiialized object is currnetly
+    undefined. Let's handle this.
 
  *****************************************************************************
  * Pipeline render path                                                      *
