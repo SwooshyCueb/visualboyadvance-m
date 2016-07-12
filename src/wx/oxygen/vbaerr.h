@@ -207,32 +207,32 @@ bool operator != (const FT_Error &num, const vbaErr &obj);
 #endif
 
 #define EH_DEFINE(objn) \
-    inline void objn::pushErr(vbaErrVal val, const char *file, int line, \
+    void objn::pushErr(vbaErrVal val, const char *file, int line, \
                               const char *func) { \
         return ctx->pushErr(val, file, line, func); \
     } \
-    inline void objn::pushErrFT(FT_Error ftval, const char *file, int line, \
+    void objn::pushErrFT(FT_Error ftval, const char *file, int line, \
                                 const char *func) { \
         return ctx->pushErr(ftval, file, line, func); \
     } \
-    inline void objn::pushErrFT(vbaErrVal val,FT_Error ftval, \
+    void objn::pushErrFT(vbaErrVal val,FT_Error ftval, \
                                 const char *file, int line, \
                                 const char *func) { \
         return ctx->pushErr(val, file, line, func); \
     } \
-    inline bool objn::pushErrGL(const char *file, int line, \
+    bool objn::pushErrGL(const char *file, int line, \
                                 const char *func) { \
         return ctx->pushErrGL(file, line, func); \
     } \
-    inline bool objn::pushErrGL(vbaErrVal val, const char *file, int line, \
+    bool objn::pushErrGL(vbaErrVal val, const char *file, int line, \
                                 const char *func) { \
         return ctx->pushErrGL(val, file, line, func); \
     } \
-    inline bool objn::catchErrGL(GLenum ignore, const char *file, int line, \
+    bool objn::catchErrGL(GLenum ignore, const char *file, int line, \
                                  const char *func) { \
         return ctx->catchErrGL(ignore, file, line, func); \
     } \
-    inline bool objn::catchErrGL(GLenum ignore, vbaErrVal val, \
+    bool objn::catchErrGL(GLenum ignore, vbaErrVal val, \
                                  const char *file, int line, \
                                  const char *func) { \
         return ctx->catchErrGL(ignore, val, file, line, func); \
