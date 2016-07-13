@@ -2,7 +2,7 @@
 #include "size.h"
 #include "stage.h"
 #include "tex.h"
-#include "text.h"
 #include "vbagl.h"
 #include "render/shader/glsl.h"
 #include "render/stages/stages.h"
+#include "text/text.h"

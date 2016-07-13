@@ -4,7 +4,7 @@
 #define VBA_OSD_H
 
 #include "oxygen.h"
-#include "render/text.h"
+#include "render/text/text.h"
 
 class glyph {
     int advance;

@@ -6,7 +6,7 @@
 #include <glib.h>
 
 #include "oxygen.h"
-#include "render/text.h"
+#include "render/text/text.h"
 
 #include <vector>
 

@@ -197,7 +197,6 @@ SET( SRC_O2
     oxygen/render/size.cpp
     oxygen/render/stage.cpp
     oxygen/render/tex.cpp
-    oxygen/render/text.cpp
     oxygen/render/vbagl.cpp
     oxygen/render/shader/program.cpp
     oxygen/render/shader/shader.cpp
@@ -205,6 +204,10 @@ SET( SRC_O2
     oxygen/render/stages/osd/osd.cpp
     oxygen/render/stages/passthrough/passthrough.cpp
     oxygen/render/stages/upscalers/supereagle.cpp
+    oxygen/render/text/font.cpp
+    oxygen/render/text/ftlib.cpp
+    oxygen/render/text/glyph.cpp
+    oxygen/render/text/ttfres.cpp
 )
 
 SET (HDR_O2
@@ -219,7 +222,6 @@ SET (HDR_O2
     oxygen/render/size.h
     oxygen/render/stage.h
     oxygen/render/tex.h
-    oxygen/render/text.h
     oxygen/render/vbagl.h
     oxygen/render/shader/glsl.h
     oxygen/render/shader/program.h
@@ -230,6 +232,11 @@ SET (HDR_O2
     oxygen/render/stages/stages.h
     oxygen/render/stages/upscalers/supereagle.h
     oxygen/render/stages/upscalers/upscalers.h
+    oxygen/render/text/font.h
+    oxygen/render/text/ftlib.h
+    oxygen/render/text/glyph.h
+    oxygen/render/text/text.h
+    oxygen/render/text/ttfres.h
 )
 
 SET( SRC_WX
