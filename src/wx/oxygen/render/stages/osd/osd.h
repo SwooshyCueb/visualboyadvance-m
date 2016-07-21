@@ -36,6 +36,8 @@ public:
     bool setSpeed(gfloat fps, gfloat speed);
 
 private:
+    bool renderGlyph(gunichar character, vbaSize pos);
+
     ftLib ft;
     ftFont fnt;
 
@@ -60,6 +62,7 @@ private:
     int vdescent;
     int vlinegap;
     int vbaseline;
+    vbaSize sz_texel;
 
 
     //static stbtt_pack_range char_ranges[];

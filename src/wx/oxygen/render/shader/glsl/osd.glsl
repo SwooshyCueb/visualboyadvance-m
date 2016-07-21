@@ -1,5 +1,5 @@
 #version 100
-/* Passthrough shader
+/* Glyph rendering shader
  *
  * Vertex and fragment implementation
  */
@@ -57,23 +57,13 @@ void main() {
 
     //vec2 f_texcoord = gl_FragCoord.xy / dst_sz;
     vec2 texcoord = f_texcoord;
-    /*
-    if (is_passthrough) {
-        color = texture2D( src_tex, texcoord );
-    } else {
-        vec4 alpha = texture2D( src_tex, texcoord ).aaaa;
-        alpha = vec4(1.0, 1.0, 1.0, 1.0) - alpha;
-        color = c_green * alpha;
-    }
-    */
-    //color = texture2D( src_tex, texcoord ).aaaa;
-    //color.a = 1.0;
 
     if (is_passthrough) {
         color = texture2D( src_tex, texcoord );
     } else {
+        vec4 alpha = texture2D( src_tex, texcoord ).aaaa;
         color = c_black;
-        //color = texture2D( src_tex, texcoord ).aaaa;
+        color.a = alpha.a;
     }
 
     gl_FragColor = color;

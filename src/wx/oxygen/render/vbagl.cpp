@@ -50,8 +50,8 @@ vbaGL::vbaGL() {
     glEnableClientState(GL_TEXTURE_COORD_ARRAY_EXT);
     //glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glBlendEquation(GL_FUNC_ADD);
-    glBlendEquationSeparate(GL_FUNC_ADD, GL_MAX);
+    glBlendEquation(GL_FUNC_ADD);
+    //glBlendEquationSeparate(GL_FUNC_ADD, GL_MAX);
 
     glGenVertexArrays(1, &vtxArr);
     glBindVertexArray(vtxArr);
@@ -278,8 +278,9 @@ bool vbaGL::initPipeline(uint scale) {
     renderStage *passthru2 = new stgPassthrough(this);
 
     pipeline.addStage(passthru1);
-    pipeline.addStage(osd);
+
     pipeline.addStage(supereagle1);
+    pipeline.addStage(osd);
     pipeline.addStage(passthru2);
 
     return true;

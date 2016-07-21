@@ -140,13 +140,13 @@ gboolean ftFont::cacheGlyph(gunichar character, GHashTable *gset) {
                   "%s glyph info:\n"
                   "value: 0x%04ix\n"
                   "sz_tex: %u * %u\n"
-                  "sz_glyph: %u * %u\n"
+                  "offset: %d * %d\n"
                   "adv: %u * %u\n"
                   "data:\n%s",
                   u8c,
                   (guint32)character,
                   glyph->sz_tex.xu(), glyph->sz_tex.yu(),
-                  glyph->sz_glyph.xu(), glyph->sz_glyph.yu(),
+                  glyph->sz_glyph.xi(), glyph->sz_glyph.yi(),
                   glyph->adv.x, glyph->adv.y,
                   bitmap);
     }

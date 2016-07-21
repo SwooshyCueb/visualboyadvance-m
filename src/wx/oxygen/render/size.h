@@ -133,6 +133,64 @@ inline vbaSize operator +  (const vbaSize &left,  const vbaSize &right) {
 inline vbaSize operator -  (const vbaSize &left,  const vbaSize &right) {
     return vbaSize(left.xd() - right.xd(), left.yd() - right.yd());
 }
+inline vbaSize operator *  (const vbaSize &left,  const vbaSize &right) {
+    return vbaSize(left.xd() * right.xd(), left.yd() * right.yd());
+}
+inline vbaSize operator /  (const vbaSize &left,  const vbaSize &right) {
+    return vbaSize(left.xd() / right.xd(), left.yd() / right.yd());
+}
+
+inline vbaSize operator +  (const vbaSize &sz,    const gdouble &num) {
+    return vbaSize(sz.xd() +          num, sz.yd() +          num);
+}
+inline vbaSize operator +  (const vbaSize &sz,    const  gfloat &num) {
+    return vbaSize(sz.xd() + (gdouble)num, sz.yd() + (gdouble)num);
+}
+inline vbaSize operator +  (const vbaSize &sz,    const   guint &num) {
+    return vbaSize(sz.xd() + (gdouble)num, sz.yd() + (gdouble)num);
+}
+inline vbaSize operator +  (const vbaSize &sz,    const    gint &num) {
+    return vbaSize(sz.xd() + (gdouble)num, sz.yd() + (gdouble)num);
+}
+
+inline vbaSize operator +  (const gdouble &num,   const vbaSize &sz ) {
+    return vbaSize(         num + sz.xd(),          num + sz.yd());
+}
+inline vbaSize operator +  (const  gfloat &num,   const vbaSize &sz ) {
+    return vbaSize((gdouble)num + sz.xd(), (gdouble)num + sz.yd());
+}
+inline vbaSize operator +  (const   guint &num,   const vbaSize &sz ) {
+    return vbaSize((gdouble)num + sz.xd(), (gdouble)num + sz.yd());
+}
+inline vbaSize operator +  (const    gint &num,   const vbaSize &sz ) {
+    return vbaSize((gdouble)num + sz.xd(), (gdouble)num + sz.yd());
+}
+
+inline vbaSize operator -  (const vbaSize &sz,    const gdouble &num) {
+    return vbaSize(sz.xd() -          num, sz.yd() -          num);
+}
+inline vbaSize operator -  (const vbaSize &sz,    const  gfloat &num) {
+    return vbaSize(sz.xd() - (gdouble)num, sz.yd() - (gdouble)num);
+}
+inline vbaSize operator -  (const vbaSize &sz,    const   guint &num) {
+    return vbaSize(sz.xd() - (gdouble)num, sz.yd() - (gdouble)num);
+}
+inline vbaSize operator -  (const vbaSize &sz,    const    gint &num) {
+    return vbaSize(sz.xd() - (gdouble)num, sz.yd() - (gdouble)num);
+}
+
+inline vbaSize operator -  (const gdouble &num,   const vbaSize &sz ) {
+    return vbaSize(         num - sz.xd(),          num - sz.yd());
+}
+inline vbaSize operator -  (const  gfloat &num,   const vbaSize &sz ) {
+    return vbaSize((gdouble)num - sz.xd(), (gdouble)num - sz.yd());
+}
+inline vbaSize operator -  (const   guint &num,   const vbaSize &sz ) {
+    return vbaSize((gdouble)num - sz.xd(), (gdouble)num - sz.yd());
+}
+inline vbaSize operator -  (const    gint &num,   const vbaSize &sz ) {
+    return vbaSize((gdouble)num - sz.xd(), (gdouble)num - sz.yd());
+}
 
 inline vbaSize operator *  (const vbaSize &sz,    const gdouble &num) {
     return vbaSize(sz.xd() *          num, sz.yd() *          num);
