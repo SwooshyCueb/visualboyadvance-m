@@ -2,6 +2,7 @@
 #define GBMEMORY_H
 
 #include <time.h>
+#include <stdint.h>
 
 struct mapperMBC1 {
     int mapperRAMEnable;
