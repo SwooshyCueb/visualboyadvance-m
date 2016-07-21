@@ -2,6 +2,9 @@
 #define FLASH_H
 
 #include <stdint.h>
+#ifndef __LIBRETRO__
+#include <zlib.h>
+#endif
 
 #define FLASH_128K_SZ 0x20000
 
