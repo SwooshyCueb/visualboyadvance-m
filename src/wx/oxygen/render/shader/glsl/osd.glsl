@@ -66,9 +66,15 @@ void main() {
         color = c_green * alpha;
     }
     */
-    color = texture2D( src_tex, texcoord ).aaaa;
-    color.a = 1.0;
-    color.g = 0.0;
+    //color = texture2D( src_tex, texcoord ).aaaa;
+    //color.a = 1.0;
+
+    if (is_passthrough) {
+        color = texture2D( src_tex, texcoord );
+    } else {
+        color = c_black;
+        //color = texture2D( src_tex, texcoord ).aaaa;
+    }
 
     gl_FragColor = color;
 }

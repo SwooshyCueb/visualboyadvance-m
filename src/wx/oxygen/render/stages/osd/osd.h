@@ -1,14 +1,26 @@
 // Not yet functional
 
+/* TODO:
+ * "Statusbar" text. (FPS, speed %, and such)
+ *     does not disappear on its own
+ * "Console"-type scrolling text
+ *     starts in top right corner, is pushed down to make room for new text,
+ *     rather than being replaced by new text. Stays on screen for a little
+ *     while before disappearing (fade out?)
+ * Unicode support
+ */
+
 #ifndef VBA_OSD_H
 #define VBA_OSD_H
 
 #include "oxygen.h"
 #include "render/text/text.h"
+#include <queue>
 
-class glyph {
-    int advance;
-    int leftSideBearing;
+class osdLine {
+    vbaTex tex;
+    vbaSize pos;
+    gint timeout = -60 * 5;
 };
 
 class stgOSD : public renderStage {
@@ -19,6 +31,9 @@ public:
 
     bool setIndex(uint idx, renderPipeline *rdrpth);
     bool render(vbaTex *src);
+
+    bool pushText(gchar *text);
+    bool setSpeed(gfloat fps, gfloat speed);
 
 private:
     ftLib ft;
@@ -31,6 +46,13 @@ private:
     vbaTex tex_atlas;
     GLuint vb_vtx;
     GLuint vb_texcoord;
+    GLuint vbo;
+
+    std::queue<osdLine*> scroll;
+
+    vbaTex tex_glyph;
+    vbaTex tex_stats;
+    vbaTex tex_osd;
 
     float scale;
 

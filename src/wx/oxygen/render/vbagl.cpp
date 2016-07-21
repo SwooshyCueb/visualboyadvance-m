@@ -278,7 +278,7 @@ bool vbaGL::initPipeline(uint scale) {
     renderStage *passthru2 = new stgPassthrough(this);
 
     pipeline.addStage(passthru1);
-    //pipeline.addStage(osd);
+    pipeline.addStage(osd);
     pipeline.addStage(supereagle1);
     pipeline.addStage(passthru2);
 

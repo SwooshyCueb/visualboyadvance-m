@@ -26,8 +26,8 @@ bool stgOSD::init(vbaGL *globj) {
     fnt.cacheGlyphs(16);
 
     // We will eventually have our own shader for this.
-    //CREATE_GLSL_SRC_OBJ(osd_glsl, osd);
-    CREATE_GLSL_SRC_OBJ(osd_glsl, passthrough);
+    CREATE_GLSL_SRC_OBJ(osd_glsl, osd);
+    //CREATE_GLSL_SRC_OBJ(osd_glsl, passthrough);
 
     glslShader shd_f(globj, GL_FRAGMENT_SHADER);
     glslShader shd_v(globj, GL_VERTEX_SHADER);
@@ -52,6 +52,7 @@ bool stgOSD::init(vbaGL *globj) {
     setMult(STAGE_MULT);
 
     shader.setVar1i(glsl_vars.needs_flip, 0);
+    shader.setVar1i(glsl_vars.is_passthrough, 1);
 
     shader.activate();
     glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_vtx);
@@ -63,15 +64,25 @@ bool stgOSD::init(vbaGL *globj) {
     glUseProgram(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    tex_stats.init(globj, getSize(), GL_ALPHA);
+    tex_osd.init(globj, getSize(), GL_ALPHA);
+
+    // Size here doesn't matter
+    tex_glyph.init(globj, 4, 4, GL_ALPHA);
+    tex_glyph.bind(0);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
 
     //tex_atlas.init(globj, (NUM_GLYPHS * ATLAS_GLYPH_S),
     //               (NUM_GLYPHS * ATLAS_GLYPH_S), GL_ALPHA);
     //tex_atlas.setData((GLvoid *)atlaspx);
 
+    glGenBuffers(1, &vbo);
 
 
     //glGenBuffers(1, &vb_vtx);
     //glGenBuffers(1, &vb_texcoord);
+
 
     is_init = true;
 
@@ -81,6 +92,24 @@ stgOSD::~stgOSD() {
     if (is_init) {
         is_init = false;
     }
+}
+
+bool stgOSD::pushText(gchar *text) {
+    // Create texture for new line of text
+
+    // Change existing textures' positions
+
+    // Remove any textures pushed below midpoint of screen
+
+    return true;
+}
+
+bool stgOSD::setSpeed(gfloat fps, gfloat speed) {
+    // Clear current speed texture
+
+    // Render new speed texture
+
+    return true;
 }
 
 bool stgOSD::setIndex(uint idx, renderPipeline *rdrpth) {
@@ -99,10 +128,70 @@ bool stgOSD::render(vbaTex *src) {
         return false;
     }
 
+    // PART 1: stats
 
+    // PART 2: scroll
+
+    // PART 3: screen
     shader.enableVertAttrArr(glsl_vars.position);
     shader.enableVertAttrArr(glsl_vars.texcoord);
     renderStage::render(src);
+    shader.disableVertAttrArr(glsl_vars.position);
+    shader.disableVertAttrArr(glsl_vars.texcoord);
+
+
+    gchar test = 'P';
+    ftGlyph *tglyph = fnt.getGlyph(g_utf8_get_char(&test), 16.0);
+    tex_glyph.setSize(tglyph->sz_tex);
+    tex_glyph.setData((GLvoid *)tglyph->data);
+
+    gfloat sx = (gfloat)(((gdouble)1.0 / getSize().xd()) * tglyph->sz_tex.xd());
+    gfloat sy = (gfloat)(((gdouble)1.0 / getSize().yd()) * tglyph->sz_tex.yd());
+
+    GLfloat box[4][2] = {
+        {0.5,    0.5},
+        {0.5+sx, 0.5},
+        {0.5,    0.5+sy},
+        {0.5+sx, 0.5+sy}
+    };
+    log_info("Glyph Rendering Test",
+             "sx: %g\n"
+             "sy: %g",
+             sx, sy);
+
+    shader.activate();
+    //shader.setVar1i(glsl_vars.is_passthrough, 0);
+    tex_glyph.bind(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), box, GL_DYNAMIC_DRAW);
+    shader.setVtxAttrPtr(glsl_vars.position, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    //shader.setVtxAttrPtr(glsl_vars.texcoord, 4, GL_FLOAT, GL_FALSE, 0, 0);
+    //glEnableVertexAttribArray(vbo);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glEnable(GL_BLEND);
+    shader.enableVertAttrArr(glsl_vars.position);
+    shader.enableVertAttrArr(glsl_vars.texcoord);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    shader.disableVertAttrArr(glsl_vars.position);
+    shader.disableVertAttrArr(glsl_vars.texcoord);
+    glDisable(GL_BLEND);
+
+    glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_vtx);
+    shader.setVtxAttrPtr(glsl_vars.position, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_texcoord);
+    shader.setVtxAttrPtr(glsl_vars.texcoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    shader.setVar1i(glsl_vars.src_tex, index);
+    shader.setVar1i(glsl_vars.is_passthrough, 1);
+    glUseProgram(0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // PART 4: text to screen
+
+
     /*
 
     shader.activate();
@@ -192,8 +281,8 @@ bool stgOSD::render(vbaTex *src) {
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     glUseProgram(0);
     */
-    shader.disableVertAttrArr(glsl_vars.position);
-    shader.disableVertAttrArr(glsl_vars.texcoord);
+    //shader.disableVertAttrArr(glsl_vars.position);
+    //shader.disableVertAttrArr(glsl_vars.texcoord);
     //glDisableVertexAttribArray(vb_vtx);
     //glDisableVertexAttribArray(vb_texcoord);
 
