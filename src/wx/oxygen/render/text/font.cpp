@@ -116,17 +116,39 @@ gboolean ftFont::cacheGlyph(gunichar character, GHashTable *gset) {
         memcpy(glyph->data, face->glyph->bitmap.buffer, glyph->sz_tex.xu() *
                                                         glyph->sz_tex.yu() * 4);
 
+        guint i, j, p, c;
+        guint bmst = (glyph->sz_tex.xu() * 3)+4;
+        guint bmsz = bmst * glyph->sz_tex.yu() + 2;
+        gchar *bitmap = (gchar *)g_malloc0(sizeof(gchar)*bmsz);
+        if ((glyph->sz_tex.xu() * glyph->sz_tex.yu()) > 0) {
+            for (i = 0; i < glyph->sz_tex.yu(); i++) {
+                bitmap[i*bmst] = ' ';
+                bitmap[(i*bmst)+1] = ' ';
+                bitmap[(i*bmst)+2] = ' ';
+                bitmap[(i*bmst)+3] = ' ';
+                for(j = 0; j < glyph->sz_tex.xu(); j++) {
+                    p = (i*bmst+(j*3))+4;
+                    c = i*glyph->sz_tex.xu()+j;
+                    g_snprintf(&bitmap[p], 4, "%.2x ", (uint)glyph->data[c]);
+                }
+                bitmap[(i+1)*bmst - 1] = '\n';
+            }
+            bitmap[bmsz-3] = '\0';
+        }
+
         log_debug("Glyph loaded",
                   "%s glyph info:\n"
                   "value: 0x%04ix\n"
                   "sz_tex: %u * %u\n"
                   "sz_glyph: %u * %u\n"
-                  "adv: %u * %u",
+                  "adv: %u * %u\n"
+                  "data:\n%s",
                   u8c,
                   (guint32)character,
                   glyph->sz_tex.xu(), glyph->sz_tex.yu(),
                   glyph->sz_glyph.xu(), glyph->sz_glyph.yu(),
-                  glyph->adv.x, glyph->adv.y);
+                  glyph->adv.x, glyph->adv.y,
+                  bitmap);
     }
     g_hash_table_insert(gset, GSIZE_TO_POINTER((gsize)character),
                         (gpointer)glyph);

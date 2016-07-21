@@ -23,7 +23,7 @@ bool stgOSD::init(vbaGL *globj) {
 
     CREATE_TTF_RES_OBJ(res_neoletters, neoletters);
     fnt.init(&ft, res_neoletters);
-    fnt.cacheGlyphs(16);
+    fnt.cacheGlyphs(12);
 
     // We will eventually have our own shader for this.
     CREATE_GLSL_SRC_OBJ(osd_glsl, osd);
@@ -141,7 +141,7 @@ bool stgOSD::render(vbaTex *src) {
 
 
     gchar test = 'P';
-    ftGlyph *tglyph = fnt.getGlyph(g_utf8_get_char(&test), 16.0);
+    ftGlyph *tglyph = fnt.getGlyph(g_utf8_get_char(&test), 12.0);
     tex_glyph.setSize(tglyph->sz_tex);
     tex_glyph.setData((GLvoid *)tglyph->data);
 
@@ -154,13 +154,13 @@ bool stgOSD::render(vbaTex *src) {
         {0.5,    0.5+sy},
         {0.5+sx, 0.5+sy}
     };
-    log_info("Glyph Rendering Test",
-             "sx: %g\n"
-             "sy: %g",
-             sx, sy);
+   // log_info("Glyph Rendering Test",
+   //          "sx: %g\n"
+   //          "sy: %g",
+   //          sx, sy);
 
     shader.activate();
-    //shader.setVar1i(glsl_vars.is_passthrough, 0);
+    shader.setVar1i(glsl_vars.is_passthrough, 0);
     tex_glyph.bind(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
