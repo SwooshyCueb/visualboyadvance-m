@@ -206,16 +206,16 @@ bool vbaGL::errPrint() {
 }
 
 void vbaGL::setBaseSize(uint x, uint y) {
-    base_sz.x = x;
-    base_sz.y = y;
+    base_sz.x(x);
+    base_sz.y(y);
 
     if (init_p)
         pipeline.refreshStages();
 }
 
 void vbaGL::setVwptSize(uint x, uint y) {
-    vwpt_sz.x = x;
-    vwpt_sz.y = y;
+    vwpt_sz.x(x);
+    vwpt_sz.y(y);
     glVwpt(x, y);
 
     if (init_p)
@@ -241,7 +241,7 @@ float vbaGL::getBaseScale() {
 }
 
 bool vbaGL::glVwpt(vbaSize sz) {
-    return glVwpt(sz.x, sz.y);
+    return glVwpt(sz.xu(), sz.yu());
 }
 
 bool vbaGL::glVwpt(uint x, uint y) {

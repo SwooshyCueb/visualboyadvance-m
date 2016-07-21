@@ -84,7 +84,7 @@ bool renderStage::setIndex(uint idx, renderPipeline *rdrpth) {
 bool renderStage::render(vbaTex *src) {
     src->bind(index);
     shader.activate();
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, src->size.x + 1);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, src->size.xu() + 1);
     glBindFramebuffer(GL_FRAMEBUFFER, buffer);
     ctx->glVwpt(texture.size);
     ctx->draw();

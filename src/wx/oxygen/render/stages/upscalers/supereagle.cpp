@@ -74,8 +74,8 @@ bool stgSuperEagle::setIndex(uint idx, renderPipeline *rdrpth) {
         sz = (ctx->getBaseSize() * ctx->getBaseScale());
     }
 
-    shader.setVar2f(glsl_vars.v_src_sz, sz.x, sz.y);
-    shader.setVar2f(glsl_vars.f_src_sz, sz.x, sz.y);
+    shader.setVar2f(glsl_vars.v_src_sz, sz.xf(), sz.yf());
+    shader.setVar2f(glsl_vars.f_src_sz, sz.xf(), sz.yf());
 
     has_shader = true;
 

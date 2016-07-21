@@ -45,8 +45,8 @@ bool vbaTex::init(vbaGL *globj, vbaSize sz, GLenum fmt) {
 bool vbaTex::init(vbaGL *globj, uint x, uint y, GLenum fmt) {
     ctx = globj;
     format = fmt;
-    size.x = x;
-    size.y = y;
+    size.x(x);
+    size.y(y);
     glGenTextures(1, &texture);
     setData(NULL);
     setResizeFilter(GL_NEAREST);
@@ -89,8 +89,8 @@ bool vbaTex::setData(const GLvoid *data) {
         return false;
     }
     bind();
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, size.x + 1);
-    glTexImage2D(GL_TEXTURE_2D, 0, format, size.x, size.y, 0, format,
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, size.xu() + 1);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, size.xu(), size.yu(), 0, format,
                  GL_UNSIGNED_BYTE, data);
     return !errGLCheck();
 }
@@ -106,8 +106,8 @@ void vbaTex::setSize(uint x, uint y) {
     if (is_init) {
         return;
     }
-    size.x = x;
-    size.y = y;
+    size.x(x);
+    size.y(y);
 }
 
 void vbaTex::setResizeFilter(GLint filter) {
