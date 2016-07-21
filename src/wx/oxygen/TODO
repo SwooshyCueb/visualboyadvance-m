@@ -83,8 +83,14 @@ Fix problem where audio only works after loading a savestate.
  *****************************************************************************
  * Project related                                                           *
  *****************************************************************************
-Rename git branch to new fork name
+Rename git branch to new fork name.
+Move to non-fork repo on GitHub once project has diverged enough from VBA-M.
 Write a README.md
+
+ *****************************************************************************
+ * Miscellaneous                                                             *
+ *****************************************************************************
+Move all functions which should be inlined into header files.
 
 
 ###############################################################################
