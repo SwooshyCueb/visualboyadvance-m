@@ -136,11 +136,6 @@ bool stgOSD::init(vbaGL *globj) {
     tex_glyph.bind(0);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    gchar* _test = "This is a test string.\0";
-    gunichar* test = g_utf8_to_ucs4_fast(_test, -1, NULL);
-    pushText(test);
-    g_free(test);
-
 
     //tex_atlas.init(globj, (NUM_GLYPHS * ATLAS_GLYPH_S),
     //               (NUM_GLYPHS * ATLAS_GLYPH_S), GL_ALPHA);
@@ -165,10 +160,10 @@ bool stgOSD::pushText(gunichar *text) {
     uint idx = 0;
     float w = 4, h = FONT_SIZE + 4;
 
-    for (gunichar c = text[idx]; c != '\0'; c = text[idx++]) {
+    for (gunichar c = text[idx]; c != '\0'; c = text[++idx]) {
         ftGlyph *g = fnt.getGlyph(c, FONT_SIZE);
-        w += g->adv.x;
-        if (w < getSize().xu()) {
+        w += (gfloat)((gdouble)g->adv.x / (gdouble)64);
+        if (w > getSize().xu()) {
             break;
         }
     }
@@ -189,11 +184,11 @@ bool stgOSD::pushText(gunichar *text) {
 
     w = 2;
     idx = 0;
-    for (gunichar c = text[idx]; c != '\0'; c = text[idx++]) {
+    for (gunichar c = text[idx]; c != '\0'; c = text[++idx]) {
         ftGlyph *g = fnt.getGlyph(c, FONT_SIZE);
         renderGlyph(c, vbaSize(w, 2));
-        w += g->adv.x;
-        if (w < getSize().xu()) {
+        w += (gfloat)((gdouble)g->adv.x / (gdouble)64);
+        if (w > getSize().xu()) {
             break;
         }
     }
@@ -242,11 +237,20 @@ bool stgOSD::setIndex(uint idx, renderPipeline *rdrpth) {
     has_shader = true;
     sz_texel = vbaSize(2.0/getSize());
 
+    gchar* _test = "This is a test string.\0";
+    gunichar* test = g_utf8_to_ucs4_fast(_test, -1, NULL);
+    pushText(test);
+    g_free(test);
+
     return true;
 }
 
 bool stgOSD::renderGlyph(gunichar character, vbaSize pos) {
     ftGlyph *g = fnt.getGlyph(character, FONT_SIZE);
+
+    if (!(g->sz_tex.xu() && g->sz_tex.yu())) {
+        return true;
+    }
 
     // we need to bring down the number of glTexImage2D calls
     tex_glyph.setSize(g->sz_tex - vbaSize(1,1));
@@ -293,13 +297,15 @@ bool stgOSD::renderGlyph(gunichar character, vbaSize pos) {
 bool stgOSD::renderLine(osdLine *line, bool fade) {
     line->tex.bind(0);
 
-    vbaSize end = line->pos + line->tex.getSize();
+    // We should probably move this to the push function
+    vbaSize fpos = (line->pos * sz_texel) - 1.0;
+    vbaSize fend = ((line->pos + line->tex.getSize()) * sz_texel) - 1.0;
 
     GLfloat tpos[4][2] = {
-        {line->pos.xf(), line->pos.yf()},
-        {end.xf(),       line->pos.yf()},
-        {end.xf(),       end.yf()},
-        {line->pos.xf(), end.yf()}
+        {fpos.xf(), fpos.yf()},
+        {fend.xf(), fpos.yf()},
+        {fend.xf(), fend.yf()},
+        {fpos.xf(), fend.yf()}
     };
 
     shd_line.activate();
