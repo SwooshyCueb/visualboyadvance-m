@@ -208,6 +208,21 @@ void glslProg::setVar2i(GLint var, GLint val1, GLint val2) {
     errGLCheck();
 }
 
+void glslProg::setVar1f(GLint var, GLfloat val) {
+    if (!is_init) {
+        return;
+    }
+    if (var < 0)
+        return;
+
+    GLint curr_prog;
+    glGetIntegerv(GL_CURRENT_PROGRAM, &curr_prog);
+    glUseProgram(program->program);
+    glUniform1f(var, val);
+    glUseProgram(curr_prog);
+    errGLCheck();
+}
+
 void glslProg::setVar2f(GLint var, GLfloat val1, GLfloat val2) {
     if (!is_init) {
         return;

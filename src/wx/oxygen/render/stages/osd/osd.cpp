@@ -84,7 +84,6 @@ bool stgOSD::init(vbaGL *globj) {
     g_glsl_vars.src_tex = shd_glyph.getUniformPtr("src_tex");
     g_glsl_vars.needs_flip = shd_glyph.getUniformPtr("needs_flip");
     g_glsl_vars.fg_color = shd_glyph.getUniformPtr("fg_color");
-    //g_glsl_vars.bg_color = shd_glyph.getUniformPtr("bg_color");
 
     shd_glyph.activate();
 
@@ -99,13 +98,48 @@ bool stgOSD::init(vbaGL *globj) {
     glUseProgram(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    tex_stats.init(globj, getSize(), GL_ALPHA);
-    tex_osd.init(globj, getSize(), GL_ALPHA);
+    CREATE_GLSL_SRC_OBJ(line_glsl, osd);
+
+    glslShader shd_l_f(globj, GL_FRAGMENT_SHADER);
+    glslShader shd_l_v(globj, GL_VERTEX_SHADER);
+    shd_l_f.setSrc(&line_glsl);
+    shd_l_f.compile();
+    shd_l_v.setSrc(&line_glsl);
+    shd_l_v.compile();
+
+    shd_line.init(ctx);
+
+    shd_line.attachShader(&shd_l_f);
+    shd_line.attachShader(&shd_l_v);
+
+    shd_line.link();
+
+    l_glsl_vars.position = shd_line.getAttrPtr("v_pos");
+    l_glsl_vars.texcoord = shd_line.getAttrPtr("v_texcoord");
+    l_glsl_vars.src_tex = shd_line.getUniformPtr("src_tex");
+    l_glsl_vars.needs_flip = shd_line.getUniformPtr("needs_flip");
+    l_glsl_vars.fade = shd_line.getUniformPtr("fade");
+
+    shd_line.activate();
+
+    shd_line.setVar1i(l_glsl_vars.needs_flip, 0);
+    shd_line.setVar1i(l_glsl_vars.src_tex, 0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_texcoord);
+    shd_glyph.setVtxAttrPtr(l_glsl_vars.texcoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glUseProgram(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // Size here doesn't matter
     tex_glyph.init(globj, 4, 4, GL_ALPHA);
     tex_glyph.bind(0);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    gchar* _test = "This is a test string.\0";
+    gunichar* test = g_utf8_to_ucs4_fast(_test, -1, NULL);
+    pushText(test);
+    g_free(test);
 
 
     //tex_atlas.init(globj, (NUM_GLYPHS * ATLAS_GLYPH_S),
@@ -113,7 +147,6 @@ bool stgOSD::init(vbaGL *globj) {
     //tex_atlas.setData((GLvoid *)atlaspx);
 
     glGenBuffers(1, &vb_vtx);
-    glGenBuffers(1, &vb_texcoord);
 
 
     is_init = true;
@@ -132,7 +165,7 @@ bool stgOSD::pushText(gunichar *text) {
     uint idx = 0;
     float w = 4, h = FONT_SIZE + 4;
 
-    for (gunichar c = text[idx]; c != '\0'; index++) {
+    for (gunichar c = text[idx]; c != '\0'; c = text[idx++]) {
         ftGlyph *g = fnt.getGlyph(c, FONT_SIZE);
         w += g->adv.x;
         if (w < getSize().xu()) {
@@ -150,13 +183,13 @@ bool stgOSD::pushText(gunichar *text) {
     glDrawBuffers(1, ctx->DrawBuffers);
 
     // Render text to texture
-    glClearColor(0.2, 0.2, 0.2, 0.6);
+    glClearColor(0.2, 0.2, 0.2, 0.8);
     glClear(GL_COLOR_BUFFER_BIT);
     glClearColor(0.0, 0.0, 0.0, 1.0);
 
     w = 2;
     idx = 0;
-    for (gunichar c = text[idx]; c != '\0'; index++) {
+    for (gunichar c = text[idx]; c != '\0'; c = text[idx++]) {
         ftGlyph *g = fnt.getGlyph(c, FONT_SIZE);
         renderGlyph(c, vbaSize(w, 2));
         w += g->adv.x;
@@ -179,10 +212,15 @@ bool stgOSD::pushText(gunichar *text) {
     while(riter != scroll.rend()) {
         if((*riter)->pos.xd() > (getSize().xd() * (gdouble)0.6)) {
             glDeleteFramebuffers(1, &((*riter)->buffer));
+            osdLine *oldLine = *riter;
+            delete oldLine;
             scroll.pop_back();
         }
         riter++;
     }
+
+    // Add texture to queue
+    scroll.push_front(newline);
 
     return true;
 }
@@ -252,25 +290,77 @@ bool stgOSD::renderGlyph(gunichar character, vbaSize pos) {
     glUseProgram(0);
 }
 
+bool stgOSD::renderLine(osdLine *line, bool fade) {
+    line->tex.bind(0);
+
+    vbaSize end = line->pos + line->tex.getSize();
+
+    GLfloat tpos[4][2] = {
+        {line->pos.xf(), line->pos.yf()},
+        {end.xf(),       line->pos.yf()},
+        {end.xf(),       end.yf()},
+        {line->pos.xf(), end.yf()}
+    };
+
+    shd_line.activate();
+
+    glBindBuffer(GL_ARRAY_BUFFER, vb_vtx);
+    glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), tpos, GL_DYNAMIC_DRAW);
+    shd_line.setVtxAttrPtr(l_glsl_vars.position, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    float fadeval;
+    if (fade) {
+        fadeval = line->timeout--;
+    } else {
+        fadeval = 255;
+    }
+    shd_line.setVar1f(l_glsl_vars.fade, (gfloat)fadeval);
+
+    glEnable(GL_BLEND);
+
+    shd_line.enableVertAttrArr(l_glsl_vars.position);
+    shd_line.enableVertAttrArr(l_glsl_vars.texcoord);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    shd_line.disableVertAttrArr(l_glsl_vars.position);
+    shd_line.disableVertAttrArr(l_glsl_vars.texcoord);
+
+    glDisable(GL_BLEND);
+
+    // We shouldn't have to do this?
+    glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_vtx);
+    shd_line.setVtxAttrPtr(l_glsl_vars.position, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glUseProgram(0);
+}
+
 bool stgOSD::render(vbaTex *src) {
     if (!is_init) {
         return false;
     }
 
-    // PART 1: stats
-
-    // PART 2: scroll
-
-    // PART 3: screen
+    // PART 1: screen
     shader.enableVertAttrArr(p_glsl_vars.position);
     shader.enableVertAttrArr(p_glsl_vars.texcoord);
     renderStage::render(src);
     shader.disableVertAttrArr(p_glsl_vars.position);
     shader.disableVertAttrArr(p_glsl_vars.texcoord);
 
-    // PART 4: text to screen
-    //gchar test = 'P';
-    //renderGlyph(g_utf8_get_char(&test), vbaSize(0, 0));
+    // PART 2: scroll
+    glBindFramebuffer(GL_FRAMEBUFFER, buffer);
+    std::deque<osdLine *>::reverse_iterator riter = scroll.rbegin();
+    while(riter != scroll.rend()) {
+        renderLine(*riter, true);
+        if((*riter)->timeout <= 0) {
+            glDeleteFramebuffers(1, &((*riter)->buffer));
+            scroll.pop_back();
+        }
+        riter++;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // PART 3: stats
 
 
     return true;

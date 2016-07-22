@@ -56,6 +56,7 @@ public:
     GLint getUniformPtr(const char *name);
     void setVar1i(GLint var, GLint val);
     void setVar2i(GLint var, GLint val1, GLint val2);
+    void setVar1f(GLint var, GLfloat val);
     void setVar2f(GLint var, GLfloat val1, GLfloat val2);
     void setVar4f(GLint var, GLfloat val1, GLfloat val2, GLfloat val3,
                   GLfloat val4);

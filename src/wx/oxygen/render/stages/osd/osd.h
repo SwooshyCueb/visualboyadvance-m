@@ -22,7 +22,7 @@ public:
     vbaTex tex;
     GLuint buffer;
     vbaSize pos;
-    gint timeout = -60 * 5;
+    gint timeout = 255 + (60 * 5);
 };
 
 class stgOSD : public renderStage {
@@ -39,26 +39,22 @@ public:
 
 private:
     bool renderGlyph(gunichar character, vbaSize pos);
+    bool renderLine(osdLine *line, bool fade);
 
     ftLib ft;
     ftFont fnt;
 
     GLuint vb_vtx;
-    GLuint vb_texcoord;
     glslProg shd_glyph;
+    glslProg shd_line;
 
     std::deque<osdLine*> scroll;
 
     vbaTex tex_glyph;
-    vbaTex tex_stats;
-    vbaTex tex_osd;
+    osdLine tex_stats;
 
     float scale;
 
-    int vascent;
-    int vdescent;
-    int vlinegap;
-    int vbaseline;
     vbaSize sz_texel;
 
 
@@ -78,8 +74,15 @@ private:
         GLint needs_flip = 0;
         GLint src_tex = 0;
         GLint fg_color = 0;
-        GLint bg_color = 0;
     } g_glsl_vars;
+
+    struct {
+        GLint texcoord = 0;
+        GLint position = 0;
+        GLint needs_flip = 0;
+        GLint src_tex = 0;
+        GLint fade = 0;
+    } l_glsl_vars;
 };
 
 #endif

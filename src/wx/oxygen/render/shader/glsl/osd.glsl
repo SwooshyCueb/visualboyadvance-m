@@ -49,6 +49,8 @@ uniform vec2 f_dst_sz;
 uniform mediump int f_pass_idx;
 uniform mediump int f_pass_qty;
 
+uniform float fade;
+
 void main() {
     vec2 dst_pos = floor(gl_FragCoord.xy);
     vec4 color;
@@ -57,6 +59,7 @@ void main() {
     vec2 texcoord = f_texcoord;
 
     color = texture2D( src_tex, texcoord );
+    color.a *= clamp(fade/255.0, 0.0, 1.0);
 
     gl_FragColor = color;
 }
