@@ -27,41 +27,74 @@ bool stgOSD::init(vbaGL *globj) {
     fnt.init(&ft, res_neoletters);
     fnt.cacheGlyphs(FONT_SIZE);
 
-    // We will eventually have our own shader for this.
-    CREATE_GLSL_SRC_OBJ(osd_glsl, osd);
-    //CREATE_GLSL_SRC_OBJ(osd_glsl, passthrough);
+    setMult(STAGE_MULT);
 
-    glslShader shd_f(globj, GL_FRAGMENT_SHADER);
-    glslShader shd_v(globj, GL_VERTEX_SHADER);
-    shd_f.setSrc(&osd_glsl);
-    shd_f.compile();
-    shd_v.setSrc(&osd_glsl);
-    shd_v.compile();
+    CREATE_GLSL_SRC_OBJ(passthru_glsl, passthrough);
+
+    glslShader shd_p_f(globj, GL_FRAGMENT_SHADER);
+    glslShader shd_p_v(globj, GL_VERTEX_SHADER);
+    shd_p_f.setSrc(&passthru_glsl);
+    shd_p_f.compile();
+    shd_p_v.setSrc(&passthru_glsl);
+    shd_p_v.compile();
 
     shader.init(ctx);
 
-    shader.attachShader(&shd_f);
-    shader.attachShader(&shd_v);
+    shader.attachShader(&shd_p_f);
+    shader.attachShader(&shd_p_v);
 
     shader.link();
 
-    glsl_vars.position = shader.getAttrPtr("v_pos");
-    glsl_vars.texcoord = shader.getAttrPtr("v_texcoord");
-    glsl_vars.src_tex = shader.getUniformPtr("src_tex");
-    glsl_vars.needs_flip = shader.getUniformPtr("needs_flip");
-    glsl_vars.is_passthrough = shader.getUniformPtr("is_passthrough");
-
-    setMult(STAGE_MULT);
-
-    shader.setVar1i(glsl_vars.needs_flip, 0);
-    shader.setVar1i(glsl_vars.is_passthrough, 1);
+    p_glsl_vars.position = shader.getAttrPtr("v_pos");
+    p_glsl_vars.texcoord = shader.getAttrPtr("v_texcoord");
+    p_glsl_vars.src_tex = shader.getUniformPtr("src_tex");
+    p_glsl_vars.needs_flip = shader.getUniformPtr("needs_flip");
 
     shader.activate();
+
+    shader.setVar1i(p_glsl_vars.needs_flip, 0);
+
     glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_vtx);
-    shader.setVtxAttrPtr(glsl_vars.position, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    shader.setVtxAttrPtr(p_glsl_vars.position, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_texcoord);
-    shader.setVtxAttrPtr(glsl_vars.texcoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    shader.setVtxAttrPtr(p_glsl_vars.texcoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glUseProgram(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    CREATE_GLSL_SRC_OBJ(glyph_glsl, osd);
+
+    glslShader shd_g_f(globj, GL_FRAGMENT_SHADER);
+    glslShader shd_g_v(globj, GL_VERTEX_SHADER);
+    shd_g_f.setSrc(&glyph_glsl);
+    shd_g_f.compile();
+    shd_g_v.setSrc(&glyph_glsl);
+    shd_g_v.compile();
+
+    shd_glyph.init(ctx);
+
+    shd_glyph.attachShader(&shd_g_f);
+    shd_glyph.attachShader(&shd_g_v);
+
+    shd_glyph.link();
+
+    g_glsl_vars.position = shd_glyph.getAttrPtr("v_pos");
+    g_glsl_vars.texcoord = shd_glyph.getAttrPtr("v_texcoord");
+    g_glsl_vars.src_tex = shd_glyph.getUniformPtr("src_tex");
+    g_glsl_vars.needs_flip = shd_glyph.getUniformPtr("needs_flip");
+    g_glsl_vars.fg_color = shd_glyph.getUniformPtr("fg_color");
+    //g_glsl_vars.bg_color = shd_glyph.getUniformPtr("bg_color");
+
+    shd_glyph.activate();
+
+    shd_glyph.setVar1i(g_glsl_vars.needs_flip, 0);
+    shd_glyph.setVar1i(g_glsl_vars.src_tex, 0);
+    shd_glyph.setVar4f(g_glsl_vars.fg_color, 1.0, 1.0, 1.0, 0.6);
+    //shd_glyph.setVar4f(g_glsl_vars.bg_color, 0.2, 0.2, 0.2, 0.6);
+
+    glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_texcoord);
+    shd_glyph.setVtxAttrPtr(g_glsl_vars.texcoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     glUseProgram(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -79,7 +112,6 @@ bool stgOSD::init(vbaGL *globj) {
     //               (NUM_GLYPHS * ATLAS_GLYPH_S), GL_ALPHA);
     //tex_atlas.setData((GLvoid *)atlaspx);
 
-    glGenBuffers(1, &vbo);
     glGenBuffers(1, &vb_vtx);
     glGenBuffers(1, &vb_texcoord);
 
@@ -94,8 +126,21 @@ stgOSD::~stgOSD() {
     }
 }
 
-bool stgOSD::pushText(gchar *text) {
+bool stgOSD::pushText(gunichar *text) {
     // Create texture for new line of text
+    osdLine *newline = new osdLine;
+    uint idx = 0;
+    float w = 4, h = FONT_SIZE + 4;
+
+    for (gunichar c = text[idx]; c != '\0'; index++) {
+        ftGlyph *g = fnt.getGlyph(c, FONT_SIZE);
+        w += g->adv.x;
+    }
+
+    newline->tex.init(ctx, w, h, GL_ALPHA);
+    newline->pos = vbaSize(2, 2);
+
+    // Render text to texture
 
     // Change existing textures' positions
 
@@ -117,7 +162,7 @@ bool stgOSD::setIndex(uint idx, renderPipeline *rdrpth) {
         return false;
     }
     renderStage::setIndex(idx, rdrpth);
-    shader.setVar1i(glsl_vars.src_tex, (GLint)idx);
+    shader.setVar1i(p_glsl_vars.src_tex, (GLint)idx);
     has_shader = true;
     sz_texel = vbaSize(2.0/getSize());
 
@@ -144,38 +189,31 @@ bool stgOSD::renderGlyph(gunichar character, vbaSize pos) {
         {fend.xf(), fend.yf()},
         {fpos.xf(), fend.yf()}
     };
-
-    shader.activate();
-    shader.setVar1i(glsl_vars.is_passthrough, 0);
-    shader.setVar1i(glsl_vars.src_tex, 0);
+    shd_glyph.activate();
 
     glBindBuffer(GL_ARRAY_BUFFER, vb_vtx);
     glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), tpos, GL_DYNAMIC_DRAW);
-    shader.setVtxAttrPtr(glsl_vars.position, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
+    shd_glyph.setVtxAttrPtr(g_glsl_vars.position, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glBindFramebuffer(GL_FRAMEBUFFER, buffer);
 
     glEnable(GL_BLEND);
 
-    shader.enableVertAttrArr(glsl_vars.position);
-    shader.enableVertAttrArr(glsl_vars.texcoord);
+    shd_glyph.enableVertAttrArr(g_glsl_vars.position);
+    shd_glyph.enableVertAttrArr(g_glsl_vars.texcoord);
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-    shader.disableVertAttrArr(glsl_vars.position);
-    shader.disableVertAttrArr(glsl_vars.texcoord);
+    shd_glyph.disableVertAttrArr(g_glsl_vars.position);
+    shd_glyph.disableVertAttrArr(g_glsl_vars.texcoord);
 
     glDisable(GL_BLEND);
 
-    glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_vtx);
-    shader.setVtxAttrPtr(glsl_vars.position, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    shader.setVar1i(glsl_vars.src_tex, index);
-    shader.setVar1i(glsl_vars.is_passthrough, 1);
+    // We shouldn't have to do this?
+    glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_vtx);
+    shd_glyph.setVtxAttrPtr(g_glsl_vars.position, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glUseProgram(0);
 }
@@ -190,11 +228,11 @@ bool stgOSD::render(vbaTex *src) {
     // PART 2: scroll
 
     // PART 3: screen
-    shader.enableVertAttrArr(glsl_vars.position);
-    shader.enableVertAttrArr(glsl_vars.texcoord);
+    shader.enableVertAttrArr(p_glsl_vars.position);
+    shader.enableVertAttrArr(p_glsl_vars.texcoord);
     renderStage::render(src);
-    shader.disableVertAttrArr(glsl_vars.position);
-    shader.disableVertAttrArr(glsl_vars.texcoord);
+    shader.disableVertAttrArr(p_glsl_vars.position);
+    shader.disableVertAttrArr(p_glsl_vars.texcoord);
 
     // PART 4: text to screen
     gchar test = 'P';

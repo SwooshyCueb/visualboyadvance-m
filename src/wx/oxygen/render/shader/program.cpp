@@ -223,6 +223,22 @@ void glslProg::setVar2f(GLint var, GLfloat val1, GLfloat val2) {
     errGLCheck();
 }
 
+void glslProg::setVar4f(GLint var, GLfloat val1, GLfloat val2, GLfloat val3,
+                        GLfloat val4) {
+    if (!is_init) {
+        return;
+    }
+    if (var < 0)
+        return;
+
+    GLint curr_prog;
+    glGetIntegerv(GL_CURRENT_PROGRAM, &curr_prog);
+    glUseProgram(program->program);
+    glUniform4f(var, val1, val2, val3, val4);
+    glUseProgram(curr_prog);
+    errGLCheck();
+}
+
 bool glslProg::printInfoLog() {
     if (!is_init) {
         return false;

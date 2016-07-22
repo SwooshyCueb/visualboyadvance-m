@@ -49,7 +49,8 @@ uniform vec2 f_dst_sz;
 uniform mediump int f_pass_idx;
 uniform mediump int f_pass_qty;
 
-uniform bool is_passthrough;
+uniform vec4 fg_color;
+uniform vec4 bg_color;
 
 void main() {
     vec2 dst_pos = floor(gl_FragCoord.xy);
@@ -58,13 +59,9 @@ void main() {
     //vec2 f_texcoord = gl_FragCoord.xy / dst_sz;
     vec2 texcoord = f_texcoord;
 
-    if (is_passthrough) {
-        color = texture2D( src_tex, texcoord );
-    } else {
-        vec4 alpha = texture2D( src_tex, texcoord ).aaaa;
-        color = c_black;
-        color.a = alpha.a;
-    }
+    vec4 alpha = texture2D( src_tex, texcoord ).aaaa;
+    color.rgb = fg_color.rgb;
+    color.a = fg_color.a * alpha.a;
 
     gl_FragColor = color;
 }

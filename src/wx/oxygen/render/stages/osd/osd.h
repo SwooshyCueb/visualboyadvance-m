@@ -18,6 +18,7 @@
 #include <queue>
 
 class osdLine {
+public:
     vbaTex tex;
     vbaSize pos;
     gint timeout = -60 * 5;
@@ -32,7 +33,7 @@ public:
     bool setIndex(uint idx, renderPipeline *rdrpth);
     bool render(vbaTex *src);
 
-    bool pushText(gchar *text);
+    bool pushText(gunichar *text);
     bool setSpeed(gfloat fps, gfloat speed);
 
 private:
@@ -41,14 +42,9 @@ private:
     ftLib ft;
     ftFont fnt;
 
-    #define NUM_GLYPHS 256
-    #define ATLAS_GLYPH_S 24
-    #define FONT_SIZE 16
-    unsigned char atlaspx[NUM_GLYPHS * ATLAS_GLYPH_S * NUM_GLYPHS * ATLAS_GLYPH_S];
-    vbaTex tex_atlas;
     GLuint vb_vtx;
     GLuint vb_texcoord;
-    GLuint vbo;
+    glslProg shd_glyph;
 
     std::queue<osdLine*> scroll;
 
@@ -72,8 +68,17 @@ private:
         GLint position = 0;
         GLint needs_flip = 0;
         GLint src_tex = 0;
-        GLint is_passthrough = 0;
-    } glsl_vars;
+        //GLint is_passthrough = 0;
+    } p_glsl_vars;
+
+    struct {
+        GLint texcoord = 0;
+        GLint position = 0;
+        GLint needs_flip = 0;
+        GLint src_tex = 0;
+        GLint fg_color = 0;
+        GLint bg_color = 0;
+    } g_glsl_vars;
 };
 
 #endif
