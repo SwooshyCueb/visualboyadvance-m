@@ -294,6 +294,7 @@ SET( HDR_WX
 FILE(GLOB XRC_WX xrc/*.xrc)
 
 SET( GLSL_SRC
+    oxygen/render/shader/glsl/coloralph.glsl
     oxygen/render/shader/glsl/passthrough.glsl
     oxygen/render/shader/glsl/osd.glsl
     oxygen/render/shader/glsl/supereagle.glsl

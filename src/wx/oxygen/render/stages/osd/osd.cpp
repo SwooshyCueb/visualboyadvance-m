@@ -63,7 +63,7 @@ bool stgOSD::init(vbaGL *globj) {
     glUseProgram(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    CREATE_GLSL_SRC_OBJ(glyph_glsl, osd);
+    CREATE_GLSL_SRC_OBJ(glyph_glsl, coloralph);
 
     glslShader shd_g_f(globj, GL_FRAGMENT_SHADER);
     glslShader shd_g_v(globj, GL_VERTEX_SHADER);

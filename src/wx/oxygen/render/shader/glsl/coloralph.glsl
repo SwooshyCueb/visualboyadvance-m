@@ -1,5 +1,5 @@
 #version 100
-/* Passthrough shader
+/* Alpha-color blending shader
  *
  * Vertex and fragment implementation
  */
@@ -49,6 +49,8 @@ uniform vec2 f_dst_sz;
 uniform mediump int f_pass_idx;
 uniform mediump int f_pass_qty;
 
+uniform vec4 fg_color;
+
 void main() {
     vec2 dst_pos = floor(gl_FragCoord.xy);
     vec4 color;
@@ -56,7 +58,9 @@ void main() {
     //vec2 f_texcoord = gl_FragCoord.xy / dst_sz;
     vec2 texcoord = f_texcoord;
 
-    color = texture2D( src_tex, texcoord );
+    vec4 alpha = texture2D( src_tex, texcoord ).aaaa;
+    color.rgb = fg_color.rgb;
+    color.a = fg_color.a * alpha.a;
 
     gl_FragColor = color;
 }
