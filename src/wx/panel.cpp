@@ -2158,10 +2158,12 @@ GLDrawingPanel::~GLDrawingPanel()
 void GLDrawingPanel::Init()
 {
     int w, h;
+    GameArea* panel = wxGetApp().frame->GetPanel();
     GL = new vbaGL();
     GetClientSize(&w, &h);
     GL->setVwptSize(w, h);
     GL->setBaseSize(width, height);
+    GL->setStatPtrs(&panel->g_fps, &panel->g_speed);
     GL->initPipeline(scale);
     GL->errPrint();
     GL->setVsyncState(vsync);

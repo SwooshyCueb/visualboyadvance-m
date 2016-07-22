@@ -116,6 +116,7 @@ gboolean ftFont::cacheGlyph(gunichar character, GHashTable *gset) {
         memcpy(glyph->data, face->glyph->bitmap.buffer, glyph->sz_tex.xu() *
                                                         glyph->sz_tex.yu() * 4);
 
+        /*
         guint i, j, p, c;
         guint bmst = (glyph->sz_tex.xu() * 3)+4;
         guint bmsz = bmst * glyph->sz_tex.yu() + 2;
@@ -149,6 +150,9 @@ gboolean ftFont::cacheGlyph(gunichar character, GHashTable *gset) {
                   glyph->sz_glyph.xi(), glyph->sz_glyph.yi(),
                   glyph->adv.x, glyph->adv.y,
                   bitmap);
+        g_free(bitmap);
+        g_free(u8c);
+        */
     }
     g_hash_table_insert(gset, GSIZE_TO_POINTER((gsize)character),
                         (gpointer)glyph);

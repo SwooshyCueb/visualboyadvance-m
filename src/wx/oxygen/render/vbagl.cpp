@@ -205,6 +205,12 @@ bool vbaGL::errPrint() {
     return ret;
 }
 
+bool vbaGL::setStatPtrs(uint *fps, uint *speed) {
+    fps_ptr = fps;
+    speed_ptr = speed;
+    return true;
+}
+
 void vbaGL::setBaseSize(uint x, uint y) {
     base_sz.x(x);
     base_sz.y(y);
@@ -277,8 +283,9 @@ bool vbaGL::initPipeline(uint scale) {
     renderStage *supereagle1 = new stgSuperEagle(this);
     renderStage *passthru2 = new stgPassthrough(this);
 
-    pipeline.addStage(passthru1);
+    ((stgOSD *)osd)->setStatPtrs(fps_ptr, speed_ptr);
 
+    pipeline.addStage(passthru1);
     pipeline.addStage(supereagle1);
     pipeline.addStage(osd);
     pipeline.addStage(passthru2);

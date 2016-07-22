@@ -60,6 +60,8 @@ public:
     vbaErr errGet();
     bool errPrint();
 
+    bool setStatPtrs(uint *fps, uint *speed);
+
     // Provide getters for these and move back to private
     GLuint vb_vtx;
     GLuint vb_texcoord;
@@ -77,6 +79,8 @@ private:
     float base_scale;
 
     GLuint largest_scale;
+    uint *fps_ptr = NULL;
+    uint *speed_ptr = NULL;
     std::queue<vbaErr> vbaErrs;
 
     #ifndef VBA_TRIANGLE_STRIP

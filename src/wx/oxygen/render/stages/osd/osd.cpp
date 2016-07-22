@@ -135,6 +135,14 @@ bool stgOSD::init(vbaGL *globj) {
     tex_glyph.init(globj, 4, 4, GL_ALPHA);
     tex_glyph.bind(0);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    tex_stats.tex.init(globj, 4, 4);
+
+    glGenFramebuffers(1, &tex_stats.buffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, tex_stats.buffer);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, tex_stats.tex.texture, 0);
+    glDrawBuffers(1, ctx->DrawBuffers);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
     //tex_atlas.init(globj, (NUM_GLYPHS * ATLAS_GLYPH_S),
@@ -154,15 +162,24 @@ stgOSD::~stgOSD() {
     }
 }
 
+bool stgOSD::setStatPtrs(guint *fps, guint *speed) {
+    fps_ptr = fps;
+    speed_ptr = speed;
+    return true;
+}
+
 bool stgOSD::pushText(gunichar *text) {
+    gdouble adv_pad = (gdouble)FONT_SIZE / (gdouble)12;
+    gfloat line_pad = (gfloat)FONT_SIZE/ 6.0;
+    gfloat line_pad_lower = (gfloat)FONT_SIZE/ 3.0;
     // Create texture for new line of text
     osdLine *newline = new osdLine;
-    uint idx = 0;
-    float w = 4, h = FONT_SIZE + 4;
+    guint idx = 0;
+    gfloat w = line_pad * 2.0, h = FONT_SIZE + line_pad + line_pad_lower;
 
     for (gunichar c = text[idx]; c != '\0'; c = text[++idx]) {
         ftGlyph *g = fnt.getGlyph(c, FONT_SIZE);
-        w += (gfloat)((gdouble)g->adv.x / (gdouble)64);
+        w += (gfloat)(((gdouble)g->adv.x / (gdouble)64) + adv_pad);
         if (w > getSize().xu()) {
             break;
         }
@@ -182,12 +199,12 @@ bool stgOSD::pushText(gunichar *text) {
     glClear(GL_COLOR_BUFFER_BIT);
     glClearColor(0.0, 0.0, 0.0, 1.0);
 
-    w = 2;
+    w = line_pad;
     idx = 0;
     for (gunichar c = text[idx]; c != '\0'; c = text[++idx]) {
         ftGlyph *g = fnt.getGlyph(c, FONT_SIZE);
-        renderGlyph(c, vbaSize(w, 2));
-        w += (gfloat)((gdouble)g->adv.x / (gdouble)64);
+        renderGlyph(c, vbaSize(w, line_pad));
+        w += (gfloat)(((gdouble)g->adv.x / (gdouble)64) + adv_pad);
         if (w > getSize().xu()) {
             break;
         }
@@ -198,14 +215,14 @@ bool stgOSD::pushText(gunichar *text) {
     // Change existing textures' positions
     std::deque<osdLine *>::iterator iter = scroll.begin();
     while(iter != scroll.end()) {
-        (*iter)->pos += vbaSize(h, 0);
+        (*iter)->pos += vbaSize(0, h);
         iter++;
     }
 
     // Remove any textures pushed below midpoint of screen
     std::deque<osdLine *>::reverse_iterator riter = scroll.rbegin();
     while(riter != scroll.rend()) {
-        if((*riter)->pos.xd() > (getSize().xd() * (gdouble)0.6)) {
+        if((*riter)->pos.yd() > (getSize().yd() * (gdouble)0.6)) {
             glDeleteFramebuffers(1, &((*riter)->buffer));
             osdLine *oldLine = *riter;
             delete oldLine;
@@ -220,14 +237,6 @@ bool stgOSD::pushText(gunichar *text) {
     return true;
 }
 
-bool stgOSD::setSpeed(gfloat fps, gfloat speed) {
-    // Clear current speed texture
-
-    // Render new speed texture
-
-    return true;
-}
-
 bool stgOSD::setIndex(uint idx, renderPipeline *rdrpth) {
     if (!is_init) {
         return false;
@@ -236,6 +245,14 @@ bool stgOSD::setIndex(uint idx, renderPipeline *rdrpth) {
     shader.setVar1i(p_glsl_vars.src_tex, (GLint)idx);
     has_shader = true;
     sz_texel = vbaSize(2.0/getSize());
+
+    gfloat line_pad = (gfloat)FONT_SIZE/ 6.0;
+    gfloat line_pad_lower = (gfloat)FONT_SIZE/ 3.0;
+
+    tex_stats.tex.setSize(getSize().xf(),
+                          (gfloat)FONT_SIZE + line_pad + line_pad_lower);
+    tex_stats.tex.setData(NULL);
+    tex_stats.pos = vbaSize(0.0, getSize().yf() - tex_stats.tex.getSize().yf());
 
     gchar* _test = "This is a test string.\0";
     gunichar* test = g_utf8_to_ucs4_fast(_test, -1, NULL);
@@ -253,15 +270,59 @@ bool stgOSD::renderGlyph(gunichar character, vbaSize pos) {
     }
 
     // we need to bring down the number of glTexImage2D calls
-    tex_glyph.setSize(g->sz_tex - vbaSize(1,1));
+    tex_glyph.setSize(g->sz_tex - vbaSize(1,0));
     tex_glyph.setData((GLvoid *)g->data);
     tex_glyph.bind(0);
 
     vbaSize ioff = vbaSize(g->sz_glyph.xd(),
-                           g->sz_glyph.yd() - g->sz_tex.yd());
+                           (gdouble)FONT_SIZE - g->sz_glyph.yd());
     vbaSize ipos = pos + ioff;
+    vbaSize iend = (ipos + (g->sz_tex));
     vbaSize fpos = (ipos * sz_texel) - 1.0;
-    vbaSize fend = ((ipos + (g->sz_tex)) * sz_texel) - 1.0;
+    vbaSize fend = (iend * sz_texel) - 1.0;
+
+    /*
+    guint i, j, p, c;
+    guint bmst = (g->sz_tex.xu() * 3)+4;
+    guint bmsz = bmst * g->sz_tex.yu() + 2;
+    gchar *bitmap = (gchar *)g_malloc0(sizeof(gchar)*bmsz);
+    gchar *u8c = (gchar *)g_malloc0(sizeof(gchar)*7);
+    g_unichar_to_utf8(character, u8c);
+    if ((g->sz_tex.xu() * g->sz_tex.yu()) > 0) {
+        for (i = 0; i < g->sz_tex.yu(); i++) {
+            bitmap[i*bmst] = ' ';
+            bitmap[(i*bmst)+1] = ' ';
+            bitmap[(i*bmst)+2] = ' ';
+            bitmap[(i*bmst)+3] = ' ';
+            for(j = 0; j < g->sz_tex.xu(); j++) {
+                p = (i*bmst+(j*3))+4;
+                c = i*g->sz_tex.xu()+j;
+                g_snprintf(&bitmap[p], 4, "%.2x ", (uint)g->data[c]);
+            }
+            bitmap[(i+1)*bmst - 1] = '\n';
+        }
+        bitmap[bmsz-3] = '\0';
+    }
+
+    log_debug("Rendering glyph",
+              "%s glyph info:\n"
+              "value: 0x%04ix\n"
+              "sz_tex: %u * %u\n"
+              "offset: %d * %d (%d * %d)\n"
+              "adv: %u * %u (%g * %g)\n"
+              "data:\n%s",
+              u8c,
+              (guint32)character,
+              g->sz_tex.xu(), g->sz_tex.yu(),
+              g->sz_glyph.xi(), g->sz_glyph.yi(),
+              ioff.xi(), ioff.yi(),
+              g->adv.x, g->adv.y,
+              (gfloat)((gdouble)g->adv.x / (gdouble)64),
+              (gfloat)((gdouble)g->adv.y / (gdouble)64),
+              bitmap);
+    g_free(bitmap);
+    g_free(u8c);
+    */
 
     GLfloat tpos[4][2] = {
         {fpos.xf(), fpos.yf()},
@@ -346,14 +407,34 @@ bool stgOSD::render(vbaTex *src) {
         return false;
     }
 
-    // PART 1: screen
+    // PART 1: stats
+    gdouble adv_pad = (gdouble)FONT_SIZE / (gdouble)12;
+    gfloat line_pad = (gfloat)FONT_SIZE/ 6.0;
+    glBindFramebuffer(GL_FRAMEBUFFER, tex_stats.buffer);
+    glClearColor(0.2, 0.2, 0.2, 0.8);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    gfloat w = line_pad;
+    gchar *statstr = g_strdup_printf("FPS: %3u (%3u%%)", *fps_ptr, *speed_ptr);
+    gunichar *text = g_utf8_to_ucs4_fast(statstr, -1, NULL);
+    g_free(statstr);
+    guint idx = 0;
+    for (gunichar c = text[idx]; c != '\0'; c = text[++idx]) {
+        ftGlyph *g = fnt.getGlyph(c, FONT_SIZE);
+        renderGlyph(c, vbaSize(w, line_pad));
+        w += (gfloat)(((gdouble)g->adv.x / (gdouble)64) + adv_pad);
+    }
+    g_free(text);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // PART 2: screen
     shader.enableVertAttrArr(p_glsl_vars.position);
     shader.enableVertAttrArr(p_glsl_vars.texcoord);
     renderStage::render(src);
     shader.disableVertAttrArr(p_glsl_vars.position);
     shader.disableVertAttrArr(p_glsl_vars.texcoord);
 
-    // PART 2: scroll
+    // PART 3: scroll
     glBindFramebuffer(GL_FRAMEBUFFER, buffer);
     std::deque<osdLine *>::reverse_iterator riter = scroll.rbegin();
     while(riter != scroll.rend()) {
@@ -364,9 +445,10 @@ bool stgOSD::render(vbaTex *src) {
         }
         riter++;
     }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // PART 3: stats
+    // PART 4: stats
+    renderLine(&tex_stats, false);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
     return true;

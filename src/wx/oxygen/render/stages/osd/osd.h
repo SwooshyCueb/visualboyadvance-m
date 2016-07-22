@@ -35,7 +35,7 @@ public:
     bool render(vbaTex *src);
 
     bool pushText(gunichar *text);
-    bool setSpeed(gfloat fps, gfloat speed);
+    bool setStatPtrs(guint* fps, guint* speed);
 
 private:
     bool renderGlyph(gunichar character, vbaSize pos);
@@ -43,6 +43,9 @@ private:
 
     ftLib ft;
     ftFont fnt;
+
+    guint *fps_ptr = NULL;
+    guint *speed_ptr = NULL;
 
     GLuint vb_vtx;
     glslProg shd_glyph;
