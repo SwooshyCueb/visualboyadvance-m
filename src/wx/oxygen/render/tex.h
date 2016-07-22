@@ -40,11 +40,12 @@ public:
     bool bind();
     bool bind(uint num);
 
+    // Move this back to private
+    GLuint texture;
 
 private:
     EH_DECLARE();
 
-    GLuint texture;
     GLint resizefilt;
     GLint blitmask;
     GLenum format;

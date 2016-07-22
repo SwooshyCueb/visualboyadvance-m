@@ -15,11 +15,12 @@
 
 #include "oxygen.h"
 #include "render/text/text.h"
-#include <queue>
+#include <deque>
 
 class osdLine {
 public:
     vbaTex tex;
+    GLuint buffer;
     vbaSize pos;
     gint timeout = -60 * 5;
 };
@@ -46,7 +47,7 @@ private:
     GLuint vb_texcoord;
     glslProg shd_glyph;
 
-    std::queue<osdLine*> scroll;
+    std::deque<osdLine*> scroll;
 
     vbaTex tex_glyph;
     vbaTex tex_stats;

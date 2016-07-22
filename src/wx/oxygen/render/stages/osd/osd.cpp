@@ -135,16 +135,54 @@ bool stgOSD::pushText(gunichar *text) {
     for (gunichar c = text[idx]; c != '\0'; index++) {
         ftGlyph *g = fnt.getGlyph(c, FONT_SIZE);
         w += g->adv.x;
+        if (w < getSize().xu()) {
+            break;
+        }
     }
 
-    newline->tex.init(ctx, w, h, GL_ALPHA);
-    newline->pos = vbaSize(2, 2);
+    newline->tex.init(ctx, w, h);
+    newline->pos = vbaSize(0, 0);
+
+    glGenFramebuffers(1, &newline->buffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, newline->buffer);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, newline->tex.texture, 0);
+    glDrawBuffers(1, ctx->DrawBuffers);
 
     // Render text to texture
+    glClearColor(0.2, 0.2, 0.2, 0.6);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+
+    w = 2;
+    idx = 0;
+    for (gunichar c = text[idx]; c != '\0'; index++) {
+        ftGlyph *g = fnt.getGlyph(c, FONT_SIZE);
+        renderGlyph(c, vbaSize(w, 2));
+        w += g->adv.x;
+        if (w < getSize().xu()) {
+            break;
+        }
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Change existing textures' positions
+    std::deque<osdLine *>::iterator iter = scroll.begin();
+    while(iter != scroll.end()) {
+        (*iter)->pos += vbaSize(h, 0);
+        iter++;
+    }
 
     // Remove any textures pushed below midpoint of screen
+    std::deque<osdLine *>::reverse_iterator riter = scroll.rbegin();
+    while(riter != scroll.rend()) {
+        if((*riter)->pos.xd() > (getSize().xd() * (gdouble)0.6)) {
+            glDeleteFramebuffers(1, &((*riter)->buffer));
+            scroll.pop_back();
+        }
+        riter++;
+    }
 
     return true;
 }
@@ -196,8 +234,6 @@ bool stgOSD::renderGlyph(gunichar character, vbaSize pos) {
     shd_glyph.setVtxAttrPtr(g_glsl_vars.position, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, buffer);
-
     glEnable(GL_BLEND);
 
     shd_glyph.enableVertAttrArr(g_glsl_vars.position);
@@ -207,8 +243,6 @@ bool stgOSD::renderGlyph(gunichar character, vbaSize pos) {
     shd_glyph.disableVertAttrArr(g_glsl_vars.texcoord);
 
     glDisable(GL_BLEND);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // We shouldn't have to do this?
     glBindBuffer(GL_ARRAY_BUFFER, ctx->vb_vtx);
@@ -235,8 +269,8 @@ bool stgOSD::render(vbaTex *src) {
     shader.disableVertAttrArr(p_glsl_vars.texcoord);
 
     // PART 4: text to screen
-    gchar test = 'P';
-    renderGlyph(g_utf8_get_char(&test), vbaSize(0, 0));
+    //gchar test = 'P';
+    //renderGlyph(g_utf8_get_char(&test), vbaSize(0, 0));
 
 
     return true;

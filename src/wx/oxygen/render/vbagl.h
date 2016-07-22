@@ -63,6 +63,7 @@ public:
     // Provide getters for these and move back to private
     GLuint vb_vtx;
     GLuint vb_texcoord;
+    static GLenum DrawBuffers[1];
 
 private:
     bool draw();
@@ -84,7 +85,6 @@ private:
     static GLint draw_vert[12];
     #endif
     static GLfloat draw_coord[8];
-    static GLenum DrawBuffers[1];
 
     GLuint vtxArr;
 
