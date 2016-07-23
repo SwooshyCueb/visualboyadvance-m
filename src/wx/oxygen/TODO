@@ -28,8 +28,10 @@ For class variables that are expected to be freed upon object destruction, but
  *****************************************************************************
 Eliminate unneeded class friendships. Add friend functions when appropriate.
 Add more comments and improve existing comments.
-Make the logging code less awful.
+Make awful code less awful.
 Write classes to wrap used glib functionality, when appropriate.
+Make the OSD its own class that provides a renderStage for insertion into the
+    pipeline
 
  *****************************************************************************
  * Logging and error handling                                                *
@@ -39,7 +41,10 @@ Have bool class methods check for errors more frequently.
 Have non-bool class methods throw vbaErr objects when appropriate.
 Slim down error handling for non-debug builds.
 Currently, our error handling and our logging system don't mesh well. Fix this.
+    This may require (another) overhaul of our error handling system.
 Handle glib errors.
+Have all these functions that return a boolean actually return a boolean
+    indicative of whether or not they were successful.
 
  *****************************************************************************
  * Data integrity                                                            *
@@ -54,21 +59,28 @@ Behavior upon calling init on an already intiialized object is currnetly
 Implement a way for renderStage child classes to expose user-configurable
     configuration options.
 Make shader attribute/uniform handling more elegant.
+Allow renderStages to use C/C++ implementations of our upscalers.
 
  *****************************************************************************
  * Shader-related classes                                                    *
  *****************************************************************************
 Implement methods for manipulating glsl precompiler directives. (glib might be
     useful here)
+Implement a pipeline stage for nearest-neighbor scaling.
 
  *****************************************************************************
  * Functionality                                                             *
  *****************************************************************************
-Implement an OSD using FreeType2 or stb_truetype
 Port more upscalers and filters to glsl/renderStages
 Separate each graphics "component" into individual pipelines
     This will require implementing a final render step that combines each 
         pipeline
+Find the bottleneck.
+Reduce the number of glTexImage2D calls in the OSD.
+    Potential solution: Each glyph should get its own texture (easy)
+    Potential solution: Use a texture atlas (harder, preferred)
+Make the OSD prettier.
+Implement a (new) command line argument parser.
 
  *****************************************************************************
  * Configuration                                                             *
@@ -79,6 +91,8 @@ Implement a new configuration system. Use glib's key-value file parser.
  * Bug squashing                                                             *
  *****************************************************************************
 Fix problem where audio only works after loading a savestate.
+Improve the quality of the SuperEagle shader (most problems are on the edges of
+    the screen image)
 
  *****************************************************************************
  * Project related                                                           *
@@ -105,11 +119,6 @@ Move all functions which should be inlined into header files.
  * Efficiency                                                                *
  *****************************************************************************
 Create a cache for individual compiled shaders.
-
- *****************************************************************************
- * Data integrity                                                            *
- *****************************************************************************
-Use floats inside vbaSize class.
 
  *****************************************************************************
  * Miscellaneous                                                             *
