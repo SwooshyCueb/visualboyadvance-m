@@ -490,6 +490,9 @@ public:
     // osdstat is always displayed at top-left of screen
     wxString osdstat;
 
+    uint g_fps = 0;
+    uint g_speed = 0;
+
     // osdtext is displayed for 3 seconds after osdtime, and then cleared
     wxString osdtext;
     u32 osdtime;

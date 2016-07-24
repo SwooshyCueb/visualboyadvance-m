@@ -30,7 +30,9 @@
 #ifndef NO_OGL
 // glcanvas must be included before SFML for MacOSX
 // originally, this was confined to drawing.h.
+#ifdef __WXMAC__
 #include <wx/glcanvas.h>
+#endif
 // besides that, other crap gets #defined
 #ifdef Status
 #undef Status

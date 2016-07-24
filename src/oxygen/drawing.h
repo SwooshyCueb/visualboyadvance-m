@@ -25,7 +25,10 @@ protected:
 };
 
 #ifndef NO_OGL
+#include <GL/glxew.h>
+#include <GL/glut.h>
 #include <wx/glcanvas.h>
+#include "oxygen/oxygen.h"
 
 class GLDrawingPanel : public DrawingPanel, public wxGLCanvas {
 public:
@@ -54,6 +57,7 @@ protected:
     void Init();
     GLuint texid, vlist;
     int texsize;
+    vbaGL *GL;
 
     DECLARE_CLASS()
     DECLARE_EVENT_TABLE()

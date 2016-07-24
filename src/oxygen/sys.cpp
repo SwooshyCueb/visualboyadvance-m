@@ -327,6 +327,9 @@ void systemShowSpeed(int speed)
     wxString s;
     s.Printf(_("%d%%(%d, %d fps)"), speed, systemFrameSkip, frames * speed / 100);
 
+    f->GetPanel()->g_speed = speed;
+    f->GetPanel()->g_fps = frames * speed / 100;
+
     switch (showSpeed) {
     case SS_NONE:
         f->GetPanel()->osdstat.clear();

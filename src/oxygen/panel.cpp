@@ -98,21 +98,23 @@ void GameArea::LoadGame(const wxString& name)
     }
 
     UnloadGame();
-    // strip extension from actual game file name
-    // FIXME: save actual file name of archive so patches & cheats can
-    // be loaded from archive
-    // FIXME: if archive name does not match game name, prepend archive
-    // name to uniquify game name
+    /* strip extension from actual game file name
+     * FIXME: save actual file name of archive so patches & cheats can
+     * be loaded from archive
+     * FIXME: if archive name does not match game name, prepend archive
+     * name to uniquify game name
+     */
     loaded_game = fnfn;
     loaded_game.ClearExt();
     loaded_game.MakeAbsolute();
-    // load patch, if enabled
-    // note that it is difficult to load from archive due to
-    // ../common/Patch.cpp depending on opening the file itself and doing
-    // lots of seeking & such.  The only way would be to copy the patch
-    // out to a temporary file and load it (and can't just use
-    // AssignTempFileName because it needs correct extension)
-    // too much trouble for now, though
+    /* load patch, if enabled
+     * note that it is difficult to load from archive due to
+     * ../common/Patch.cpp depending on opening the file itself and doing
+     * lots of seeking & such.  The only way would be to copy the patch
+     * out to a temporary file and load it (and can't just use
+     * AssignTempFileName because it needs correct extension)
+     * too much trouble for now, though
+     */
     bool loadpatch = autoPatch;
     wxFileName pfn = loaded_game;
     int ovSaveType = 0;
@@ -382,9 +384,10 @@ void GameArea::LoadGame(const wxString& name)
         systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
     }
 
-    // do an immediate rewind save
-    // even if loaded from state file: not smart enough yet to just
-    // do a reset or load from state file when # rewinds == 0
+    /* do an immediate rewind save
+     * even if loaded from state file: not smart enough yet to just
+     * do a reset or load from state file when # rewinds == 0
+     */
     do_rewind = gopts.rewind_interval > 0;
     // FIXME: backup battery file (useful if game name conflict)
     cheats_dirty = (did_autoload && !skipSaveGameCheats) || (loaded == IMAGE_GB ? gbCheatNumber > 0 : cheatsNumber > 0);
@@ -577,9 +580,10 @@ bool GameArea::LoadState(const wxFileName& fname)
         mf->cmd_enable &= ~CMDEN_REWIND;
         mf->enable_menus();
         num_rewind_states = 0;
-        // do an immediate rewind save
-        // even if loaded from state file: not smart enough yet to just
-        // do a reset or load from state file when # rewinds == 0
+        /* do an immediate rewind save
+         * even if loaded from state file: not smart enough yet to just
+         * do a reset or load from state file when # rewinds == 0
+         */
         do_rewind = true;
         rewind_time = gopts.rewind_interval * 6;
     }
@@ -648,9 +652,10 @@ void GameArea::SaveBattery(bool quiet)
     wxCharBuffer fnb = fn.mb_fn_str();
     wxString msg;
 
-    // FIXME: add option to support ring of backups
-    // of course some games just write battery way too often for such
-    // a thing to be useful
+    /* FIXME: add option to support ring of backups
+     * of course some games just write battery way too often for such
+     * a thing to be useful
+     */
     if (emusys->emuWriteBattery(fnb.data()))
         msg.Printf(_("Wrote battery %s"), fn.c_str());
     else
@@ -765,9 +770,10 @@ void GameArea::ShowFullScreen(bool full)
         panel = NULL;
     }
 
-    // Windows does not restore old window size/pos
-    // at least under Wine
-    // so store them before entering fullscreen
+    /* Windows does not restore old window size/pos
+     * at least under Wine
+     * so store them before entering fullscreen
+     */
     static bool cursz_valid = false;
     static wxSize cursz;
     static wxPoint curpos;
@@ -803,15 +809,16 @@ void GameArea::ShowFullScreen(bool full)
         LowerMinSize();
 
         if (gopts.fs_mode.w && gopts.fs_mode.h) {
-            // grglflargm
-            // stupid wx does not do fullscreen properly when video mode is
-            // changed under X11.   Since it does not use xrandr to switch, it
-            // just changes the video mode without resizing the desktop.  It
-            // still uses the original desktop size for fullscreen, though.
-            // It also seems to stick the top-left corner wherever it pleases,
-            // so I can't just resize the panel and expect it to show up.
-            // ^(*&^^&!!!!  maybe just disable this code altogether on UNIX
-            // most 3d cards are fine with full screen size, anyway.
+            /* grglflargm
+             * stupid wx does not do fullscreen properly when video mode is
+             * changed under X11.   Since it does not use xrandr to switch, it
+             * just changes the video mode without resizing the desktop.  It
+             * still uses the original desktop size for fullscreen, though.
+             * It also seems to stick the top-left corner wherever it pleases,
+             * so I can't just resize the panel and expect it to show up.
+             * ^(*&^^&!!!!  maybe just disable this code altogether on UNIX
+             * most 3d cards are fine with full screen size, anyway.
+             */
             wxDisplay d(dno);
 
             if (!d.ChangeMode(gopts.fs_mode)) {
@@ -941,10 +948,11 @@ void GameArea::OnIdle(wxIdleEvent& event)
         }
     }
 
-    // stupid wx doesn't resize to screen size
-    // forcing it this way just puts it in an infinite loop, though
-    // with wx trying to resize/reposition to what it thinks is full screen
-    // every time it detects a manual resize like this
+    /* stupid wx doesn't resize to screen size
+     * forcing it this way just puts it in an infinite loop, though
+     * with wx trying to resize/reposition to what it thinks is full screen
+     * every time it detects a manual resize like this
+     */
     if (gopts.fs_mode.w && gopts.fs_mode.h && fullscreen) {
         wxSize sz = GetSize();
 
@@ -1074,9 +1082,10 @@ void GameArea::OnIdle(wxIdleEvent& event)
     }
 }
 
-// Note: keys will get stuck if they are released while window has no focus
-// can't really do anything about it, except scan for pressed keys on
-// activate events.  Maybe later.
+/* Note: keys will get stuck if they are released while window has no focus
+ * can't really do anything about it, except scan for pressed keys on
+ * activate events.  Maybe later.
+ */
 
 static uint32_t bmask[NUM_KEYS] = {
     KEYM_UP, KEYM_DOWN, KEYM_LEFT, KEYM_RIGHT, KEYM_A, KEYM_B, KEYM_L, KEYM_R,
@@ -1357,24 +1366,25 @@ void DrawingPanel::PaintEv(wxPaintEvent& ev)
     DrawOSD(dc);
 }
 
-// In order to run filters in parallel, they have to run from the method of
-// a wxThread-derived class
-//   threads are only created once, if possible, to avoid thread creation
-//   overhead every frame; mutex+cond used to signal start and sem for end
-
-//   when threading, there _will_ be bands for any nontrivial filter
-//   usually the top and bottom line(s) of each region will look a little
-//   different.  To ease this a tiny bit, 2 extra lines are generated at
-//   the top of each region, so hopefully only the bottom of the previous
-//   region will look screwed up.  The only correct way to handle this
-//   is to draw an increasingly larger band around the seam until the
-//   seam cover matches a line in both top & bottom regions, and then apply
-//   cover to seam.   Way too much trouble for this, though.
-
-//   another issue to consider is whether or not these filters are thread-
-//   safe to begin with.  The built-in ones are verifyable (I didn't verify
-//   them, though).  The plugins cannot be verified.  However, unlike the MFC
-//   interface, I will allow them to be threaded at user's discretion.
+/* In order to run filters in parallel, they have to run from the method of
+ * a wxThread-derived class
+ *   threads are only created once, if possible, to avoid thread creation
+ *   overhead every frame; mutex+cond used to signal start and sem for end
+ *
+ *   when threading, there _will_ be bands for any nontrivial filter
+ *   usually the top and bottom line(s) of each region will look a little
+ *   different.  To ease this a tiny bit, 2 extra lines are generated at
+ *   the top of each region, so hopefully only the bottom of the previous
+ *   region will look screwed up.  The only correct way to handle this
+ *   is to draw an increasingly larger band around the seam until the
+ *   seam cover matches a line in both top & bottom regions, and then apply
+ *   cover to seam.   Way too much trouble for this, though.
+ *
+ *   another issue to consider is whether or not these filters are thread-
+ *   safe to begin with.  The built-in ones are verifyable (I didn't verify
+ *   them, though).  The plugins cannot be verified.  However, unlike the MFC
+ *   interface, I will allow them to be threaded at user's discretion.
+ */
 class FilterThread : public wxThread {
 public:
     FilterThread()
@@ -1423,9 +1433,10 @@ public:
             // + 1 for stupid top border
             src += instride;
 
-            // interframe blending filter
-            // definitely not thread safe by default
-            // added procy param to provide offset into accum buffers
+            /* interframe blending filter
+             * definitely not thread safe by default
+             * added procy param to provide offset into accum buffers
+             */
             if (gopts.ifb != IFB_NONE) {
                 switch (gopts.ifb) {
                 case IFB_SMART:
@@ -1546,20 +1557,22 @@ public:
                 break;
 
             case FF_PLUGIN:
-                // MFC interface did not do plugins in parallel
-                // Probably because it's almost certain they carry state or do
-                // other non-thread-safe things
-                // But the user can always turn mt off of it's not working..
+                /* MFC interface did not do plugins in parallel
+                 * Probably because it's almost certain they carry state or do
+                 * other non-thread-safe things
+                 * But the user can always turn mt off of it's not working..
+                 */
                 RENDER_PLUGIN_OUTP outdesc;
                 outdesc.Size = sizeof(outdesc);
                 outdesc.Flags = rpi->Flags;
                 outdesc.SrcPtr = src;
                 outdesc.SrcPitch = instride;
                 outdesc.SrcW = width;
-                // FIXME: win32 code adds to H, saying that frame isn't fully
-                // rendered otherwise
-                // I need to verify that statement before I go adding stuff that
-                // may make it crash.
+                /* FIXME: win32 code adds to H, saying that frame isn't fully
+                 * rendered otherwise
+                 * I need to verify that statement before I go adding stuff that
+                 * may make it crash.
+                 */
                 outdesc.SrcH = height; // + scale / 2
                 outdesc.DstPtr = dst;
                 outdesc.DstPitch = outstride;
@@ -1585,9 +1598,10 @@ public:
 
 void DrawingPanel::DrawArea(u8** data)
 {
-    // double-buffer buffer:
-    //   if filtering, this is filter output, retained for redraws
-    //   if not filtering, we still retain current image for redraws
+    /* double-buffer buffer:
+     *   if filtering, this is filter output, retained for redraws
+     *   if not filtering, we still retain current image for redraws
+     */
     int outbpp = out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
     int outrb = systemColorDepth == 24 ? 0 : 4;
     int outstride = width * outbpp * scale + outrb;
@@ -1740,17 +1754,18 @@ void DrawingPanel::DrawArea(u8** data)
 
 void DrawingPanel::DrawOSD(wxWindowDC& dc)
 {
-    // draw OSD message, if available
-    // doing this here rather than using drawText() directly into the screen
-    // image gives us 2 advantages:
-    //   - non-ASCII text in messages
-    //   - message is always default font size, regardless of screen stretch
-    // and one known disadvantage:
-    //   - 3d renderers may overwrite text asynchronously
-    // Until I go through the trouble of making this render to a bitmap, and
-    // then using the bitmap as a texture for the 3d renderers or rendering
-    // directly into the output like DrawText, this is only enabled for
-    // non-3d renderers.
+    /* draw OSD message, if available
+     * doing this here rather than using drawText() directly into the screen
+     * image gives us 2 advantages:
+     *   - non-ASCII text in messages
+     *   - message is always default font size, regardless of screen stretch
+     * and one known disadvantage:
+     *   - 3d renderers may overwrite text asynchronously
+     * Until I go through the trouble of making this render to a bitmap, and
+     * then using the bitmap as a texture for the 3d renderers or rendering
+     * directly into the output like DrawText, this is only enabled for
+     * non-3d renderers.
+     */
     GameArea* panel = wxGetApp().frame->GetPanel();
     dc.SetTextForeground(wxColour(255, 0, 0, showSpeedTransparent ? 128 : 255));
     dc.SetTextBackground(wxColour(0, 0, 0, 0));
@@ -1781,13 +1796,14 @@ void DrawingPanel::DrawOSD(wxWindowDC& dc)
             wxArrayInt llen; // length of each line, in chars
 
             for (int off = 0; off < msg.size();) {
-// One way would be to bsearch on GetTextExtent() looking for
-// best fit.
-// Another would be to use GetPartialTextExtents and search
-// the resulting array.
-// GetPartialTextExtents may be inaccurate, but calling it
-// once per line may be more efficient than calling
-// GetTextExtent log2(remaining_len) times per line.
+                /* One way would be to bsearch on GetTextExtent() looking for
+                 * best fit.
+                 * Another would be to use GetPartialTextExtents and search
+                 * the resulting array.
+                 * GetPartialTextExtents may be inaccurate, but calling it
+                 * once per line may be more efficient than calling
+                 * GetTextExtent log2(remaining_len) times per line.
+                 */
 #if 1
                 wxArrayInt clen;
                 dc.GetPartialTextExtents(msg.substr(off), clen);
@@ -1927,7 +1943,10 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 #include <OpenGL/OpenGL.h>
 #endif
 #ifdef __WXGTK__ // should actually check for X11, but GTK implies X11
-#include <GL/glx.h>
+//#include <GL/glx.h>
+#include <GL/glxew.h>
+#include <GL/glut.h>
+#include "oxygen/oxygen.h"
 #endif
 #ifdef __WXMSW__
 #include <GL/glext.h>
@@ -1988,83 +2007,17 @@ GLDrawingPanel::~GLDrawingPanel()
 
 void GLDrawingPanel::Init()
 {
-    // taken from GTK front end almost verbatim
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_TEXTURE_2D);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0.0, 1.0, 1.0, 0.0, 0.0, 1.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    vlist = glGenLists(1);
-    glNewList(vlist, GL_COMPILE);
-    glBegin(GL_TRIANGLE_STRIP);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3i(0, 0, 0);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3i(1, 0, 0);
-    glTexCoord2f(0.0, 1.0);
-    glVertex3i(0, 1, 0);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3i(1, 1, 0);
-    glEnd();
-    glEndList();
-    glGenTextures(1, &texid);
-    glBindTexture(GL_TEXTURE_2D, texid);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-        gopts.bilinear ? GL_LINEAR : GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-        gopts.bilinear ? GL_LINEAR : GL_NEAREST);
-#define int_fmt out_16 ? GL_RGB5 : GL_RGB
-#define tex_fmt out_16 ? GL_BGRA : GL_RGBA, \
-                out_16 ? GL_UNSIGNED_SHORT_1_5_5_5_REV : GL_UNSIGNED_BYTE
-#if 0
-	texsize = width > height ? width : height;
-	texsize *= scale;
-	// texsize = 1 << ffs(texsize);
-	texsize = texsize | (texsize >> 1);
-	texsize = texsize | (texsize >> 2);
-	texsize = texsize | (texsize >> 4);
-	texsize = texsize | (texsize >> 8);
-	texsize = (texsize >> 1) + 1;
-	glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, texsize, texsize, 0, tex_fmt, NULL);
-#else
-    // but really, most cards support non-p2 and rect
-    // if not, use cairo or wx renderer
-    glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, width * scale, height * scale, 0, tex_fmt, NULL);
-#endif
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-// non-portable vsync code
-#if defined(__WXGTK__) && defined(GLX_SGI_swap_control)
-    static PFNGLXSWAPINTERVALSGIPROC si = NULL;
-
-    if (!si)
-        si = (PFNGLXSWAPINTERVALSGIPROC)glXGetProcAddress((const GLubyte*)"glxSwapIntervalSGI");
-
-    if (si)
-        si(vsync);
-
-#else
-#if defined(__WXMSW__) && defined(WGL_EXT_swap_control)
-    static PFNWGLSWAPINTERVALEXTPROC si = NULL;
-
-    if (!si)
-        si = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
-
-    if (si)
-        si(vsync);
-
-#else
-#ifdef __WXMAC__
-    int swap_interval = vsync ? 1 : 0;
-    CGLContextObj cgl_context = CGLGetCurrentContext();
-    CGLSetParameter(cgl_context, kCGLCPSwapInterval, &swap_interval);
-#else
-//#warning no vsync support on this platform
-#endif
-#endif
-#endif
-    did_init = true;
+    int w, h;
+    GameArea* panel = wxGetApp().frame->GetPanel();
+    GL = new vbaGL();
+    GetClientSize(&w, &h);
+    GL->setVwptSize(w, h);
+    GL->setBaseSize(width, height);
+    GL->setStatPtrs(&panel->g_fps, &panel->g_speed);
+    GL->initPipeline(scale);
+    GL->errPrint();
+    GL->setVsyncState(vsync);
+	did_init = true;
 }
 
 void GLDrawingPanel::DrawArea(wxWindowDC& dc)
@@ -2079,20 +2032,11 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
         Init();
 
     if (todraw) {
-        int rowlen = width * scale + (out_16 ? 2 : 1);
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, rowlen);
-#if wxBYTE_ORDER == wxBIG_ENDIAN
-
-        // FIXME: is this necessary?
-        if (out_16)
-            glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
-
-#endif
-        glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, width * scale, height * scale,
-            0, tex_fmt, todraw + rowlen * (out_16 ? 2 : 4) * scale);
-        glCallList(vlist);
+        GL->render(todraw + (width * scale + 1) * (out_16 ? 2 : 4) * scale);
+        if(GL->errPrint())
+            errThrowVBA(VBA_ERR_GL_ERR);
     } else
-        glClear(GL_COLOR_BUFFER_BIT);
+        GL->clear();
 
     SwapBuffers();
 }
@@ -2109,7 +2053,7 @@ void GLDrawingPanel::OnSize(wxSizeEvent& ev)
 #else
     SetCurrent();
 #endif
-    glViewport(0, 0, w, h);
+    GL->setVwptSize(w, h);
     ev.Skip(); // propagate to parent
 }
 #endif
@@ -2165,9 +2109,10 @@ void CairoDrawingPanel::DrawArea(wxWindowDC& dc)
     cairo_t* cr;
     wxGraphicsContext* gc = wxGraphicsContext::Create(dc);
 #ifdef __WXMSW__
-    // not sure why this is so slow
-    // doing this only once in constructor and resize handler doesn't seem
-    // to help, and may be unsafe
+    /* not sure why this is so slow
+     * doing this only once in constructor and resize handler doesn't seem
+     * to help, and may be unsafe
+     */
     Gdiplus::Graphics* gr = (Gdiplus::Graphics*)gc->GetNativeContext();
     cairo_surface_t* s = cairo_win32_surface_create(gr->GetHDC());
     cr = cairo_create(s);
