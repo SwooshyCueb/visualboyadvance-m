@@ -10,42 +10,39 @@
 /////////////////////////////////////////////////////////////////////////////
 // Hyperlink window
 
-class Hyperlink : public CStatic
-{
-// Construction
+class Hyperlink : public CStatic {
+    // Construction
 public:
-	Hyperlink();
+    Hyperlink();
 
-// Attributes
+    // Attributes
 public:
-
-// Operations
+    // Operations
 public:
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(Hyperlink)
-	protected:
-	virtual void PreSubclassWindow();
-	//}}AFX_VIRTUAL
-
-// Implementation
-public:
-	bool m_over;
-	HCURSOR m_cursor;
-	afx_msg void OnClicked();
-	CFont m_underlineFont;
-	virtual ~Hyperlink();
-
-	// Generated message map functions
+    // Overrides
+    // ClassWizard generated virtual function overrides
+    //{{AFX_VIRTUAL(Hyperlink)
 protected:
-	//{{AFX_MSG(Hyperlink)
-	afx_msg HBRUSH CtlColor(CDC* pDC, UINT nCtlColor);
-	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
-	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-	//}}AFX_MSG
+    virtual void PreSubclassWindow();
+    //}}AFX_VIRTUAL
 
-	DECLARE_MESSAGE_MAP()
+    // Implementation
+public:
+    bool m_over;
+    HCURSOR m_cursor;
+    afx_msg void OnClicked();
+    CFont m_underlineFont;
+    virtual ~Hyperlink();
+
+    // Generated message map functions
+protected:
+    //{{AFX_MSG(Hyperlink)
+    afx_msg HBRUSH CtlColor(CDC* pDC, UINT nCtlColor);
+    afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+    afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+    //}}AFX_MSG
+
+    DECLARE_MESSAGE_MAP()
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -2,7 +2,7 @@
 #define VBA_WIN32_IUPDATE_H
 
 class IUpdateListener {
- public:
-  virtual void update()=0;
+public:
+    virtual void update() = 0;
 };
 #endif

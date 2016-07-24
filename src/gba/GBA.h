@@ -3,7 +3,7 @@
 
 #include "../System.h"
 
-const u64 TICKS_PER_SECOND = 16777216;
+const uint64_t TICKS_PER_SECOND = 16777216;
 
 #define SAVE_GAME_VERSION_1 1
 #define SAVE_GAME_VERSION_2 2
@@ -15,46 +15,46 @@ const u64 TICKS_PER_SECOND = 16777216;
 #define SAVE_GAME_VERSION_8 8
 #define SAVE_GAME_VERSION_9 9
 #define SAVE_GAME_VERSION_10 10
-#define SAVE_GAME_VERSION  SAVE_GAME_VERSION_10
+#define SAVE_GAME_VERSION SAVE_GAME_VERSION_10
 
 typedef struct {
-  u8 *address;
-  u32 mask;
+    uint8_t* address;
+    uint32_t mask;
 #ifdef BKPT_SUPPORT
-  u8 *breakPoints;
-  u8 *searchMatch;
-  u8* trace;
-  u32 size;
+    uint8_t* breakPoints;
+    uint8_t* searchMatch;
+    uint8_t* trace;
+    uint32_t size;
 #endif
 } memoryMap;
 
 typedef union {
-  struct {
+    struct {
 #ifdef WORDS_BIGENDIAN
-    u8 B3;
-    u8 B2;
-    u8 B1;
-    u8 B0;
+        uint8_t B3;
+        uint8_t B2;
+        uint8_t B1;
+        uint8_t B0;
 #else
-    u8 B0;
-    u8 B1;
-    u8 B2;
-    u8 B3;
+        uint8_t B0;
+        uint8_t B1;
+        uint8_t B2;
+        uint8_t B3;
 #endif
-  } B;
-  struct {
+    } B;
+    struct {
 #ifdef WORDS_BIGENDIAN
-    u16 W1;
-    u16 W0;
+        uint16_t W1;
+        uint16_t W0;
 #else
-    u16 W0;
-    u16 W1;
+        uint16_t W0;
+        uint16_t W1;
 #endif
-  } W;
+    } W;
 #ifdef WORDS_BIGENDIAN
-  volatile u32 I;
+    volatile uint32_t I;
 #else
-	u32 I;
+    uint32_t I;
 #endif
 } reg_pair;
 
@@ -62,94 +62,94 @@ typedef union {
 extern memoryMap map[256];
 #endif
 
-extern u8 biosProtected[4];
+extern uint8_t biosProtected[4];
 
-extern void (*cpuSaveGameFunc)(u32,u8);
+extern void (*cpuSaveGameFunc)(uint32_t, uint8_t);
 
 #ifdef BKPT_SUPPORT
-extern u8 freezeWorkRAM[0x40000];
-extern u8 freezeInternalRAM[0x8000];
-extern u8 freezeVRAM[0x18000];
-extern u8 freezeOAM[0x400];
-extern u8 freezePRAM[0x400];
+extern uint8_t freezeWorkRAM[0x40000];
+extern uint8_t freezeInternalRAM[0x8000];
+extern uint8_t freezeVRAM[0x18000];
+extern uint8_t freezeOAM[0x400];
+extern uint8_t freezePRAM[0x400];
 extern bool debugger_last;
-extern int  oldreg[18];
+extern int oldreg[18];
 extern char oldbuffer[10];
 extern bool debugger;
 #endif
 
-extern bool CPUReadGSASnapshot(const char *);
-extern bool CPUReadGSASPSnapshot(const char *);
-extern bool CPUWriteGSASnapshot(const char *, const char *, const char *, const char *);
-extern bool CPUWriteBatteryFile(const char *);
-extern bool CPUReadBatteryFile(const char *);
-extern bool CPUExportEepromFile(const char *);
-extern bool CPUImportEepromFile(const char *);
-extern bool CPUWritePNGFile(const char *);
-extern bool CPUWriteBMPFile(const char *);
+extern bool CPUReadGSASnapshot(const char*);
+extern bool CPUReadGSASPSnapshot(const char*);
+extern bool CPUWriteGSASnapshot(const char*, const char*, const char*, const char*);
+extern bool CPUWriteBatteryFile(const char*);
+extern bool CPUReadBatteryFile(const char*);
+extern bool CPUExportEepromFile(const char*);
+extern bool CPUImportEepromFile(const char*);
+extern bool CPUWritePNGFile(const char*);
+extern bool CPUWriteBMPFile(const char*);
 extern void CPUCleanUp();
 extern void CPUUpdateRender();
 extern void CPUUpdateRenderBuffers(bool);
-extern bool CPUReadMemState(char *, int);
-extern bool CPUWriteMemState(char *, int);
+extern bool CPUReadMemState(char*, int);
+extern bool CPUWriteMemState(char*, int);
 #ifdef __LIBRETRO__
-extern bool CPUReadState(const u8*, unsigned);
-extern unsigned int CPUWriteState(u8 *data, unsigned int size);
+extern bool CPUReadState(const uint8_t*, unsigned);
+extern unsigned int CPUWriteState(uint8_t* data, unsigned int size);
 #else
-extern bool CPUReadState(const char *);
-extern bool CPUWriteState(const char *);
+extern bool CPUReadState(const char*);
+extern bool CPUWriteState(const char*);
 #endif
-extern int CPULoadRom(const char *);
-extern int CPULoadRomData(const char *data, int size);
+extern int CPULoadRom(const char*);
+extern int CPULoadRomData(const char* data, int size);
 extern void doMirroring(bool);
-extern void CPUUpdateRegister(u32, u16);
-extern void applyTimer ();
-extern void CPUInit(const char *,bool);
+extern void CPUUpdateRegister(uint32_t, uint16_t);
+extern void applyTimer();
+extern void CPUInit(const char*, bool);
 void SetSaveType(int st);
 extern void CPUReset();
 extern void CPULoop(int);
-extern void CPUCheckDMA(int,int);
-extern bool CPUIsGBAImage(const char *);
-extern bool CPUIsZipFile(const char *);
+extern void CPUCheckDMA(int, int);
+extern bool CPUIsGBAImage(const char*);
+extern bool CPUIsZipFile(const char*);
 #ifdef PROFILING
 #include "prof/prof.h"
-extern void cpuProfil(profile_segment *seg);
+extern void cpuProfil(profile_segment* seg);
 extern void cpuEnableProfiling(int hz);
 #endif
 
 const char* GetLoadDotCodeFile();
 const char* GetSaveDotCodeFile();
-void SetLoadDotCodeFile(const char *szFile);
-void SetSaveDotCodeFile(const char *szFile);
+void SetLoadDotCodeFile(const char* szFile);
+void SetSaveDotCodeFile(const char* szFile);
 
 extern struct EmulatedSystem GBASystem;
 
-#define R13_IRQ  18
-#define R14_IRQ  19
+#define R13_IRQ 18
+#define R14_IRQ 19
 #define SPSR_IRQ 20
-#define R13_USR  26
-#define R14_USR  27
-#define R13_SVC  28
-#define R14_SVC  29
+#define R13_USR 26
+#define R14_USR 27
+#define R13_SVC 28
+#define R14_SVC 29
 #define SPSR_SVC 30
-#define R13_ABT  31
-#define R14_ABT  32
+#define R13_ABT 31
+#define R14_ABT 32
 #define SPSR_ABT 33
-#define R13_UND  34
-#define R14_UND  35
+#define R13_UND 34
+#define R14_UND 35
 #define SPSR_UND 36
-#define R8_FIQ   37
-#define R9_FIQ   38
-#define R10_FIQ  39
-#define R11_FIQ  40
-#define R12_FIQ  41
-#define R13_FIQ  42
-#define R14_FIQ  43
+#define R8_FIQ 37
+#define R9_FIQ 38
+#define R10_FIQ 39
+#define R11_FIQ 40
+#define R12_FIQ 41
+#define R13_FIQ 42
+#define R14_FIQ 43
 #define SPSR_FIQ 44
 
 #include "Cheats.h"
-#include "Globals.h"
 #include "EEprom.h"
 #include "Flash.h"
+#include "Globals.h"
 
 #endif // GBA_H

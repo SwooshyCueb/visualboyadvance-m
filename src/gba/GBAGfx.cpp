@@ -1,16 +1,17 @@
 #include "../System.h"
 
 int coeff[32] = {
-  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-  16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16};
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+    16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
+};
 
-u32 line0[240];
-u32 line1[240];
-u32 line2[240];
-u32 line3[240];
-u32 lineOBJ[240];
-u32 lineOBJWin[240];
-u32 lineMix[240];
+uint32_t line0[240];
+uint32_t line1[240];
+uint32_t line2[240];
+uint32_t line3[240];
+uint32_t lineOBJ[240];
+uint32_t lineOBJWin[240];
+uint32_t lineMix[240];
 bool gfxInWin0[240];
 bool gfxInWin1[240];
 int lineOBJpixleft[128];
