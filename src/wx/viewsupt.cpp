@@ -1,6 +1,6 @@
-#include "viewsupt.h"
 #include "../common/ConfigManager.h"
 #include "wxvbam.h"
+#include "viewsupt.h"
 
 namespace Viewers {
 void Viewer::CloseDlg(wxCloseEvent& ev)

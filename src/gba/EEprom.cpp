@@ -1,3 +1,4 @@
+#include "../System.h"
 #include "EEprom.h"
 #include "../Util.h"
 #include "GBA.h"

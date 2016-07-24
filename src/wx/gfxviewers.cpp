@@ -2,10 +2,10 @@
 // these are all the viewer dialogs with graphical panel areas
 // they can be instantiated multiple times
 
-#include "viewsupt.h"
-#include "wxvbam.h"
 #include <wx/colordlg.h>
 #include <wx/ffile.h>
+#include "wxvbam.h"
+#include "viewsupt.h"
 
 // FIXME: many of these read e.g. palette data directly without regard to
 // byte order.  Need to determine where things are stored in emulated machine

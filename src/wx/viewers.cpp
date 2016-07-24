@@ -2,11 +2,11 @@
 // these are all the viewer dialogs except for the ones with graphical areas
 // they can be instantiated multiple times
 
-#include "../gba/armdis.h"
-#include "viewsupt.h"
-#include "wxvbam.h"
 #include <wx/ffile.h>
 #include <wx/vlbox.h>
+#include "wxvbam.h"
+#include "../gba/armdis.h"
+#include "viewsupt.h"
 
 // avoid exporting classes
 namespace Viewers {

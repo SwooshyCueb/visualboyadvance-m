@@ -92,6 +92,7 @@ bool speedhack = true;
 #define LOCAL_LINK_NAME "VBA link memory"
 #define IP_LINK_PORT 5738
 
+#include "../System.h"
 #include "../common/Port.h"
 #include "GBA.h"
 #include "GBALink.h"

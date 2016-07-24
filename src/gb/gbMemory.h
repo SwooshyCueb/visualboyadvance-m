@@ -1,6 +1,7 @@
 #ifndef GBMEMORY_H
 #define GBMEMORY_H
 
+#include <stdint.h>
 #include <time.h>
 
 struct mapperMBC1 {

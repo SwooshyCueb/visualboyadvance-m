@@ -1,6 +1,6 @@
+#include "GBA.h"
 #include "Sram.h"
 #include "Flash.h"
-#include "GBA.h"
 #include "Globals.h"
 
 u8 sramRead(u32 address)

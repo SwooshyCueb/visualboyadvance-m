@@ -7,9 +7,9 @@
 #include "../gba/RTC.h"
 #include "../gba/agbprint.h"
 #include "../sdl/text.h"
+#include "wxvbam.h"
 #include "drawing.h"
 #include "filters.h"
-#include "wxvbam.h"
 
 int emulating;
 

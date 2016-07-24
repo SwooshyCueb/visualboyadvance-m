@@ -81,6 +81,7 @@ Reduce the number of glTexImage2D calls in the OSD.
     Potential solution: Use a texture atlas (harder, preferred)
 Make the OSD prettier.
 Implement a (new) command line argument parser.
+Ensure upscalers work with images with alpha channels.
 
  *****************************************************************************
  * Configuration                                                             *
@@ -105,6 +106,7 @@ Write a README.md
  * Miscellaneous                                                             *
  *****************************************************************************
 Move all functions which should be inlined into header files.
+Submit includes fix PR to VBA-M upstream repo.
 
 
 ###############################################################################

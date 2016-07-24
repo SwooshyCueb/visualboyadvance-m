@@ -14,6 +14,8 @@ extern "C" {
 #include "../AutoBuild.h"
 #include "../version.h"
 
+#include "../System.h"
+
 #include "../common/Patch.h"
 #include "../common/ConfigManager.h"
 #include "../gba/GBA.h"

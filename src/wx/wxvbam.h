@@ -4,6 +4,7 @@
 #include <list>
 #include <stdexcept>
 #include <typeinfo>
+#include <wx/wx.h>
 #include <wx/propdlg.h>
 
 #include "wx/joyedit.h"
@@ -18,13 +19,13 @@
 /* yeah, they aren't needed globally, but I'm too lazy to limit where needed */
 #include "../System.h"
 #include "../Util.h"
+#include "../gba/Globals.h"
 #include "../gb/gb.h"
 #include "../gb/gbCheats.h"
 #include "../gb/gbGlobals.h"
 #include "../gb/gbSound.h"
 #include "../gba/Cheats.h"
 #include "../gba/GBALink.h"
-#include "../gba/Globals.h"
 #include "../gba/Sound.h"
 
 template <typename T>

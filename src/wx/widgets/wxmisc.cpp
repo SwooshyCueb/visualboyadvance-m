@@ -1,6 +1,6 @@
 // utility widgets
-#include "wx/wxmisc.h"
 #include <wx/wx.h>
+#include "wx/wxmisc.h"
 
 wxFarRadio::wxFarRadio()
     : wxCheckBox()

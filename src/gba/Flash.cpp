@@ -1,3 +1,4 @@
+#include "../System.h"
 #include "Flash.h"
 #include "../Util.h"
 #include "GBA.h"
