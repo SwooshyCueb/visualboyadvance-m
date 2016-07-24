@@ -68,17 +68,22 @@ GLogLevelFlags vbalog_enabled_levels = (GLogLevelFlags)(
 void wwrap(const gchar *string, uint width, gpointer printfunc) {
     uint stringpos = 0;
     int linepos = 0;
-    uint backtrackpos;
+    uint backtrackpos, twidth;
+    if (width) {
+        twidth = width;
+    } else {
+        twidth = 80;
+    }
 
     void (*print)(const gchar*, ...);
     print = (void (*)(const gchar*, ...))printfunc;
 
     while (stringpos < strlen(string)) {
         // Allocate our line string
-        gchar *line = (gchar *)g_malloc0(width * sizeof(gchar));
+        gchar *line = (gchar *)g_malloc0(twidth * sizeof(gchar));
 
         // Copy our string until the end of the line is reached
-        for (linepos = 0; linepos < (int)width-2; linepos++) {
+        for (linepos = 0; linepos < (int)twidth-2; linepos++) {
 
             // Check if we've hit the end of the string
             if (stringpos == strlen(string)) {
@@ -96,7 +101,7 @@ void wwrap(const gchar *string, uint width, gpointer printfunc) {
                  */
                 print("    %s", line);
                 g_free(line);
-                line = (gchar *)g_malloc0(width * sizeof(gchar));
+                line = (gchar *)g_malloc0(twidth * sizeof(gchar));
                 linepos = -1;
             }
             stringpos++;
