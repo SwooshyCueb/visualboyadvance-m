@@ -1,26 +1,14 @@
 #Do not use this file directly.  Always use the top level CMakeLists.txt file
 # This build is much easier if we just do it here.
 SET( CMAKE_CXX_FLAGS -std=gnu++11 )
-# not yet implemented
-option( ENABLE_CAIRO "Enable Cairo rendering for the wxWidgets port" OFF )
 if( WIN32 )
-  # not yet implemented
-  option( ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" OFF )
   option( ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ON )
 endif( WIN32 )
 option( ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" ON )
 
-if( NOT ENABLE_CAIRO )
-    ADD_DEFINITIONS (-DNO_CAIRO)
-endif( NOT ENABLE_CAIRO )
-
 if( NOT ENABLE_XAUDIO2 )
     ADD_DEFINITIONS (-DNO_XAUDIO2)
 endif( NOT ENABLE_XAUDIO2 )
-
-if(NOT ENABLE_DIRECT3D)
-   ADD_DEFINITIONS(-DNO_D3D)
-endif(NOT ENABLE_DIRECT3D)
 
 if(ENABLE_OPENAL)
     FIND_PACKAGE(OpenAL REQUIRED)
@@ -49,22 +37,6 @@ if(ENABLE_NLS AND (NOT XGETTEXT OR NOT MSGINIT))
 endif(ENABLE_NLS AND (NOT XGETTEXT OR NOT MSGINIT))
 
 FIND_PACKAGE ( PkgConfig REQUIRED )
-
-IF(ENABLE_CAIRO)
-    PKG_CHECK_MODULES(CAIRO REQUIRED cairo)
-    include_directories(${CAIRO_INCLUDE_DIRS})
-    IF(WIN32)
-       # need gdiplus to extract hdc for cairo context
-       SET(CAIRO_LIBRARIES ${CAIRO_LIBRARIES} -lgdiplus)
-    ENDIF(WIN32)
-    # SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${CAIRO_CFLAGS})
-ELSE(ENABLE_CAIRO)
-    ADD_DEFINITIONS (-DNO_CAIRO)
-    SET(CAIRO_LIBRARIES )
-ENDIF(ENABLE_CAIRO)
-IF(WIN32 AND ENABLE_DIRECTX)
-    FIND_PACKGE ( DirectX REQUIRED )
-ENDIF(WIN32 AND ENABLE_DIRECTX)
 
 FIND_PACKAGE(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
@@ -340,13 +312,13 @@ ENDIF(ENABLE_XAUDIO2)
 
 IF( WIN32 )
     SET( SRC_WX ${SRC_WX} wxvbam.rc dsound.cpp )
-    SET(DIRECTX_LIBRARIES -ldxguid -ldsound -lws2_32)
+    SET(DSOUND_LIBRARIES -ldxguid -ldsound -lws2_32)
     # not strictly directx, but win32-related
     IF(ENABLE_DEBUGGER)
-        SET(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} -lwsock32)
+        SET(DSOUND_LIBRARIES ${DSOUND_LIBRARIES} -lwsock32)
     ENDIF(ENABLE_DEBUGGER)
 ELSE( WIN32 )
-    SET(DIRECTX_LIBRARIES )
+    SET(DSOUND_LIBRARIES )
 ENDIF( WIN32 )
 
 link_directories( ${CMAKE_BINARY_DIR} )
@@ -370,8 +342,7 @@ TARGET_LINK_LIBRARIES (
     ${VBAMCORE_LIBS}
     ${wxWidgets_LIBRARIES}
     ${FFMPEG_LIBRARIES}
-    ${DIRECTX_LIBRARIES}
-    ${CAIRO_LIBRARIES}
+    ${DSOUND_LIBRARIES}
     ${FREETYPE_LIBRARIES}
     ${GLIB_LIBRARIES}
 )

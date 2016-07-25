@@ -101,6 +101,7 @@ Improve the quality of the SuperEagle shader (most problems are on the edges of
 Rename git branch to new fork name.
 Move to non-fork repo on GitHub once project has diverged enough from VBA-M.
 Write a README.md
+Restructure folder tree.
 
  *****************************************************************************
  * Miscellaneous                                                             *

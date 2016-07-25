@@ -3300,14 +3300,6 @@ bool MainFrame::BindControls()
 #ifdef NO_OGL
             rb->Hide();
 #endif
-            getrbi("OutputCairo", gopts.render_method, RND_CAIRO);
-#ifdef NO_CAIRO
-            rb->Hide();
-#endif
-            getrbi("OutputDirect3D", gopts.render_method, RND_DIRECT3D);
-#if !defined(__WXMSW__) || defined(NO_D3D) || 1 // not implemented
-            rb->Hide();
-#endif
             ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "Filter", wxGenericValidator(&gopts.filter));
             // these two are filled and/or hidden at dialog load time
             wxControl* pll;
